@@ -178,7 +178,7 @@ func ExtractMaxScale(m *Mat4) float32 {
 
 // Calculates the Normal of the Matrix (aka the inverse transpose)
 func Mat4Normal(m *Mat4) *Mat3 {
-	n := m.Inv().TransposeSelf()
+	n := m.InvSelf().TransposeSelf()
 	return &Mat3{n[0], n[1], n[2], n[4], n[5], n[6], n[8], n[9], n[10]}
 }
 

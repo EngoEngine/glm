@@ -182,6 +182,169 @@ func TestString(t *testing.T) {
 	}
 }
 
+func TestMat2Conv(t *testing.T) {
+	m2 := Mat2{1, 0, 0, 1}
+	m2tom3 := m2.Mat3()
+	if *m2tom3 != *Ident3() {
+		t.Errorf("did not get iden from casting Mat2 to Mat3")
+	}
+	m2tom4 := m2.Mat4()
+	if *m2tom4 != *Ident4() {
+		t.Errorf("did not get iden from casting Mat2 to Mat3")
+	}
+}
+
+func TestMat3Conv(t *testing.T) {
+	m3 := Mat3{1, 0, 0, 0, 1, 0, 0, 0, 1}
+	m3tom2 := m3.Mat2()
+	if *m3tom2 != *Ident2() {
+		t.Errorf("did not get iden from casting Mat3 to Mat2")
+	}
+	m3tom4 := m3.Mat4()
+	if *m3tom4 != *Ident4() {
+		t.Errorf("did not get iden from casting Mat3 to Mat4")
+	}
+}
+
+func TestMat4Conv(t *testing.T) {
+	m4 := Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+	m4tom2 := m4.Mat2()
+	if *m4tom2 != *Ident2() {
+		t.Errorf("did not get iden from casting Mat4 to Mat2")
+	}
+	m4tom3 := m4.Mat3()
+	if *m4tom3 != *Ident3() {
+		t.Errorf("did not get iden from casting Mat4 to Mat3")
+	}
+}
+func TestMat2SetCol(t *testing.T) {
+	m2 := Ident2()
+	m2.SetCol(0, &Vec2{2, 2})
+	expected := Mat2{2, 2, 0, 1}
+	if *m2 != expected {
+		t.Errorf("unexpected result matrix from Mat2.SetCol, %+v, %+v", m2.String(), expected.String())
+	}
+}
+
+func TestMat3SetCol(t *testing.T) {
+	m3 := Ident3()
+	m3.SetCol(0, &Vec3{2, 2, 2})
+	expected := Mat3{2, 2, 2, 0, 1, 0, 0, 0, 1}
+	if *m3 != expected {
+		t.Errorf("unexpected result matrix from Mat3.SetCol, %+v, %+v", m3.String(), expected.String())
+	}
+}
+
+func TestMat4SetCol(t *testing.T) {
+	m4 := Ident4()
+	m4.SetCol(0, &Vec4{2, 2, 2, 2})
+	expected := Mat4{2, 2, 2, 2, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+	if *m4 != expected {
+		t.Errorf("unexpected result matrix from Mat4.SetCol, %s, %+v", m4.String(), expected.String())
+	}
+}
+
+func TestMat2SetRow(t *testing.T) {
+	m2 := Ident2()
+	m2.SetRow(0, &Vec2{2, 2})
+	expected := Mat2{2, 0, 2, 1}
+	if *m2 != expected {
+		t.Errorf("unexpected result matrix from Mat2.SetCol, %+v, %+v", m2.String(), expected.String())
+	}
+}
+
+func TestMat3SetRow(t *testing.T) {
+	m3 := Ident3()
+	m3.SetRow(0, &Vec3{2, 2, 2})
+	expected := Mat3{2, 0, 0, 2, 1, 0, 2, 0, 1}
+	if *m3 != expected {
+		t.Errorf("unexpected result matrix from Mat3.SetCol, %+v, %+v", m3.String(), expected.String())
+	}
+}
+
+func TestMat4SetRow(t *testing.T) {
+	m4 := Ident4()
+	m4.SetRow(0, &Vec4{2, 2, 2, 2})
+	expected := Mat4{2, 0, 0, 0, 2, 1, 0, 0, 2, 0, 1, 0, 2, 0, 0, 1}
+	if *m4 != expected {
+		t.Errorf("unexpected result matrix from Mat4.SetCol, %s, %+v", m4.String(), expected.String())
+	}
+}
+func TestMat2Diag2(t *testing.T) {
+	m := Ident2()
+	diag := m.Diag()
+	expected := Vec2{1, 1}
+	if *diag != expected {
+		t.Errorf("Unexpected diagonal %+v,%+v", *diag, expected)
+	}
+}
+func TestMat3Diag3(t *testing.T) {
+	m := Ident3()
+	diag := m.Diag()
+	expected := Vec3{1, 1, 1}
+	if *diag != expected {
+		t.Errorf("Unexpected diagonal %+v,%+v", *diag, expected)
+	}
+}
+func TestMat4Diag4(t *testing.T) {
+	m := Ident4()
+	diag := m.Diag()
+	expected := Vec4{1, 1, 1, 1}
+	if *diag != expected {
+		t.Errorf("Unexpected diagonal %+v,%+v", *diag, expected)
+	}
+}
+func TestMat2Ident(t *testing.T) {
+	expected := Mat2{1, 0, 0, 1}
+	iden := Ident2()
+	if expected != *iden {
+		t.Errorf("Unexpected identity Mat2 %+v, %+v", *iden, expected)
+	}
+}
+func TestMat3Ident(t *testing.T) {
+	expected := Mat3{1, 0, 0, 0, 1, 0, 0, 0, 1}
+	iden := Ident3()
+	if expected != *iden {
+		t.Errorf("Unexpected identity Mat3 %+v, %+v", *iden, expected)
+	}
+}
+func TestMat4Ident(t *testing.T) {
+	expected := Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+	iden := Ident4()
+	if expected != *iden {
+		t.Errorf("Unexpected identity Mat4 %+v, %+v", *iden, expected)
+	}
+}
+
+func TestDiag2(t *testing.T) {
+	vec := &Vec2{1, 1}
+	m := Diag2(vec)
+	if *Ident2() != *m {
+		t.Errorf("Unexpected Mat2 from Diag2 %+v", m)
+	}
+}
+func TestDiag3(t *testing.T) {
+	vec := &Vec3{1, 1, 1}
+	m := Diag3(vec)
+	if *Ident3() != *m {
+		t.Errorf("Unexpected Mat3 from Diag3 %+v", m)
+	}
+}
+func TestDiag4(t *testing.T) {
+	vec := &Vec4{1, 1, 1, 1}
+	m := Diag4(vec)
+	if *Ident4() != *m {
+		t.Errorf("Unexpected Mat4 from Diag4 %+v", m)
+	}
+}
+
+func TestMat2FromRow(t *testing.T) {
+	m := Mat2FromRows(&Vec2{1, 0}, &Vec2{0, 1})
+	if *m != *Ident2() {
+		t.Errorf("Unexpected result from Mat2FromRow %+v", *m)
+	}
+}
+
 func BenchmarkMatAdd(b *testing.B) {
 	b.StopTimer()
 	rand := rand.New(rand.NewSource(int64(time.Now().Nanosecond())))
@@ -270,7 +433,7 @@ func BenchmarkMatDet(b *testing.B) {
 	}
 }
 
-func BenchmarkMatInv(b *testing.B) {
+func BenchmarkMatInvSelf(b *testing.B) {
 	b.StopTimer()
 	rand := rand.New(rand.NewSource(int64(time.Now().Nanosecond())))
 
@@ -284,5 +447,21 @@ func BenchmarkMatInv(b *testing.B) {
 		b.StartTimer()
 
 		m1.InvSelf()
+	}
+}
+
+func BenchmarkMatInvNew(b *testing.B) {
+	b.StopTimer()
+	rand := rand.New(rand.NewSource(int64(time.Now().Nanosecond())))
+
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		m1 := &Mat4{}
+
+		for j := 0; j < len(m1); j++ {
+			m1[j] = rand.Float32()
+		}
+		b.StartTimer()
+		m1.Inv()
 	}
 }

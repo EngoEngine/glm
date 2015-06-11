@@ -127,16 +127,64 @@ func (m1 *Mat2) Add(m2 *Mat2) *Mat2 {
 	return &Mat2{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3]}
 }
 
+func (m1 *Mat2) SumOf(m2, m3 *Mat2) *Mat2 {
+	m1[0] = m2[0] + m3[0]
+	m1[1] = m2[1] + m3[1]
+	m1[2] = m2[2] + m3[2]
+	m1[3] = m2[3] + m3[3]
+	return m1
+}
+
+func (m1 *Mat2) SumWith(m2 *Mat2) *Mat2 {
+	m1[0] += m2[0]
+	m1[1] += m2[1]
+	m1[2] += m2[2]
+	m1[3] += m2[3]
+	return m1
+}
+
 // Sub performs an element-wise subtraction of two matrices, this is
 // equivalent to iterating over every element of m1 and subtracting the corresponding value of m2.
 func (m1 *Mat2) Sub(m2 *Mat2) *Mat2 {
 	return &Mat2{m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3]}
 }
 
+func (m1 *Mat2) SubOf(m2, m3 *Mat2) *Mat2 {
+	m1[0] = m2[0] - m3[0]
+	m1[1] = m2[1] - m3[1]
+	m1[2] = m2[2] - m3[2]
+	m1[3] = m2[3] - m3[3]
+	return m1
+}
+
+func (m1 *Mat2) SubWith(m2 *Mat2) *Mat2 {
+	m1[0] -= m2[0]
+	m1[1] -= m2[1]
+	m1[2] -= m2[2]
+	m1[3] -= m2[3]
+	return m1
+}
+
 // Mul performs a scalar multiplcation of the matrix. This is equivalent to iterating
 // over every element of the matrix and multiply it by c.
 func (m1 *Mat2) Mul(c float32) *Mat2 {
 	return &Mat2{m1[0] * c, m1[1] * c, m1[2] * c, m1[3] * c}
+}
+
+func (m1 *Mat2) MulOf(m2 *Mat2, c float32) *Mat2 {
+	m1[0] = m2[0] * c
+	m1[1] = m2[1] * c
+	m1[2] = m2[2] * c
+	m1[3] = m2[3] * c
+	return m1
+}
+
+func (m1 *Mat2) MulWith(c float32) *Mat2 {
+	m1[0] *= c
+	m1[1] *= c
+	m1[2] *= c
+	m1[3] *= c
+	return m1
 }
 
 // Mul2x1 performs a "matrix product" between this matrix
@@ -163,6 +211,26 @@ func (m1 *Mat2) Mul2(m2 *Mat2) *Mat2 {
 	}
 }
 
+func (m1 *Mat2) Mul2Of(m2, m3 *Mat2) *Mat2 {
+	m1[0] = m2[0]*m3[0] + m2[2]*m3[1]
+	m1[1] = m2[1]*m3[0] + m2[3]*m3[1]
+	m1[2] = m2[0]*m3[2] + m2[2]*m3[3]
+	m1[3] = m2[1]*m3[2] + m2[3]*m3[3]
+	return m1
+}
+
+func (m1 *Mat2) Mul2With(m2 *Mat2) *Mat2 {
+	v0 := m1[0]
+	v1 := m1[1]
+	v2 := m1[2]
+	v3 := m1[3]
+	m1[0] = v0*m2[0] + v2*m2[1]
+	m1[1] = v1*m2[0] + v3*m2[1]
+	m1[2] = v0*m2[2] + v2*m2[3]
+	m1[3] = v1*m2[2] + v3*m2[3]
+	return m1
+}
+
 // Transpose produces the transpose of this matrix. For any MxN matrix
 // the transpose is an NxM matrix with the rows swapped with the columns. For instance
 // the transpose of the Mat3x2 is a Mat2x3 like so:
@@ -174,14 +242,31 @@ func (m1 *Mat2) Transpose() *Mat2 {
 	return &Mat2{m1[0], m1[2], m1[1], m1[3]}
 }
 
+// TransposeSelf transpose this matrix with itself as destination. For any MxN matrix
+// the transpose is an NxM matrix with the rows swapped with the columns. For instance
+// the transpose of the Mat3x2 is a Mat2x3 like so:
+//
+//    [[a b]]    [[a c e]]
+//    [[c d]] =  [[b d f]]
+//    [[e f]]
+func (m *Mat2) TransposeSelf() *Mat2 {
+	m1 := m[1]
+	m[1] = m[2]
+	m[2] = m1
+	return m
+}
+
+func (m *Mat2) TransposeFrom(m2 *Mat2) *Mat2 {
+	m[0], m[1], m[2], m[3] = m2[0], m2[2], m2[1], m2[3]
+	return m
+}
+
 // The determinant of a matrix is a measure of a square matrix's
 // singularity and invertability, among other things. In this library, the
 // determinant is hard coded based on pre-computed cofactor expansion, and uses
 // no loops. Of course, the addition and multiplication must still be done.
 func (m *Mat2) Det() float32 {
-
 	return m[0]*m[2] - m[1]*m[3]
-
 }
 
 // Inv computes the inverse of a square matrix. An inverse is a square matrix such that when multiplied by the
@@ -204,7 +289,7 @@ func (m *Mat2) Inv() *Mat2 {
 
 	retMat := Mat2{m[3], -m[1], -m[2], m[0]}
 
-	return retMat.Mul(1 / det)
+	return retMat.MulWith(1 / det)
 }
 
 // ApproxEqual performs an element-wise approximate equality test between two matrices,
@@ -266,7 +351,7 @@ func (m *Mat2) Set(row, col int, value float32) {
 // This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
 // (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
 // a panic if you try to access the array with it if it's truly out of bounds.
-func (m *Mat2) Index(row, col int) int {
+func (Mat2) Index(row, col int) int {
 	return col*2 + row
 }
 
@@ -305,6 +390,26 @@ func (m *Mat2) Trace() float32 {
 // Abs returns the element-wise absolute value of this matrix
 func (m *Mat2) Abs() *Mat2 {
 	return &Mat2{Abs(m[0]), Abs(m[1]), Abs(m[2]), Abs(m[3])}
+}
+
+// Abs return the element-wise absolute value of this matrix in this matrix
+func (m *Mat2) AbsSelf() *Mat2 {
+	m[0], m[1], m[2], m[3] = Abs(m[0]), Abs(m[1]), Abs(m[2]), Abs(m[3])
+	return m
+}
+
+// Abs returns the element-wise absolute value of this matrix from the other matrix
+func (m *Mat2) AbsFrom(m2 *Mat2) *Mat2 {
+	m[0], m[1], m[2], m[3] = Abs(m2[0]), Abs(m2[1]), Abs(m2[2]), Abs(m2[3])
+	return m
+}
+
+func (m *Mat2) Iden() *Mat2 {
+	m[0] = 1
+	m[1] = 0
+	m[2] = 0
+	m[3] = 1
+	return m
 }
 
 // Pretty prints the matrix
@@ -351,7 +456,7 @@ func Ident3() *Mat3 {
 // That is, for each pointer for row==col, vector[row] is the entry. Otherwise it's 0.
 //
 // Another way to think about it is that the identity is this function where the every vector element is 1.
-func Diag3(v Vec3) *Mat3 {
+func Diag3(v *Vec3) *Mat3 {
 	m := Mat3{}
 	m[0], m[4], m[8] = v[0], v[1], v[2]
 	return &m
@@ -376,16 +481,94 @@ func (m1 *Mat3) Add(m2 *Mat3) *Mat3 {
 	return &Mat3{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3], m1[4] + m2[4], m1[5] + m2[5], m1[6] + m2[6], m1[7] + m2[7], m1[8] + m2[8]}
 }
 
+func (m1 *Mat3) SumOf(m2, m3 *Mat3) *Mat3 {
+	m1[0] = m2[0] + m3[0]
+	m1[1] = m2[1] + m3[1]
+	m1[2] = m2[2] + m3[2]
+	m1[3] = m2[3] + m3[3]
+	m1[4] = m2[4] + m3[4]
+	m1[5] = m2[5] + m3[5]
+	m1[6] = m2[6] + m3[6]
+	m1[7] = m2[7] + m3[7]
+	m1[8] = m2[8] + m3[8]
+	return m1
+}
+
+func (m1 *Mat3) SumWith(m2 *Mat3) *Mat3 {
+	m1[0] += m2[0]
+	m1[1] += m2[1]
+	m1[2] += m2[2]
+	m1[3] += m2[3]
+	m1[4] += m2[4]
+	m1[5] += m2[5]
+	m1[6] += m2[6]
+	m1[7] += m2[7]
+	m1[8] += m2[8]
+	return m1
+}
+
 // Sub performs an element-wise subtraction of two matrices, this is
 // equivalent to iterating over every element of m1 and subtracting the corresponding value of m2.
 func (m1 *Mat3) Sub(m2 *Mat3) *Mat3 {
 	return &Mat3{m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3], m1[4] - m2[4], m1[5] - m2[5], m1[6] - m2[6], m1[7] - m2[7], m1[8] - m2[8]}
 }
 
+func (m1 *Mat3) SubOf(m2, m3 *Mat3) *Mat3 {
+	m1[0] = m2[0] - m3[0]
+	m1[1] = m2[1] - m3[1]
+	m1[2] = m2[2] - m3[2]
+	m1[3] = m2[3] - m3[3]
+	m1[4] = m2[4] - m3[4]
+	m1[5] = m2[5] - m3[5]
+	m1[6] = m2[6] - m3[6]
+	m1[7] = m2[7] - m3[7]
+	m1[8] = m2[8] - m3[8]
+	return m1
+}
+
+func (m1 *Mat3) SubWith(m2 *Mat3) *Mat3 {
+	m1[0] -= m2[0]
+	m1[1] -= m2[1]
+	m1[2] -= m2[2]
+	m1[3] -= m2[3]
+	m1[4] -= m2[4]
+	m1[5] -= m2[5]
+	m1[6] -= m2[6]
+	m1[7] -= m2[7]
+	m1[8] -= m2[8]
+	return m1
+}
+
 // Mul performs a scalar multiplcation of the matrix. This is equivalent to iterating
 // over every element of the matrix and multiply it by c.
 func (m1 *Mat3) Mul(c float32) *Mat3 {
 	return &Mat3{m1[0] * c, m1[1] * c, m1[2] * c, m1[3] * c, m1[4] * c, m1[5] * c, m1[6] * c, m1[7] * c, m1[8] * c}
+}
+
+func (m1 *Mat3) MulOf(m2 *Mat3, c float32) *Mat3 {
+	m1[0] = m2[0] * c
+	m1[1] = m2[1] * c
+	m1[2] = m2[2] * c
+	m1[3] = m2[3] * c
+	m1[4] = m2[4] * c
+	m1[5] = m2[5] * c
+	m1[6] = m2[6] * c
+	m1[7] = m2[7] * c
+	m1[8] = m2[8] * c
+	return m1
+}
+
+func (m1 *Mat3) MulWith(c float32) *Mat3 {
+	m1[0] *= c
+	m1[1] *= c
+	m1[2] *= c
+	m1[3] *= c
+	m1[4] *= c
+	m1[5] *= c
+	m1[6] *= c
+	m1[7] *= c
+	m1[8] *= c
+	return m1
 }
 
 // Mul3x1 performs a "matrix product" between this matrix
@@ -418,6 +601,43 @@ func (m1 *Mat3) Mul3(m2 *Mat3) *Mat3 {
 	}
 }
 
+func (m1 *Mat3) Mul3Of(m2, m3 *Mat3) *Mat3 {
+	m1[0] = m2[0]*m3[0] + m2[3]*m3[1] + m2[6]*m3[2]
+	m1[1] = m2[1]*m3[0] + m2[4]*m3[1] + m2[7]*m3[2]
+	m1[2] = m2[2]*m3[0] + m2[5]*m3[1] + m2[8]*m3[2]
+	m1[3] = m2[0]*m3[3] + m2[3]*m3[4] + m2[6]*m3[5]
+	m1[4] = m2[1]*m3[3] + m2[4]*m3[4] + m2[7]*m3[5]
+	m1[5] = m2[2]*m3[3] + m2[5]*m3[4] + m2[8]*m3[5]
+	m1[6] = m2[0]*m3[6] + m2[3]*m3[7] + m2[6]*m3[8]
+	m1[7] = m2[1]*m3[6] + m2[4]*m3[7] + m2[7]*m3[8]
+	m1[8] = m2[2]*m3[6] + m2[5]*m3[7] + m2[8]*m3[8]
+	return m1
+}
+
+func (m1 *Mat3) Mul3With(m2 *Mat3) *Mat3 {
+	v0 := m1[0]
+	v1 := m1[1]
+	v2 := m1[2]
+	v3 := m1[3]
+	v4 := m1[4]
+	v5 := m1[5]
+	v6 := m1[6]
+	v7 := m1[7]
+	v8 := m1[8]
+	m1[0] = v0*m2[0] + v3*m2[1] + v6*m2[2]
+	m1[1] = v1*m2[0] + v4*m2[1] + v7*m2[2]
+	m1[2] = v2*m2[0] + v5*m2[1] + v8*m2[2]
+	m1[3] = v0*m2[3] + v3*m2[4] + v6*m2[5]
+	m1[4] = v1*m2[3] + v4*m2[4] + v7*m2[5]
+	m1[5] = v2*m2[3] + v5*m2[4] + v8*m2[5]
+	m1[6] = v0*m2[6] + v3*m2[7] + v6*m2[8]
+	m1[7] = v1*m2[6] + v4*m2[7] + v7*m2[8]
+	m1[8] = v2*m2[6] + v5*m2[7] + v8*m2[8]
+	return m1
+}
+
+//func (m1 *Mat3) Mul3Of() *Mat3{}
+
 // Transpose produces the transpose of this matrix. For any MxN matrix
 // the transpose is an NxM matrix with the rows swapped with the columns. For instance
 // the transpose of the Mat3x2 is a Mat2x3 like so:
@@ -427,6 +647,19 @@ func (m1 *Mat3) Mul3(m2 *Mat3) *Mat3 {
 //    [[e f]]
 func (m1 *Mat3) Transpose() *Mat3 {
 	return &Mat3{m1[0], m1[3], m1[6], m1[1], m1[4], m1[7], m1[2], m1[5], m1[8]}
+}
+
+func (m1 *Mat3) TransposeSelf() *Mat3 {
+	v1 := m1[1]
+	v2 := m1[2]
+	v5 := m1[5]
+	m1[1] = m1[3]
+	m1[2] = m1[6]
+	m1[3] = v1
+	m1[5] = m1[7]
+	m1[6] = v2
+	m1[7] = v5
+	return m1
 }
 
 // The determinant of a matrix is a measure of a square matrix's
@@ -468,6 +701,34 @@ func (m *Mat3) Inv() *Mat3 {
 	}
 
 	return retMat.Mul(1 / det)
+}
+
+func (m *Mat3) InvSelf() *Mat3 {
+	det := m.Det()
+	if FloatEqual(det, float32(0.0)) {
+		return &Mat3{}
+	}
+
+	v0 := m[0]
+	v1 := m[1]
+	v2 := m[2]
+	v3 := m[3]
+	v4 := m[4]
+	v5 := m[5]
+	v6 := m[6]
+	v7 := m[7]
+	v8 := m[8]
+	m[0] = v4*v8 - v5*v7
+	m[1] = v2*v7 - v1*v8
+	m[2] = v1*v5 - v2*v4
+	m[3] = v5*v6 - v3*v8
+	m[4] = v0*v8 - v2*v6
+	m[5] = v2*v3 - v0*v5
+	m[6] = v3*v7 - v4*v6
+	m[7] = v1*v6 - v0*v7
+	m[8] = v0*v4 - v1*v3
+
+	return m.MulWith(1 / det)
 }
 
 // ApproxEqual performs an element-wise approximate equality test between two matrices,
@@ -529,7 +790,7 @@ func (m *Mat3) Set(row, col int, value float32) {
 // This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
 // (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
 // a panic if you try to access the array with it if it's truly out of bounds.
-func (m *Mat3) Index(row, col int) int {
+func (Mat3) Index(row, col int) int {
 	return col*3 + row
 }
 
@@ -568,6 +829,32 @@ func (m *Mat3) Trace() float32 {
 // Abs returns the element-wise absolute value of this matrix
 func (m *Mat3) Abs() *Mat3 {
 	return &Mat3{Abs(m[0]), Abs(m[1]), Abs(m[2]), Abs(m[3]), Abs(m[4]), Abs(m[5]), Abs(m[6]), Abs(m[7]), Abs(m[8])}
+}
+
+func (m *Mat3) AbsSelf() *Mat3 {
+	m[0] = Abs(m[0])
+	m[1] = Abs(m[1])
+	m[2] = Abs(m[2])
+	m[3] = Abs(m[3])
+	m[4] = Abs(m[4])
+	m[5] = Abs(m[5])
+	m[6] = Abs(m[6])
+	m[7] = Abs(m[7])
+	m[8] = Abs(m[8])
+	return m
+}
+
+func (m *Mat3) Iden() *Mat3 {
+	m[0] = 1
+	m[1] = 0
+	m[2] = 0
+	m[3] = 0
+	m[4] = 1
+	m[5] = 0
+	m[6] = 0
+	m[7] = 0
+	m[8] = 1
+	return m
 }
 
 // Pretty prints the matrix
@@ -946,57 +1233,75 @@ func (m *Mat4) Inv() *Mat4 {
 		return &Mat4{}
 	}
 
-	v7v10 := m[7] * m[10]
-	v6v11 := m[6] * m[11]
-	v7v9 := m[7] * m[9]
-	v5v11 := m[5] * m[11]
-	v6v9 := m[6] * m[9]
-	v5v10 := m[5] * m[10]
-	v1v4 := m[1] * m[4]
-	v4v9 := m[4] * m[9]
-	v6v8 := m[6] * m[8]
-	v5v8 := m[5] * m[8]
-	v7v8 := m[7] * m[8]
-	v1v12 := m[1] * m[12]
-	v2v12 := m[2] * m[12]
-	v2v13 := m[2] * m[13]
-	v2v15 := m[2] * m[15]
-	v3v12 := m[3] * m[12]
-	v3v13 := m[3] * m[13]
-	v3v14 := m[3] * m[14]
-	v4v10 := m[4] * m[10]
-	v4v11 := m[4] * m[11]
-	v10v15 := m[10] * m[15]
-	v7v14 := m[7] * m[14]
-	v6v15 := m[6] * m[15]
-	v0v11 := m[0] * m[11]
-	v1v8 := m[1] * m[8]
-	v0v9 := m[0] * m[9]
-	v0v5 := m[0] * m[5]
-	v0v13 := m[0] * m[13]
-	//6,15
-	//7,14
+	//make a copy to not override original while reading
+	v0 := m[0]
+	v1 := m[1]
+	v2 := m[2]
+	v3 := m[3]
+	v4 := m[4]
+	v5 := m[5]
+	v6 := m[6]
+	v7 := m[7]
+	v8 := m[8]
+	v9 := m[9]
+	v10 := m[10]
+	v11 := m[11]
+	v12 := m[12]
+	v13 := m[13]
+	v14 := m[14]
+	v15 := m[15]
+
+	//precalculate the most common products
+	v7v10 := v7 * v10
+	v6v11 := v6 * v11
+	v7v9 := v7 * v9
+	v5v11 := v5 * v11
+	v6v9 := v6 * v9
+	v5v10 := v5 * v10
+	v1v4 := v1 * v4
+	v4v9 := v4 * v9
+	v6v8 := v6 * v8
+	v5v8 := v5 * v8
+	v7v8 := v7 * v8
+	v1v12 := v1 * v12
+	v2v12 := v2 * v12
+	v2v13 := v2 * v13
+	v2v15 := v2 * v15
+	v3v12 := v3 * v12
+	v3v13 := v3 * v13
+	v3v14 := v3 * v14
+	v4v10 := v4 * v10
+	v4v11 := v4 * v11
+	v10v15 := v10 * v15
+	v7v14 := v7 * v14
+	v6v15 := v6 * v15
+	v0v11 := v0 * v11
+	v1v8 := v1 * v8
+	v0v9 := v0 * v9
+	v0v5 := v0 * v5
+	v0v13 := v0 * v13
+
 	retMat := Mat4{
-		-v7v10*m[13] + v6v11*m[13] + v7v9*m[14] - v5v11*m[14] - v6v9*m[15] + v5v10*m[15],
-		v3v13*m[10] - v2v13*m[11] - v3v14*m[9] + m[1]*m[11]*m[14] + v2v15*m[9] - m[1]*v10v15,
-		-v3v13*m[6] + v2v13*m[7] + v3v14*m[5] - m[1]*v7v14 - v2v15*m[5] + m[1]*v6v15,
-		m[3]*v6v9 - m[2]*v7v9 - m[3]*v5v10 + m[1]*v7v10 + m[2]*v5v11 - m[1]*v6v11,
-		v7v10*m[12] - v6v11*m[12] - v7v8*m[14] + v4v11*m[14] + v6v8*m[15] - v4v10*m[15],
-		-v3v12*m[10] + v2v12*m[11] + v3v14*m[8] - v0v11*m[14] - v2v15*m[8] + m[0]*v10v15,
-		v3v12*m[6] - v2v12*m[7] - v3v14*m[4] + m[0]*v7v14 + v2v15*m[4] - m[0]*v6v15,
-		-m[3]*v6v8 + m[2]*v7v8 + m[3]*v4v10 - m[0]*v7v10 - m[2]*v4v11 + m[0]*v6v11,
-		-v7v9*m[12] + v5v11*m[12] + v7v8*m[13] - v4v11*m[13] - v5v8*m[15] + v4v9*m[15],
-		v3v12*m[9] - v1v12*m[11] - v3v13*m[8] + v0v11*m[13] + v1v8*m[15] - v0v9*m[15],
-		-v3v12*m[5] + v1v12*m[7] + v3v13*m[4] - v0v13*m[7] - v1v4*m[15] + v0v5*m[15],
-		m[3]*v5v8 - m[1]*v7v8 - m[3]*v4v9 + m[0]*v7v9 + v1v4*m[11] - m[0]*v5v11,
-		v6v9*m[12] - v5v10*m[12] - v6v8*m[13] + v4v10*m[13] + v5v8*m[14] - v4v9*m[14],
-		-v2v12*m[9] + v1v12*m[10] + v2v13*m[8] - v0v13*m[10] - v1v8*m[14] + v0v9*m[14],
-		v2v12*m[5] - v1v12*m[6] - v2v13*m[4] + v0v13*m[6] + v1v4*m[14] - v0v5*m[14],
-		-m[2]*v5v8 + m[1]*v6v8 + m[2]*v4v9 - m[0]*v6v9 - v1v4*m[10] + m[0]*v5v10,
+		-v7v10*v13 + v6v11*v13 + v7v9*v14 - v5v11*v14 - v6v9*v15 + v5v10*v15,
+		v3v13*v10 - v2v13*v11 - v3v14*v9 + v1*v11*v14 + v2v15*v9 - v1*v10v15,
+		-v3v13*v6 + v2v13*v7 + v3v14*v5 - v1*v7v14 - v2v15*v5 + v1*v6v15,
+		v3*v6v9 - v2*v7v9 - v3*v5v10 + v1*v7v10 + v2*v5v11 - v1*v6v11,
+		v7v10*v12 - v6v11*v12 - v7v8*v14 + v4v11*v14 + v6v8*v15 - v4v10*v15,
+		-v3v12*v10 + v2v12*v11 + v3v14*v8 - v0v11*v14 - v2v15*v8 + v0*v10v15,
+		v3v12*v6 - v2v12*v7 - v3v14*v4 + v0*v7v14 + v2v15*v4 - v0*v6v15,
+		-v3*v6v8 + v2*v7v8 + v3*v4v10 - v0*v7v10 - v2*v4v11 + v0*v6v11,
+		-v7v9*v12 + v5v11*v12 + v7v8*v13 - v4v11*v13 - v5v8*v15 + v4v9*v15,
+		v3v12*v9 - v1v12*v11 - v3v13*v8 + v0v11*v13 + v1v8*v15 - v0v9*v15,
+		-v3v12*v5 + v1v12*v7 + v3v13*v4 - v0v13*v7 - v1v4*v15 + v0v5*v15,
+		v3*v5v8 - v1*v7v8 - v3*v4v9 + v0*v7v9 + v1v4*v11 - v0*v5v11,
+		v6v9*v12 - v5v10*v12 - v6v8*v13 + v4v10*v13 + v5v8*v14 - v4v9*v14,
+		-v2v12*v9 + v1v12*v10 + v2v13*v8 - v0v13*v10 - v1v8*v14 + v0v9*v14,
+		v2v12*v5 - v1v12*v6 - v2v13*v4 + v0v13*v6 + v1v4*v14 - v0v5*v14,
+		-v2*v5v8 + v1*v6v8 + v2*v4v9 - v0*v6v9 - v1v4*v10 + v0*v5v10,
 	}
 	//v2v4, v8v13 v8v14, v10v13, v4v10, v1v7, v4v11, v11v14
 
-	return retMat.Mul(1 / det)
+	return retMat.MulWith(1 / det)
 }
 
 func (m *Mat4) InvSelf() *Mat4 {
@@ -1069,23 +1374,23 @@ func (m *Mat4) InvSelf() *Mat4 {
 	v0v5 := v0 * v5
 	v0v13 := v0 * v13
 
-	m[0] = -v7v10*m[13] + v6v11*m[13] + v7v9*m[14] - v5v11*m[14] - v6v9*m[15] + v5v10*m[15]
-	m[1] = v3v13*m[10] - v2v13*m[11] - v3v14*m[9] + m[1]*m[11]*m[14] + v2v15*m[9] - m[1]*v10v15
-	m[2] = -v3v13*m[6] + v2v13*m[7] + v3v14*m[5] - m[1]*v7v14 - v2v15*m[5] + m[1]*v6v15
-	m[3] = m[3]*v6v9 - m[2]*v7v9 - m[3]*v5v10 + m[1]*v7v10 + m[2]*v5v11 - m[1]*v6v11
-	m[4] = v7v10*m[12] - v6v11*m[12] - v7v8*m[14] + v4v11*m[14] + v6v8*m[15] - v4v10*m[15]
-	m[5] = -v3v12*m[10] + v2v12*m[11] + v3v14*m[8] - v0v11*m[14] - v2v15*m[8] + m[0]*v10v15
-	m[6] = v3v12*m[6] - v2v12*m[7] - v3v14*m[4] + m[0]*v7v14 + v2v15*m[4] - m[0]*v6v15
-	m[7] = -m[3]*v6v8 + m[2]*v7v8 + m[3]*v4v10 - m[0]*v7v10 - m[2]*v4v11 + m[0]*v6v11
-	m[8] = -v7v9*m[12] + v5v11*m[12] + v7v8*m[13] - v4v11*m[13] - v5v8*m[15] + v4v9*m[15]
-	m[9] = v3v12*m[9] - v1v12*m[11] - v3v13*m[8] + v0v11*m[13] + v1v8*m[15] - v0v9*m[15]
-	m[10] = -v3v12*m[5] + v1v12*m[7] + v3v13*m[4] - v0v13*m[7] - v1v4*m[15] + v0v5*m[15]
-	m[11] = m[3]*v5v8 - m[1]*v7v8 - m[3]*v4v9 + m[0]*v7v9 + v1v4*m[11] - m[0]*v5v11
-	m[12] = v6v9*m[12] - v5v10*m[12] - v6v8*m[13] + v4v10*m[13] + v5v8*m[14] - v4v9*m[14]
-	m[13] = -v2v12*m[9] + v1v12*m[10] + v2v13*m[8] - v0v13*m[10] - v1v8*m[14] + v0v9*m[14]
-	m[14] = v2v12*m[5] - v1v12*m[6] - v2v13*m[4] + v0v13*m[6] + v1v4*m[14] - v0v5*m[14]
-	m[15] = -m[2]*v5v8 + m[1]*v6v8 + m[2]*v4v9 - m[0]*v6v9 - v1v4*m[10] + m[0]*v5v10
-	return m
+	m[0] = -v7v10*v13 + v6v11*v13 + v7v9*v14 - v5v11*v14 - v6v9*v15 + v5v10*v15
+	m[1] = v3v13*v10 - v2v13*v11 - v3v14*v9 + v1*v11*v14 + v2v15*v9 - v1*v10v15
+	m[2] = -v3v13*v6 + v2v13*v7 + v3v14*v5 - v1*v7v14 - v2v15*v5 + v1*v6v15
+	m[3] = v3*v6v9 - v2*v7v9 - v3*v5v10 + v1*v7v10 + v2*v5v11 - v1*v6v11
+	m[4] = v7v10*v12 - v6v11*v12 - v7v8*v14 + v4v11*v14 + v6v8*v15 - v4v10*v15
+	m[5] = -v3v12*v10 + v2v12*v11 + v3v14*v8 - v0v11*v14 - v2v15*v8 + v0*v10v15
+	m[6] = v3v12*v6 - v2v12*v7 - v3v14*v4 + v0*v7v14 + v2v15*v4 - v0*v6v15
+	m[7] = -v3*v6v8 + v2*v7v8 + v3*v4v10 - v0*v7v10 - v2*v4v11 + v0*v6v11
+	m[8] = -v7v9*v12 + v5v11*v12 + v7v8*v13 - v4v11*v13 - v5v8*v15 + v4v9*v15
+	m[9] = v3v12*v9 - v1v12*v11 - v3v13*v8 + v0v11*v13 + v1v8*v15 - v0v9*v15
+	m[10] = -v3v12*v5 + v1v12*v7 + v3v13*v4 - v0v13*v7 - v1v4*v15 + v0v5*v15
+	m[11] = v3*v5v8 - v1*v7v8 - v3*v4v9 + v0*v7v9 + v1v4*v11 - v0*v5v11
+	m[12] = v6v9*v12 - v5v10*v12 - v6v8*v13 + v4v10*v13 + v5v8*v14 - v4v9*v14
+	m[13] = -v2v12*v9 + v1v12*v10 + v2v13*v8 - v0v13*v10 - v1v8*v14 + v0v9*v14
+	m[14] = v2v12*v5 - v1v12*v6 - v2v13*v4 + v0v13*v6 + v1v4*v14 - v0v5*v14
+	m[15] = -v2*v5v8 + v1*v6v8 + v2*v4v9 - v0*v6v9 - v1v4*v10 + v0*v5v10
+	return m.MulWith(1 / det)
 }
 
 // ApproxEqual performs an element-wise approximate equality test between two matrices,
@@ -1147,7 +1452,7 @@ func (m *Mat4) Set(row, col int, value float32) {
 // This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
 // (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
 // a panic if you try to access the array with it if it's truly out of bounds.
-func (m *Mat4) Index(row, col int) int {
+func (Mat4) Index(row, col int) int {
 	return col*4 + row
 }
 
@@ -1225,6 +1530,26 @@ func (m *Mat4) AbsSelf() *Mat4 {
 	m[13] = Abs(m[13])
 	m[14] = Abs(m[14])
 	m[15] = Abs(m[15])
+	return m
+}
+
+func (m *Mat4) Iden() *Mat4 {
+	m[0] = 1
+	m[1] = 0
+	m[2] = 0
+	m[3] = 0
+	m[4] = 0
+	m[5] = 1
+	m[6] = 0
+	m[7] = 0
+	m[8] = 0
+	m[9] = 0
+	m[10] = 1
+	m[11] = 0
+	m[12] = 0
+	m[13] = 0
+	m[14] = 0
+	m[15] = 1
 	return m
 }
 

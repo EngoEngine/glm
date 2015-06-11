@@ -247,6 +247,34 @@ func TestVecEqual(t *testing.T) {
 	assert(!v4.ApproxFuncEqual(errV4, FloatEqual), "Vec4.ApproxFuncEq")
 }
 
+func TestOuterProd2(t *testing.T) {
+	v1 := Vec2{1, -1}
+	v2 := Vec2{2, 3}
+	m := v1.OuterProd2(&v2)
+	expected := Mat2{2, -2, 3, -3}
+	if *m != expected {
+		t.Errorf("unexpeted result from %+v\n%+v", *m, expected)
+	}
+}
+
+func TestOuterProd3(t *testing.T) {
+	v1 := Vec3{1, 2, 3}
+	v2 := Vec3{3, 2, 1}
+	m := v1.OuterProd3(&v2)
+	expected := Mat3{3, 6, 9, 2, 4, 6, 1, 2, 3}
+	if *m != expected {
+		t.Errorf("unexpected result from Outerprod3 %+v, %+v", *m, expected)
+	}
+}
+
+func TestVec4Normalize(t *testing.T) {
+	v := &Vec4{1, 2, 3, 4}
+	v = v.Normalize()
+	if !FloatEqual(v.Len(), 1) {
+		t.Errorf("length after normalize not 1")
+	}
+}
+
 func BenchmarkVec4Add(b *testing.B) {
 	b.StopTimer()
 	r := rand.New(rand.NewSource(int64(time.Now().Nanosecond())))

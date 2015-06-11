@@ -727,3 +727,21 @@ func TestQuatDot(t *testing.T) {
 		}
 	}
 }
+
+func TestApproxEqual(t *testing.T) {
+	q1 := Quat{1, Vec3{2, 3, 4}}
+	q2 := Quat{1, Vec3{2, 3, 4}}
+	if !q1.ApproxEqual(&q2) {
+		t.Errorf("quaternion should be equal %+v, %+v", q1, q2)
+	}
+	q2 = Quat{2, Vec3{6, 2, 5}}
+	if q1.ApproxEqual(&q2) {
+		t.Errorf("quaternion shouldnt be equal %+v, %+v", q1, q2)
+	}
+}
+
+func TestQuatBetweenVector3(t *testing.T) {
+	v1 := Vec3{1, 0, 0}
+	v2 := Vec3{-1, 0, 0}
+	QuatBetweenVectors(&v1, &v2)
+}

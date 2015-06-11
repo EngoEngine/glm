@@ -294,6 +294,45 @@ func TestRound(t *testing.T) {
 	}
 }
 
+func TestClampFunc(t *testing.T) {
+	clamp := ClampFunc(0, 1)
+	if clamp(-1) != 0 {
+		t.Errorf("clamp func failed to turn -1 into a 0")
+	}
+	if clamp(2) != 1 {
+		t.Errorf("clamp func failed to turn 2 into a 1")
+	}
+	if clamp(0.5) != 0.5 {
+		t.Errorf("clamp func failed to turn 0.5 into a 0.5")
+	}
+}
+
+func TestSetMax(t *testing.T) {
+	a, b := float32(0), float32(5)
+	SetMax(&a, &b)
+	if a != 5 {
+		t.Errorf("SetMax failed: %d %d", a, b)
+	}
+	a, b = float32(1), float32(0)
+	SetMax(&a, &b)
+	if a != 1 {
+		t.Errorf("SetMax failed: %d %d", a, b)
+	}
+}
+
+func TestSetMin(t *testing.T) {
+	a, b := float32(0), float32(5)
+	SetMin(&a, &b)
+	if a != 0 {
+		t.Errorf("SetMin failed: %d %d", a, b)
+	}
+	a, b = float32(1), float32(0)
+	SetMin(&a, &b)
+	if a != 0 {
+		t.Errorf("SetMin failed: %d %d", a, b)
+	}
+}
+
 func BenchmarkRound(b *testing.B) {
 	b.StopTimer()
 	r := rand.New(rand.NewSource(int64(time.Now().Nanosecond())))

@@ -194,8 +194,8 @@ func (v *Vec2) Y() float32 {
 //
 // The outer product orients it so they're facing "outward": Vec2*Vec3
 // = Mat2x1*Mat1x3 = Mat2x3.
-func (v1 *Vec2) OuterProd2(v2 *Vec2) Mat2 {
-	return Mat2{v1[0] * v2[0], v1[1] * v2[0], v1[0] * v2[1], v1[1] * v2[1]}
+func (v1 *Vec2) OuterProd2(v2 *Vec2) *Mat2 {
+	return &Mat2{v1[0] * v2[0], v1[1] * v2[0], v1[0] * v2[1], v1[1] * v2[1]}
 }
 
 // Add performs element-wise addition between two vectors. It is equivalent to iterating
@@ -325,8 +325,8 @@ func (v *Vec3) Z() float32 {
 //
 // The outer product orients it so they're facing "outward": Vec2*Vec3
 // = Mat2x1*Mat1x3 = Mat2x3.
-func (v1 *Vec3) OuterProd3(v2 *Vec3) Mat3 {
-	return Mat3{v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0], v1[0] * v2[1], v1[1] * v2[1], v1[2] * v2[1], v1[0] * v2[2], v1[1] * v2[2], v1[2] * v2[2]}
+func (v1 *Vec3) OuterProd3(v2 *Vec3) *Mat3 {
+	return &Mat3{v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0], v1[0] * v2[1], v1[1] * v2[1], v1[2] * v2[1], v1[0] * v2[2], v1[1] * v2[2], v1[2] * v2[2]}
 }
 
 // Add performs element-wise addition between two vectors. It is equivalent to iterating

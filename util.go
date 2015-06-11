@@ -98,9 +98,9 @@ func Clamp(a, low, high float32) float32 {
 
 // CampFunc generates a closure that always checks if the value
 // passed in is between two constant values.
-func ClampFunc(low, high float32) func(float32) {
-	return func(a float32) {
-		Clamp(a, low, high)
+func ClampFunc(low, high float32) func(float32) float32 {
+	return func(a float32) float32 {
+		return Clamp(a, low, high)
 	}
 }
 
