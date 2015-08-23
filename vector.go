@@ -8,53 +8,64 @@
 package glm
 
 import (
-	"math"
+	"luxengine.net/math"
 )
 
+// Vec2 is the representation of a vector with 2 components.
 type Vec2 [2]float32
+
+// Vec3 is the representation of a vector with 3 components.
 type Vec3 [3]float32
+
+// Vec4 is the representation of a vector with 4 components.
 type Vec4 [4]float32
 
-func (v *Vec2) Vec3(z float32) *Vec3 {
-	return &Vec3{v[0], v[1], z}
+// Vec3 return a Vec3 from this Vec2 with {z}.
+func (v1 *Vec2) Vec3(z float32) Vec3 {
+	return Vec3{v1[0], v1[1], z}
 }
 
-func (v *Vec2) Vec4(z, w float32) *Vec4 {
-	return &Vec4{v[0], v[1], z, w}
+// Vec4 return a Vec4 from this Vec2 with {z,w}.
+func (v1 *Vec2) Vec4(z, w float32) Vec4 {
+	return Vec4{v1[0], v1[1], z, w}
 }
 
-func (v *Vec3) Vec2() *Vec2 {
-	return &Vec2{v[0], v[1]}
+// Vec2 return a Vec2 from the first 2 components of this Vec3.
+func (v1 *Vec3) Vec2() Vec2 {
+	return Vec2{v1[0], v1[1]}
 }
 
-func (v *Vec3) Vec4(w float32) *Vec4 {
-	return &Vec4{v[0], v[1], v[2], w}
+// Vec4 return a Vec4 from this Vec3 with {w}.
+func (v1 *Vec3) Vec4(w float32) Vec4 {
+	return Vec4{v1[0], v1[1], v1[2], w}
 }
 
-func (v *Vec4) Vec2() *Vec2 {
-	return &Vec2{v[0], v[1]}
+// Vec2 return a Vec2 from the first 2 components of this Vec4.
+func (v1 *Vec4) Vec2() Vec2 {
+	return Vec2{v1[0], v1[1]}
 }
 
-func (v *Vec4) Vec3() *Vec3 {
-	return &Vec3{v[0], v[1], v[2]}
-}
-
-// Elem extracts the elements of the vector for direct value assignment.
-func (v *Vec2) Elem() (x, y float32) {
-	return v[0], v[1]
-}
-
-// Elem extracts the elements of the vector for direct value assignment.
-func (v *Vec3) Elem() (x, y, z float32) {
-	return v[0], v[1], v[2]
+// Vec3 return a Vec3 from the first 3 components of this Vec4.
+func (v1 *Vec4) Vec3() Vec3 {
+	return Vec3{v1[0], v1[1], v1[2]}
 }
 
 // Elem extracts the elements of the vector for direct value assignment.
-func (v *Vec4) Elem() (x, y, z, w float32) {
-	return v[0], v[1], v[2], v[3]
+func (v1 Vec2) Elem() (x, y float32) {
+	return v1[0], v1[1]
 }
 
-// The vector cross product is an operation only defined on 3D vectors. It is equivalent to
+// Elem extracts the elements of the vector for direct value assignment.
+func (v1 Vec3) Elem() (x, y, z float32) {
+	return v1[0], v1[1], v1[2]
+}
+
+// Elem extracts the elements of the vector for direct value assignment.
+func (v1 Vec4) Elem() (x, y, z, w float32) {
+	return v1[0], v1[1], v1[2], v1[3]
+}
+
+// Cross is an operation only defined on 3D vectors, commonly refered to as "the cross product". It is equivalent to
 // Vec3{v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]}.
 // Another interpretation is that it's the vector whose magnitude is |v1||v2|sin(theta)
 // where theta is the angle between v1 and v2.
@@ -73,26 +84,94 @@ func (v *Vec4) Elem() (x, y, z, w float32) {
 // The cross product is "anticommutative" meaning v1.Cross(v2) = -v2.Cross(v1),
 // this property can be useful to know when finding normals,
 // as taking the wrong cross product can lead to the opposite normal of the one you want.
-func (v1 *Vec3) Cross(v2 *Vec3) *Vec3 {
-	return &Vec3{v1[1]*v2[2] - v1[2]*v2[1], v1[2]*v2[0] - v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]}
+func (v1 *Vec3) Cross(v2 *Vec3) Vec3 {
+	return Vec3{v1[1]*v2[2] - v1[2]*v2[1], v1[2]*v2[0] - v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]}
 }
 
-// Add performs element-wise addition between two vectors. It is equivalent to iterating
-// over every element of v1 and adding the corresponding element of v2 to it.
-func (v1 *Vec2) Add(v2 *Vec2) *Vec2 {
-	return &Vec2{v1[0] + v2[0], v1[1] + v2[1]}
+// CrossOf is the same as Cross but with destination vector. v1 = v2 X v3
+func (v1 *Vec3) CrossOf(v2, v3 *Vec3) {
+	v1[0] = v2[1]*v3[2] - v2[2]*v3[1]
+	v1[1] = v2[2]*v3[0] - v2[0]*v3[2]
+	v1[2] = v2[0]*v3[1] - v2[1]*v3[0]
 }
 
-// Sub performs element-wise subtraction between two vectors. It is equivalent to iterating
-// over every element of v1 and subtracting the corresponding element of v2 from it.
-func (v1 *Vec2) Sub(v2 *Vec2) *Vec2 {
-	return &Vec2{v1[0] - v2[0], v1[1] - v2[1]}
+// CrossWith is the same as cross except it stores the result in v1
+func (v1 *Vec3) CrossWith(v2 *Vec3) {
+	vx, vy, vz := v1[0], v1[1], v1[2]
+	v1[0] = vy*v2[2] - vz*v2[1]
+	v1[1] = vz*v2[0] - vx*v2[2]
+	v1[2] = vx*v2[1] - vy*v2[0]
 }
 
-// Mul performs a scalar multiplication between the vector and some constant value
-// c. This is equivalent to iterating over every vector element and multiplying by c.
-func (v1 *Vec2) Mul(c float32) *Vec2 {
-	return &Vec2{v1[0] * c, v1[1] * c}
+// Add is equivalent to v3 := v1+v2
+func (v1 *Vec2) Add(v2 *Vec2) Vec2 {
+	return Vec2{v1[0] + v2[0], v1[1] + v2[1]}
+}
+
+// AddOf is equivalent to v1 = v2+v3
+func (v1 *Vec2) AddOf(v2, v3 *Vec2) {
+	v1[0], v1[1] = v2[0]+v3[0], v2[1]+v3[1]
+}
+
+// AddWith is equivalent to v1+=v2
+func (v1 *Vec2) AddWith(v2 *Vec2) {
+	v1[0] += v2[0]
+	v1[1] += v2[1]
+}
+
+// AddScaledVec is a shortcut for v1 += c*v2
+func (v1 *Vec2) AddScaledVec(c float32, v2 *Vec2) {
+	v1[0] += c * v2[0]
+	v1[1] += c * v2[1]
+}
+
+// Sub is equivalent to v3 := v1-v2
+func (v1 *Vec2) Sub(v2 *Vec2) Vec2 {
+	return Vec2{v1[0] - v2[0], v1[1] - v2[1]}
+}
+
+// SubOf is equivalent to v1 = v2-v3
+func (v1 *Vec2) SubOf(v2, v3 *Vec2) {
+	v1[0], v1[1] = v2[0]-v3[0], v2[1]-v3[1]
+}
+
+// SubWith is equivalent to v1-=v2
+func (v1 *Vec2) SubWith(v2 *Vec2) {
+	v1[0] -= v2[0]
+	v1[1] -= v2[1]
+}
+
+// Mul is equivalent to v3 := c*v1
+func (v1 *Vec2) Mul(c float32) Vec2 {
+	return Vec2{v1[0] * c, v1[1] * c}
+}
+
+// MulOf is equivalent to v1 = c*v2
+func (v1 *Vec2) MulOf(c float32, v2 *Vec2) {
+	v1[0], v1[1] = c*v2[0], c*v2[1]
+}
+
+// MulWith is equivalent to v1*=c
+func (v1 *Vec2) MulWith(c float32) {
+	v1[0] *= c
+	v1[1] *= c
+}
+
+// ComponentProduct returns {v1[0]*v2[0],v1[1]*v2[1], ... v1[n]*v2[n]}. It's equivalent to v3 := v1 * v2
+func (v1 *Vec2) ComponentProduct(v2 *Vec2) Vec2 {
+	return Vec2{v1[0] * v2[0], v1[1] * v2[1]}
+}
+
+// ComponentProductOf is equivalent to v1 = v2*v3
+func (v1 *Vec2) ComponentProductOf(v2, v3 *Vec2) {
+	v1[0] = v2[0] * v3[0]
+	v1[1] = v2[1] * v3[1]
+}
+
+// ComponentProductWith is equivalent to v1 = v1*v2
+func (v1 *Vec2) ComponentProductWith(v2 *Vec2) {
+	v1[0] = v1[0] * v2[0]
+	v1[1] = v1[1] * v2[1]
 }
 
 // Dot returns the dot product of this vector with another. There are multiple ways
@@ -100,7 +179,7 @@ func (v1 *Vec2) Mul(c float32) *Vec2 {
 // theta is the angle between the vectors: v1.v2 = |v1||v2|cos(theta).
 //
 // The other (and what is actually done) is the sum of the element-wise multiplication of all
-// elements. So for instance, two Vec3s would yield v1.x * v2.x + v1.y * v2.y + v1.z * v2.z.
+// elements. So for instance, two Vec3s would yield v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2].
 //
 // This means that the dot product of a vector and itself is the square of its Len (within
 // the bounds of floating points error).
@@ -117,10 +196,31 @@ func (v1 *Vec2) Dot(v2 *Vec2) float32 {
 // root of the sum of the squares of all elements. E.G. for a Vec2 it's
 // math.Hypot(v[0], v[1]).
 func (v1 *Vec2) Len() float32 {
-	return float32(math.Hypot(float64(v1[0]), float64(v1[1])))
+	return math.Hypot(v1[0], v1[1])
 }
 
-// Normalize normalizes the vector. Normalization is (1/|v|)*v,
+// Len2 returns the square of the length, this function is used when optimising out the sqrt operation.
+func (v1 *Vec2) Len2() float32 {
+	return v1[0]*v1[0] + v1[1]*v1[1]
+}
+
+// Invert changes the sign of every component of this vector.
+func (v1 *Vec2) Invert() {
+	v1[0] = -v1[0]
+	v1[1] = -v1[1]
+}
+
+// Inverse return a new vector with invert sign for every component
+func (v1 *Vec2) Inverse() Vec2 {
+	return Vec2{-v1[0], -v1[1]}
+}
+
+// Zero sets this vector to all zero components.
+func (v1 *Vec2) Zero() {
+	v1[0], v1[1] = 0, 0
+}
+
+// Normalized normalizes the vector. Normalization is (1/|v|)*v,
 // making this equivalent to v.Scale(1/v.Len()). If the len is 0.0,
 // this function will return an infinite value for all elements due
 // to how floating point division works in Go (n/0.0 = math.Inf(Sign(n))).
@@ -129,61 +229,61 @@ func (v1 *Vec2) Len() float32 {
 // while maintaining its directionality.
 //
 // (Can be seen here: http://play.golang.org/p/Aaj7SnbqIp )
-func (v1 *Vec2) Normalize() *Vec2 {
+func (v1 *Vec2) Normalized() Vec2 {
 	l := 1.0 / v1.Len()
-	return &Vec2{v1[0] * l, v1[1] * l}
+	return Vec2{v1[0] * l, v1[1] * l}
+}
+
+// Normalize is the same as Normalize but doesnt return a new vector.
+func (v1 *Vec2) Normalize() {
+	l := 1.0 / v1.Len()
+	v1[0] *= l
+	v1[1] *= l
+}
+
+// NormalizeVec2 normalizes given vector. shortcut for when you don't want to use pointers.
+func NormalizeVec2(v Vec2) Vec2 {
+	l := 1.0 / v.Len()
+	v[0] *= l
+	v[1] *= l
+	return v
 }
 
 // ApproxEqual takes in a vector and does an element-wise
 // approximate float comparison as if FloatEqual had been used
 func (v1 *Vec2) ApproxEqual(v2 *Vec2) bool {
-	for i := range v1 {
-		if !FloatEqual(v1[i], v2[i]) {
-			return false
-		}
-	}
-	return true
+	return FloatEqual(v1[0], v2[0]) && FloatEqual(v1[1], v2[1])
 }
 
-// ApproxThresholdEq takes in a threshold for comparing two floats, and uses it to do an
+// ApproxEqualThreshold takes in a threshold for comparing two floats, and uses it to do an
 // element-wise comparison of the vector to another.
 func (v1 *Vec2) ApproxEqualThreshold(v2 *Vec2, threshold float32) bool {
-	for i := range v1 {
-		if !FloatEqualThreshold(v1[i], v2[i], threshold) {
-			return false
-		}
-	}
-	return true
+	return FloatEqualThreshold(v1[0], v2[0], threshold) && FloatEqualThreshold(v1[1], v2[1], threshold)
 }
 
-// ApproxFuncEq takes in a func that compares two floats, and uses it to do an element-wise
+// ApproxFuncEqual takes in a func that compares two floats, and uses it to do an element-wise
 // comparison of the vector to another. This is intended to be used with FloatEqualFunc
 func (v1 *Vec2) ApproxFuncEqual(v2 *Vec2, eq func(float32, float32) bool) bool {
-	for i := range v1 {
-		if !eq(v1[i], v2[i]) {
-			return false
-		}
-	}
-	return true
+	return eq(v1[0], v2[0]) && eq(v1[1], v2[1])
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// X is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec2) X() float32 {
-	return v[0]
+func (v1 Vec2) X() float32 {
+	return v1[0]
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// Y is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec2) Y() float32 {
-	return v[1]
+func (v1 Vec2) Y() float32 {
+	return v1[1]
 }
 
-// Does the vector outer product
+// OuterProd2 does the vector outer product
 // of two vectors. The outer product produces an
 // 2x2 matrix. E.G. a Vec2 * Vec2 = Mat2.
 //
@@ -194,26 +294,90 @@ func (v *Vec2) Y() float32 {
 //
 // The outer product orients it so they're facing "outward": Vec2*Vec3
 // = Mat2x1*Mat1x3 = Mat2x3.
-func (v1 *Vec2) OuterProd2(v2 *Vec2) *Mat2 {
-	return &Mat2{v1[0] * v2[0], v1[1] * v2[0], v1[0] * v2[1], v1[1] * v2[1]}
+func (v1 *Vec2) OuterProd2(v2 *Vec2) Mat2 {
+	return Mat2{v1[0] * v2[0], v1[1] * v2[0], v1[0] * v2[1], v1[1] * v2[1]}
 }
 
-// Add performs element-wise addition between two vectors. It is equivalent to iterating
-// over every element of v1 and adding the corresponding element of v2 to it.
-func (v1 *Vec3) Add(v2 *Vec3) *Vec3 {
-	return &Vec3{v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]}
+// Add is equivalent to v3 := v1+v2
+func (v1 *Vec3) Add(v2 *Vec3) Vec3 {
+	return Vec3{v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]}
 }
 
-// Sub performs element-wise subtraction between two vectors. It is equivalent to iterating
-// over every element of v1 and subtracting the corresponding element of v2 from it.
-func (v1 *Vec3) Sub(v2 *Vec3) *Vec3 {
-	return &Vec3{v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]}
+// AddOf is equivalent to v1 = v2+v3
+func (v1 *Vec3) AddOf(v2, v3 *Vec3) {
+	v1[0] = v2[0] + v3[0]
+	v1[1] = v2[1] + v3[1]
+	v1[2] = v2[2] + v3[2]
+
 }
 
-// Mul performs a scalar multiplication between the vector and some constant value
-// c. This is equivalent to iterating over every vector element and multiplying by c.
-func (v1 *Vec3) Mul(c float32) *Vec3 {
-	return &Vec3{v1[0] * c, v1[1] * c, v1[2] * c}
+// AddWith is equivalent to v1+=v2
+func (v1 *Vec3) AddWith(v2 *Vec3) {
+	v1[0] += v2[0]
+	v1[1] += v2[1]
+	v1[2] += v2[2]
+}
+
+// AddScaledVec is a shortcut for v1 += c*v2
+func (v1 *Vec3) AddScaledVec(c float32, v2 *Vec3) {
+	v1[0] += c * v2[0]
+	v1[1] += c * v2[1]
+	v1[2] += c * v2[2]
+}
+
+// Sub is equivalent to v3 := v1-v2
+func (v1 *Vec3) Sub(v2 *Vec3) Vec3 {
+	return Vec3{v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]}
+}
+
+// SubOf is equivalent to v1 = v2-v3
+func (v1 *Vec3) SubOf(v2, v3 *Vec3) {
+	v1[0], v1[1], v1[2] = v2[0]-v3[0], v2[1]-v3[1], v2[2]-v3[2]
+}
+
+// SubWith is equivalent to v1-=v2
+func (v1 *Vec3) SubWith(v2 *Vec3) {
+	v1[0] -= v2[0]
+	v1[1] -= v2[1]
+	v1[2] -= v2[2]
+}
+
+// Mul is equivalent to v3 := c*v1
+func (v1 *Vec3) Mul(c float32) Vec3 {
+	return Vec3{v1[0] * c, v1[1] * c, v1[2] * c}
+}
+
+// MulOf is equivalent to v1 = c*v2
+func (v1 *Vec3) MulOf(c float32, v2 *Vec3) {
+	v1[0] = c * v2[0]
+	v1[1] = c * v2[1]
+	v1[2] = c * v2[2]
+}
+
+// MulWith is equivalent to v1*=c
+func (v1 *Vec3) MulWith(c float32) {
+	v1[0] *= c
+	v1[1] *= c
+	v1[2] *= c
+}
+
+// ComponentProduct returns {v1[0]*v2[0],v1[1]*v2[1], ... v1[n]*v2[n]}. It's equivalent to v3 := v1 * v2
+func (v1 *Vec3) ComponentProduct(v2 *Vec3) Vec3 {
+	return Vec3{v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2]}
+}
+
+// ComponentProductOf is equivalent to v1 = v2*v3
+func (v1 *Vec3) ComponentProductOf(v2, v3 *Vec3) {
+	v1[0] = v2[0] * v3[0]
+	v1[1] = v2[1] * v3[1]
+	v1[2] = v2[2] * v3[2]
+}
+
+// ComponentProductWith is equivalent to v1 = v1*v2
+func (v1 *Vec3) ComponentProductWith(v2 *Vec3) {
+	v1[0] = v1[0] * v2[0]
+	v1[1] = v1[1] * v2[1]
+	v1[2] = v1[2] * v2[2]
 }
 
 // Dot returns the dot product of this vector with another. There are multiple ways
@@ -221,7 +385,7 @@ func (v1 *Vec3) Mul(c float32) *Vec3 {
 // theta is the angle between the vectors: v1.v2 = |v1||v2|cos(theta).
 //
 // The other (and what is actually done) is the sum of the element-wise multiplication of all
-// elements. So for instance, two Vec3s would yield v1.x * v2.x + v1.y * v2.y + v1.z * v2.z.
+// elements. So for instance, two Vec3s would yield v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2].
 //
 // This means that the dot product of a vector and itself is the square of its Len (within
 // the bounds of floating points error).
@@ -238,10 +402,32 @@ func (v1 *Vec3) Dot(v2 *Vec3) float32 {
 // root of the sum of the squares of all elements. E.G. for a Vec2 it's
 // math.Hypot(v[0], v[1]).
 func (v1 *Vec3) Len() float32 {
-	return float32(math.Sqrt(float64(v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2])))
+	return math.Sqrt(v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2])
 }
 
-// Normalize normalizes the vector. Normalization is (1/|v|)*v,
+// Len2 returns the square of the length, this function is used when optimising out the sqrt operation.
+func (v1 *Vec3) Len2() float32 {
+	return v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2]
+}
+
+// Invert changes the sign of every component of this vector.
+func (v1 *Vec3) Invert() {
+	v1[0] = -v1[0]
+	v1[1] = -v1[1]
+	v1[2] = -v1[2]
+}
+
+// Inverse return a new vector with invert sign for every component
+func (v1 *Vec3) Inverse() Vec3 {
+	return Vec3{-v1[0], -v1[1], -v1[2]}
+}
+
+// Zero sets this vector to all zero components.
+func (v1 *Vec3) Zero() {
+	v1[0], v1[1], v1[2] = 0, 0, 0
+}
+
+// Normalized normalizes the vector. Normalization is (1/|v|)*v,
 // making this equivalent to v.Scale(1/v.Len()). If the len is 0.0,
 // this function will return an infinite value for all elements due
 // to how floating point division works in Go (n/0.0 = math.Inf(Sign(n))).
@@ -250,69 +436,71 @@ func (v1 *Vec3) Len() float32 {
 // while maintaining its directionality.
 //
 // (Can be seen here: http://play.golang.org/p/Aaj7SnbqIp )
-func (v1 *Vec3) Normalize() *Vec3 {
+func (v1 *Vec3) Normalized() Vec3 {
 	l := 1.0 / v1.Len()
-	return &Vec3{v1[0] * l, v1[1] * l, v1[2] * l}
+	return Vec3{v1[0] * l, v1[1] * l, v1[2] * l}
+}
+
+// Normalize is the same as Normalize but doesnt return a new vector.
+func (v1 *Vec3) Normalize() {
+	l := 1.0 / v1.Len()
+	v1[0] *= l
+	v1[1] *= l
+	v1[2] *= l
+}
+
+// NormalizeVec3 normalizes given vector. shortcut for when you don't want to use pointers.
+func NormalizeVec3(v Vec3) Vec3 {
+	l := 1.0 / v.Len()
+	v[0] *= l
+	v[1] *= l
+	v[2] *= l
+	return v
 }
 
 // ApproxEqual takes in a vector and does an element-wise
 // approximate float comparison as if FloatEqual had been used
 func (v1 *Vec3) ApproxEqual(v2 *Vec3) bool {
-	for i := range v1 {
-		if !FloatEqual(v1[i], v2[i]) {
-			return false
-		}
-	}
-	return true
+	return FloatEqual(v1[0], v2[0]) && FloatEqual(v1[1], v2[1]) && FloatEqual(v1[2], v2[2])
 }
 
-// ApproxThresholdEq takes in a threshold for comparing two floats, and uses it to do an
+// ApproxEqualThreshold takes in a threshold for comparing two floats, and uses it to do an
 // element-wise comparison of the vector to another.
 func (v1 *Vec3) ApproxEqualThreshold(v2 *Vec3, threshold float32) bool {
-	for i := range v1 {
-		if !FloatEqualThreshold(v1[i], v2[i], threshold) {
-			return false
-		}
-	}
-	return true
+	return FloatEqualThreshold(v1[0], v2[0], threshold) && FloatEqualThreshold(v1[1], v2[1], threshold) && FloatEqualThreshold(v1[2], v2[2], threshold)
 }
 
-// ApproxFuncEq takes in a func that compares two floats, and uses it to do an element-wise
+// ApproxFuncEqual takes in a func that compares two floats, and uses it to do an element-wise
 // comparison of the vector to another. This is intended to be used with FloatEqualFunc
 func (v1 *Vec3) ApproxFuncEqual(v2 *Vec3, eq func(float32, float32) bool) bool {
-	for i := range v1 {
-		if !eq(v1[i], v2[i]) {
-			return false
-		}
-	}
-	return true
+	return eq(v1[0], v2[0]) && eq(v1[1], v2[1]) && eq(v1[2], v2[2])
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// X is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec3) X() float32 {
-	return v[0]
+func (v1 Vec3) X() float32 {
+	return v1[0]
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// Y is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec3) Y() float32 {
-	return v[1]
+func (v1 Vec3) Y() float32 {
+	return v1[1]
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// Z is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec3) Z() float32 {
-	return v[2]
+func (v1 Vec3) Z() float32 {
+	return v1[2]
 }
 
-// Does the vector outer product
+// OuterProd3 does the vector outer product
 // of two vectors. The outer product produces an
 // 3x3 matrix. E.G. a Vec3 * Vec3 = Mat3.
 //
@@ -323,26 +511,94 @@ func (v *Vec3) Z() float32 {
 //
 // The outer product orients it so they're facing "outward": Vec2*Vec3
 // = Mat2x1*Mat1x3 = Mat2x3.
-func (v1 *Vec3) OuterProd3(v2 *Vec3) *Mat3 {
-	return &Mat3{v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0], v1[0] * v2[1], v1[1] * v2[1], v1[2] * v2[1], v1[0] * v2[2], v1[1] * v2[2], v1[2] * v2[2]}
+func (v1 *Vec3) OuterProd3(v2 *Vec3) Mat3 {
+	return Mat3{v1[0] * v2[0], v1[1] * v2[0], v1[2] * v2[0], v1[0] * v2[1], v1[1] * v2[1], v1[2] * v2[1], v1[0] * v2[2], v1[1] * v2[2], v1[2] * v2[2]}
 }
 
-// Add performs element-wise addition between two vectors. It is equivalent to iterating
-// over every element of v1 and adding the corresponding element of v2 to it.
-func (v1 *Vec4) Add(v2 *Vec4) *Vec4 {
-	return &Vec4{v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2], v1[3] + v2[3]}
+// Add is equivalent to v3 := v1+v2
+func (v1 *Vec4) Add(v2 *Vec4) Vec4 {
+	return Vec4{v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2], v1[3] + v2[3]}
 }
 
-// Sub performs element-wise subtraction between two vectors. It is equivalent to iterating
-// over every element of v1 and subtracting the corresponding element of v2 from it.
-func (v1 *Vec4) Sub(v2 *Vec4) *Vec4 {
-	return &Vec4{v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2], v1[3] - v2[3]}
+// AddOf is equivalent to v1 = v2+v3
+func (v1 *Vec4) AddOf(v2, v3 *Vec4) {
+	v1[0] = v2[0] + v3[0]
+	v1[1] = v2[1] + v3[1]
+	v1[2] = v2[2] + v3[2]
+	v1[3] = v2[3] + v3[3]
 }
 
-// Mul performs a scalar multiplication between the vector and some constant value
-// c. This is equivalent to iterating over every vector element and multiplying by c.
-func (v1 *Vec4) Mul(c float32) *Vec4 {
-	return &Vec4{v1[0] * c, v1[1] * c, v1[2] * c, v1[3] * c}
+// AddWith is equivalent to v1+=v2
+func (v1 *Vec4) AddWith(v2 *Vec4) {
+	v1[0] += v2[0]
+	v1[1] += v2[1]
+	v1[2] += v2[2]
+	v1[3] += v2[3]
+}
+
+// AddScaledVec is a shortcut for v1 += c*v2
+func (v1 *Vec4) AddScaledVec(c float32, v2 *Vec4) {
+	v1[0] += c * v2[0]
+	v1[1] += c * v2[1]
+	v1[2] += c * v2[2]
+	v1[3] += c * v2[3]
+}
+
+// Sub is equivalent to v3 := v1-v2
+func (v1 *Vec4) Sub(v2 *Vec4) Vec4 {
+	return Vec4{v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2], v1[3] - v2[3]}
+}
+
+// SubOf is equivalent to v1 = v2-v3
+func (v1 *Vec4) SubOf(v2, v3 *Vec4) {
+	v1[0], v1[1], v1[2], v1[3] = v2[0]-v3[0], v2[1]-v3[1], v2[2]-v3[2], v2[3]-v3[3]
+}
+
+// SubWith is equivalent to v1-=v2
+func (v1 *Vec4) SubWith(v2 *Vec4) {
+	v1[0] -= v2[0]
+	v1[1] -= v2[1]
+	v1[2] -= v2[2]
+	v1[3] -= v2[3]
+}
+
+// Mul is equivalent to v3 := c*v1
+func (v1 *Vec4) Mul(c float32) Vec4 {
+	return Vec4{v1[0] * c, v1[1] * c, v1[2] * c, v1[3] * c}
+}
+
+// MulOf is equivalent to v1 = c*v2
+func (v1 *Vec4) MulOf(c float32, v2 *Vec4) {
+	v1[0], v1[1], v1[2], v1[3] = c*v2[0], c*v2[1], c*v2[2], c*v2[3]
+}
+
+// MulWith is equivalent to v1*=c
+func (v1 *Vec4) MulWith(c float32) {
+	v1[0] *= c
+	v1[1] *= c
+	v1[2] *= c
+	v1[3] *= c
+}
+
+// ComponentProduct returns {v1[0]*v2[0],v1[1]*v2[1], ... v1[n]*v2[n]}. It's equivalent to v3 := v1 * v2
+func (v1 *Vec4) ComponentProduct(v2 *Vec4) Vec4 {
+	return Vec4{v1[0] * v2[0], v1[1] * v2[1], v1[2] * v2[2], v1[3] * v2[3]}
+}
+
+// ComponentProductOf is equivalent to v1 = v2*v3
+func (v1 *Vec4) ComponentProductOf(v2, v3 *Vec4) {
+	v1[0] = v2[0] * v3[0]
+	v1[1] = v2[1] * v3[1]
+	v1[2] = v2[2] * v3[2]
+	v1[3] = v2[3] * v3[3]
+}
+
+// ComponentProductWith is equivalent to v1 = v1*v2
+func (v1 *Vec4) ComponentProductWith(v2 *Vec4) {
+	v1[0] = v1[0] * v2[0]
+	v1[1] = v1[1] * v2[1]
+	v1[2] = v1[2] * v2[2]
+	v1[3] = v1[3] * v2[3]
 }
 
 // Dot returns the dot product of this vector with another. There are multiple ways
@@ -350,7 +606,7 @@ func (v1 *Vec4) Mul(c float32) *Vec4 {
 // theta is the angle between the vectors: v1.v2 = |v1||v2|cos(theta).
 //
 // The other (and what is actually done) is the sum of the element-wise multiplication of all
-// elements. So for instance, two Vec3s would yield v1.x * v2.x + v1.y * v2.y + v1.z * v2.z.
+// elements. So for instance, two Vec3s would yield v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2].
 //
 // This means that the dot product of a vector and itself is the square of its Len (within
 // the bounds of floating points error).
@@ -367,11 +623,33 @@ func (v1 *Vec4) Dot(v2 *Vec4) float32 {
 // root of the sum of the squares of all elements. E.G. for a Vec2 it's
 // math.Hypot(v[0], v[1]).
 func (v1 *Vec4) Len() float32 {
-	return float32(math.Sqrt(float64(v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2] + v1[3]*v1[3])))
-
+	return math.Sqrt(v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2] + v1[3]*v1[3])
 }
 
-// Normalize normalizes the vector. Normalization is (1/|v|)*v,
+// Len2 returns the square of the length, this function is used when optimising out the sqrt operation.
+func (v1 *Vec4) Len2() float32 {
+	return v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2] + v1[3]*v1[3]
+}
+
+// Invert changes the sign of every component of this vector.
+func (v1 *Vec4) Invert() {
+	v1[0] = -v1[0]
+	v1[1] = -v1[1]
+	v1[2] = -v1[2]
+	v1[3] = -v1[3]
+}
+
+// Inverse return a new vector with invert sign for every component
+func (v1 *Vec4) Inverse() Vec4 {
+	return Vec4{-v1[0], -v1[1], -v1[2], -v1[3]}
+}
+
+// Zero sets this vector to all zero components.
+func (v1 *Vec4) Zero() {
+	v1[0], v1[1], v1[2], v1[3] = 0, 0, 0, 0
+}
+
+// Normalized normalizes the vector. Normalization is (1/|v|)*v,
 // making this equivalent to v.Scale(1/v.Len()). If the len is 0.0,
 // this function will return an infinite value for all elements due
 // to how floating point division works in Go (n/0.0 = math.Inf(Sign(n))).
@@ -380,72 +658,100 @@ func (v1 *Vec4) Len() float32 {
 // while maintaining its directionality.
 //
 // (Can be seen here: http://play.golang.org/p/Aaj7SnbqIp )
-func (v1 *Vec4) Normalize() *Vec4 {
+func (v1 *Vec4) Normalized() Vec4 {
 	l := 1.0 / v1.Len()
-	return &Vec4{v1[0] * l, v1[1] * l, v1[2] * l, v1[3] * l}
+	return Vec4{v1[0] * l, v1[1] * l, v1[2] * l, v1[3] * l}
+}
+
+// Normalize is the same as Normalize but doesnt return a new vector.
+func (v1 *Vec4) Normalize() {
+	l := 1.0 / v1.Len()
+	v1[0] *= l
+	v1[1] *= l
+	v1[2] *= l
+	v1[3] *= l
+}
+
+// NormalizeVec4 normalizes given vector. shortcut for when you don't want to use pointers.
+func NormalizeVec4(v Vec4) Vec4 {
+	l := 1.0 / v.Len()
+	v[0] *= l
+	v[1] *= l
+	v[2] *= l
+	v[3] *= l
+	return v
 }
 
 // ApproxEqual takes in a vector and does an element-wise
 // approximate float comparison as if FloatEqual had been used
 func (v1 *Vec4) ApproxEqual(v2 *Vec4) bool {
-	for i := range v1 {
-		if !FloatEqual(v1[i], v2[i]) {
-			return false
-		}
-	}
-	return true
+	return FloatEqual(v1[0], v2[0]) && FloatEqual(v1[1], v2[1]) && FloatEqual(v1[2], v2[2]) && FloatEqual(v1[3], v2[3])
 }
 
-// ApproxThresholdEq takes in a threshold for comparing two floats, and uses it to do an
+// ApproxEqualThreshold takes in a threshold for comparing two floats, and uses it to do an
 // element-wise comparison of the vector to another.
 func (v1 *Vec4) ApproxEqualThreshold(v2 *Vec4, threshold float32) bool {
-	for i := range v1 {
-		if !FloatEqualThreshold(v1[i], v2[i], threshold) {
-			return false
-		}
-	}
-	return true
+	return FloatEqualThreshold(v1[0], v2[0], threshold) && FloatEqualThreshold(v1[1], v2[1], threshold) && FloatEqualThreshold(v1[2], v2[2], threshold) && FloatEqualThreshold(v1[3], v2[3], threshold)
 }
 
-// ApproxFuncEq takes in a func that compares two floats, and uses it to do an element-wise
+// ApproxFuncEqual takes in a func that compares two floats, and uses it to do an element-wise
 // comparison of the vector to another. This is intended to be used with FloatEqualFunc
 func (v1 *Vec4) ApproxFuncEqual(v2 *Vec4, eq func(float32, float32) bool) bool {
-	for i := range v1 {
-		if !eq(v1[i], v2[i]) {
-			return false
-		}
-	}
-	return true
+	return eq(v1[0], v2[0]) && eq(v1[1], v2[1]) && eq(v1[2], v2[2]) && eq(v1[3], v2[3])
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// X is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec4) X() float32 {
-	return v[0]
+func (v1 Vec4) X() float32 {
+	return v1[0]
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// Y is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec4) Y() float32 {
-	return v[1]
+func (v1 Vec4) Y() float32 {
+	return v1[1]
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// Z is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec4) Z() float32 {
-	return v[2]
+func (v1 Vec4) Z() float32 {
+	return v1[2]
 }
 
-// This is an element access func, it is equivalent to v[n] where
+// W is an element access func, it is equivalent to v[n] where
 // n is some valid index. The mappings are XYZW (X=0, Y=1 etc). Benchmarks
 // show that this is more or less as fast as direct acces, probably due to
 // inlining, so use v[0] or v.X() depending on personal preference.
-func (v *Vec4) W() float32 {
-	return v[3]
+func (v1 Vec4) W() float32 {
+	return v1[3]
+}
+
+// SetNormalizeOf sets this vector as v2 normalized. v1 = normalize(v2).
+func (v1 *Vec2) SetNormalizeOf(v2 *Vec2) {
+	l := 1.0 / v2.Len()
+	v1[0] = l * v2[0]
+	v1[1] = l * v2[1]
+}
+
+// SetNormalizeOf sets this vector as v2 normalized. v1 = normalize(v2).
+func (v1 *Vec3) SetNormalizeOf(v2 *Vec3) {
+	l := 1.0 / v2.Len()
+	v1[0] = l * v2[0]
+	v1[1] = l * v2[1]
+	v1[2] = l * v2[2]
+}
+
+// SetNormalizeOf sets this vector as v2 normalized. v1 = normalize(v2).
+func (v1 *Vec4) SetNormalizeOf(v2 *Vec4) {
+	l := 1.0 / v2.Len()
+	v1[0] = l * v2[0]
+	v1[1] = l * v2[1]
+	v1[2] = l * v2[2]
+	v1[3] = l * v2[3]
 }

@@ -72,28 +72,28 @@ func Translate3D(Tx, Ty, Tz float32) *Mat4 {
 	return &Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, float32(Tx), float32(Ty), float32(Tz), 1}
 }
 
-// Same as Rotate2D, except homogeneous (3x3 with the extra row/col being all zeroes with a one in the bottom right)
+// HomogRotate2D is the same as Rotate2D, except homogeneous (3x3 with the extra row/col being all zeroes with a one in the bottom right)
 func HomogRotate2D(angle float32) *Mat3 {
 	//angle = (angle * math.Pi) / 180.0
 	sin, cos := float32(math.Sin(float64(angle))), float32(math.Cos(float64(angle)))
 	return &Mat3{cos, sin, 0, -sin, cos, 0, 0, 0, 1}
 }
 
-// Same as Rotate3DX, except homogeneous (4x4 with the extra row/col being all zeroes with a one in the bottom right)
+// HomogRotate3DX is the same as Rotate3DX, except homogeneous (4x4 with the extra row/col being all zeroes with a one in the bottom right)
 func HomogRotate3DX(angle float32) *Mat4 {
 	//angle = (angle * math.Pi) / 180.0
 	sin, cos := float32(math.Sin(float64(angle))), float32(math.Cos(float64(angle)))
 	return &Mat4{1, 0, 0, 0, 0, cos, sin, 0, 0, -sin, cos, 0, 0, 0, 0, 1}
 }
 
-// Same as Rotate3DY, except homogeneous (4x4 with the extra row/col being all zeroes with a one in the bottom right)
+// HomogRotate3DY is the same as Rotate3DY, except homogeneous (4x4 with the extra row/col being all zeroes with a one in the bottom right)
 func HomogRotate3DY(angle float32) *Mat4 {
 	//angle = (angle * math.Pi) / 180.0
 	sin, cos := float32(math.Sin(float64(angle))), float32(math.Cos(float64(angle)))
 	return &Mat4{cos, 0, -sin, 0, 0, 1, 0, 0, sin, 0, cos, 0, 0, 0, 0, 1}
 }
 
-// Same as Rotate3DZ, except homogeneous (4x4 with the extra row/col being all zeroes with a one in the bottom right)
+// HomogRotate3DZ is the same as Rotate3DZ, except homogeneous (4x4 with the extra row/col being all zeroes with a one in the bottom right)
 func HomogRotate3DZ(angle float32) *Mat4 {
 	//angle = (angle * math.Pi) / 180.0
 	sin, cos := float32(math.Sin(float64(angle))), float32(math.Cos(float64(angle)))
@@ -160,14 +160,14 @@ func HomogRotate3D(angle float32, axis *Vec3) *Mat4 {
 	return &Mat4{x*x*k + c, x*y*k + z*s, x*z*k - y*s, 0, x*y*k - z*s, y*y*k + c, y*z*k + x*s, 0, x*z*k + y*s, y*z*k - x*s, z*z*k + c, 0, 0, 0, 0, 1}
 }
 
-// Extracts the 3d scaling from a homogeneous matrix
+// Extract3DScale extracts the 3d scaling from a homogeneous matrix
 func Extract3DScale(m *Mat4) (x, y, z float32) {
 	return float32(math.Sqrt(float64(m[0]*m[0] + m[1]*m[1] + m[2]*m[2]))),
 		float32(math.Sqrt(float64(m[4]*m[4] + m[5]*m[5] + m[6]*m[6]))),
 		float32(math.Sqrt(float64(m[8]*m[8] + m[9]*m[9] + m[10]*m[10])))
 }
 
-// Extracts the maximum scaling from a homogeneous matrix
+// ExtractMaxScale extracts the maximum scaling from a homogeneous matrix
 func ExtractMaxScale(m *Mat4) float32 {
 	scaleX := float64(m[0]*m[0] + m[1]*m[1] + m[2]*m[2])
 	scaleY := float64(m[4]*m[4] + m[5]*m[5] + m[6]*m[6])
@@ -176,13 +176,14 @@ func ExtractMaxScale(m *Mat4) float32 {
 	return float32(math.Sqrt(math.Max(scaleX, math.Max(scaleY, scaleZ))))
 }
 
-// Calculates the Normal of the Matrix (aka the inverse transpose)
+// Mat4Normal calculates the Normal of the Matrix (aka the inverse transpose)
 func Mat4Normal(m *Mat4) *Mat3 {
-	n := m.InvSelf().TransposeSelf()
+	n := m.Inverse()
+	n.Transpose()
 	return &Mat3{n[0], n[1], n[2], n[4], n[5], n[6], n[8], n[9], n[10]}
 }
 
-// Multiplies a 3D vector by a transformation given by
+// TransformCoordinate multiplies a 3D vector by a transformation given by
 // the homogeneous 4D matrix m, applying any translation.
 // If this transformation is non-affine, it will project this
 // vector onto the plane w=1 before returning the result.
@@ -192,16 +193,16 @@ func Mat4Normal(m *Mat4) *Mat3 {
 // This is effectively equivalent to the GLSL code
 //     vec4 r = (m * vec4(v,1.));
 //     r = r/r.w;
-//     vec3 newV = r.xyz;
-func TransformCoordinate(v *Vec3, m *Mat4) *Vec3 {
+//     vec3 newV = r[0]yz;
+func TransformCoordinate(v *Vec3, m *Mat4) Vec3 {
 	t := v.Vec4(1)
-	t = m.Mul4x1(t)
-	t.Mul(1 / t[3])
+	t = m.Mul4x1(&t)
+	t.Mul(1 / t[2])
 
 	return t.Vec3()
 }
 
-// Multiplies a 3D vector by a transformation given by
+// TransformNormal multiplies a 3D vector by a transformation given by
 // the homogeneous 4D matrix m, NOT applying any translations.
 //
 // This is similar to saying you're applying a transformation
@@ -210,10 +211,10 @@ func TransformCoordinate(v *Vec3, m *Mat4) *Vec3 {
 //
 // This is effectively equivalent to the GLSL code
 //    vec4 r = (m * vec4(v,0.));
-//    vec3 newV = r.xyz
-func TransformNormal(v *Vec3, m *Mat4) *Vec3 {
+//    vec3 newV = r[0]yz
+func TransformNormal(v *Vec3, m *Mat4) Vec3 {
 	t := v.Vec4(0)
-	t = m.Mul4x1(t)
+	t = m.Mul4x1(&t)
 
 	return t.Vec3()
 }

@@ -105,21 +105,21 @@ func Test4DVecSub(t *testing.T) {
 }
 
 func TestVecMul(t *testing.T) {
-	v := &Vec2{1.0, 0.0}
+	v := Vec2{1.0, 0.0}
 	v = v.Mul(15.0)
 
 	if !FloatEqual(v[0], 15.0) || !FloatEqual(v[1], 0.0) {
 		t.Errorf("Vec mul does something weird [%f, %f]", v[0], v[1])
 	}
 
-	v2 := &Vec3{1.0, 0.0, 100.1}
+	v2 := Vec3{1.0, 0.0, 100.1}
 	v2 = v2.Mul(15.0)
 
 	if !FloatEqual(v2[0], 15.0) || !FloatEqual(v2[1], 0.0) || !FloatEqual(v2[2], 1501.5) {
 		t.Errorf("Vec mul does something weird [%f, %f, %f]", v2[0], v2[1], v2[2])
 	}
 
-	v3 := &Vec4{1.0, 0.0, 100.1, -1.0}
+	v3 := Vec4{1.0, 0.0, 100.1, -1.0}
 	v3 = v3.Mul(15.0)
 
 	if !FloatEqual(v3[0], 15.0) || !FloatEqual(v3[1], 0.0) || !FloatEqual(v3[2], 1501.5) || !FloatEqual(v3[3], -15.0) {
@@ -128,12 +128,38 @@ func TestVecMul(t *testing.T) {
 }
 
 func TestVecCrossProduct(t *testing.T) {
-	v1 := &Vec3{1, 2, 3}
-	v2 := &Vec3{10, 11, 12}
+	v1 := Vec3{1, 2, 3}
+	v2 := Vec3{10, 11, 12}
 	expected := Vec3{-9, 18, -9}
-	result := v1.Cross(v2)
+	result := v1.Cross(&v2)
 
-	if !expected.ApproxEqual(result) {
+	if !expected.ApproxEqual(&result) {
+		t.Errorf("Vec3 cross product %v x %v Got: %v. Expected: %v.",
+			v1, v2, result, expected)
+	}
+}
+
+func TestVecCrossOfProduct(t *testing.T) {
+	v1 := Vec3{1, 2, 3}
+	v2 := Vec3{10, 11, 12}
+	expected := v1.Cross(&v2)
+	var result Vec3
+	result.CrossOf(&v1, &v2)
+
+	if !expected.ApproxEqual(&result) {
+		t.Errorf("Vec3 cross product %v x %v Got: %v. Expected: %v.",
+			v1, v2, result, expected)
+	}
+}
+
+func TestVecCrossWithProduct(t *testing.T) {
+	v1 := Vec3{1, 2, 3}
+	v2 := Vec3{10, 11, 12}
+	expected := v1.Cross(&v2)
+	result := v1
+	result.CrossWith(&v2)
+
+	if !expected.ApproxEqual(&result) {
 		t.Errorf("Vec3 cross product %v x %v Got: %v. Expected: %v.",
 			v1, v2, result, expected)
 	}
@@ -171,7 +197,7 @@ func TestVecLen(t *testing.T) {
 
 func Test2DVecNormalize(t *testing.T) {
 	v := Vec2{3, 4}
-	norm := v.Normalize()
+	norm := v.Normalized()
 	expected := &Vec2{0.6, 0.8}
 	if !norm.ApproxEqual(expected) {
 		t.Errorf("%v.Normalize() failed. Got: %v. Expected: %v",
@@ -252,8 +278,8 @@ func TestOuterProd2(t *testing.T) {
 	v2 := Vec2{2, 3}
 	m := v1.OuterProd2(&v2)
 	expected := Mat2{2, -2, 3, -3}
-	if *m != expected {
-		t.Errorf("unexpeted result from %+v\n%+v", *m, expected)
+	if m != expected {
+		t.Errorf("unexpeted result from %+v\n%+v", m, expected)
 	}
 }
 
@@ -262,14 +288,14 @@ func TestOuterProd3(t *testing.T) {
 	v2 := Vec3{3, 2, 1}
 	m := v1.OuterProd3(&v2)
 	expected := Mat3{3, 6, 9, 2, 4, 6, 1, 2, 3}
-	if *m != expected {
-		t.Errorf("unexpected result from Outerprod3 %+v, %+v", *m, expected)
+	if m != expected {
+		t.Errorf("unexpected result from Outerprod3 %+v, %+v", m, expected)
 	}
 }
 
 func TestVec4Normalize(t *testing.T) {
-	v := &Vec4{1, 2, 3, 4}
-	v = v.Normalize()
+	v := Vec4{1, 2, 3, 4}
+	v.Normalize()
 	if !FloatEqual(v.Len(), 1) {
 		t.Errorf("length after normalize not 1")
 	}

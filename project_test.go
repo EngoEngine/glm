@@ -20,7 +20,9 @@ func TestProject(t *testing.T) {
 	answer := &Vec3{1205.0000359117985, -1.0000501200556755, 0.5} // From glu.Project()
 
 	if !win.ApproxEqualThreshold(answer, 1e-4) {
-		t.Errorf("Project does something weird, differs from expected by of %v", win.Sub(answer).Len())
+		var diff Vec3
+		diff.SubOf(win, answer)
+		t.Errorf("Project does something weird, differs from expected by of %v", diff.Len())
 	}
 
 	objr, err := UnProject(win, modelview, projection, initialX, initialY, width, height)
@@ -42,7 +44,7 @@ func TestUnprojectSingular(t *testing.T) {
 
 func TestLookAtV(t *testing.T) {
 	// http://www.euclideanspace.com/maths/algebra/matrix/transforms/examples/index.htm
-
+	iden := Ident4()
 	tests := []struct {
 		Description     string
 		Eye, Center, Up *Vec3
@@ -53,7 +55,7 @@ func TestLookAtV(t *testing.T) {
 			&Vec3{0, 0, 0},
 			&Vec3{0, 0, -1},
 			&Vec3{0, 1, 0},
-			Ident4(),
+			&iden,
 		},
 		{
 			"heading 90 degree",
@@ -118,6 +120,7 @@ func TestLookAtV(t *testing.T) {
 }
 
 func TestOrtho(t *testing.T) {
+	iden := Ident4()
 	tests := []struct {
 		Left, Right,
 		Bottom, Top,
@@ -126,7 +129,7 @@ func TestOrtho(t *testing.T) {
 	}{
 		{
 			-1.0, 1.0, -1.0, 1.0, 1.0, -1.0,
-			Ident4(),
+			&iden,
 		}, {
 			-10.0, 10.0, -10.0, 10.0, 0.0, 100.0,
 			&Mat4{0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, -0.02, 0.0, 0.0, 0.0, -1.0, 1.0},

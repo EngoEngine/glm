@@ -18,16 +18,20 @@ func TestQuatMulIdentity(t *testing.T) {
 	i2 := QuatIdent()
 	i3 := QuatIdent()
 
-	mul := i2.Mul(i3)
+	mul := i2.Mul(&i3)
 
 	if !FloatEqual(mul.W, 1.0) {
 		t.Errorf("Multiplication of identities does not yield identity")
 	}
 
-	for i := range mul.V {
-		if mul.V[i] != i1.V[i] {
-			t.Errorf("Multiplication of identities does not yield identity")
-		}
+	if mul.V[0] != i1.V[0] {
+		t.Errorf("Multiplication of identities does not yield identity")
+	}
+	if mul.V[1] != i1.V[1] {
+		t.Errorf("Multiplication of identities does not yield identity")
+	}
+	if mul.V[2] != i1.V[2] {
+		t.Errorf("Multiplication of identities does not yield identity")
 	}
 }
 
@@ -41,17 +45,21 @@ func TestQuatRotateOnAxis(t *testing.T) {
 
 	rotatedAxis := i1.Rotate(&axis)
 
-	for i := range rotatedAxis {
-		if !FloatEqualThreshold(rotatedAxis[i], axis[i], 1e-4) {
-			t.Errorf("Rotation of axis does not yield identity")
-		}
+	if !FloatEqualThreshold(rotatedAxis[0], axis[0], 1e-4) {
+		t.Errorf("Rotation of axis does not yield identity")
+	}
+	if !FloatEqualThreshold(rotatedAxis[1], axis[1], 1e-4) {
+		t.Errorf("Rotation of axis does not yield identity")
+	}
+	if !FloatEqualThreshold(rotatedAxis[2], axis[2], 1e-4) {
+		t.Errorf("Rotation of axis does not yield identity")
 	}
 }
 
 func TestQuatRotateOffAxis(t *testing.T) {
 	//t.Parallel()
 
-	var angleRads float32 = DegToRad(30.0)
+	angleRads := DegToRad(30.0)
 	axis := Vec3{1, 0, 0}
 
 	i1 := QuatRotate(angleRads, &axis)
@@ -62,10 +70,14 @@ func TestQuatRotateOffAxis(t *testing.T) {
 	s, c := math.Sincos(float64(angleRads))
 	answer := Vec3{0, float32(c), float32(s)}
 
-	for i := range rotatedVector {
-		if !FloatEqualThreshold(rotatedVector[i], answer[i], 1e-4) {
-			t.Errorf("Rotation of vector does not yield answer")
-		}
+	if !FloatEqualThreshold(rotatedVector[0], answer[0], 1e-4) {
+		t.Errorf("Rotation of vector does not yield answer")
+	}
+	if !FloatEqualThreshold(rotatedVector[1], answer[1], 1e-4) {
+		t.Errorf("Rotation of vector does not yield answer")
+	}
+	if !FloatEqualThreshold(rotatedVector[2], answer[2], 1e-4) {
+		t.Errorf("Rotation of vector does not yield answer")
 	}
 }
 
@@ -76,7 +88,7 @@ func TestQuatIdentityToMatrix(t *testing.T) {
 	matrix := quat.Mat4()
 	answer := Ident4()
 
-	if !matrix.ApproxEqual(answer) {
+	if !matrix.ApproxEqual(&answer) {
 		t.Errorf("Identity quaternion does not yield identity matrix")
 	}
 }
@@ -84,12 +96,13 @@ func TestQuatIdentityToMatrix(t *testing.T) {
 func TestQuatRotationToMatrix(t *testing.T) {
 	//t.Parallel()
 
-	var angle float32 = DegToRad(45.0)
+	angle := DegToRad(45.0)
 
-	axis := (&Vec3{1, 2, 3}).Normalize()
-	quat := QuatRotate(angle, axis)
+	axis := Vec3{1, 2, 3}
+	axis.Normalize()
+	quat := QuatRotate(angle, &axis)
 	matrix := quat.Mat4()
-	answer := HomogRotate3D(angle, axis)
+	answer := HomogRotate3D(angle, &axis)
 
 	if !matrix.ApproxEqualThreshold(answer, 1e-4) {
 		t.Errorf("Rotation quaternion does not yield correct rotation matrix; got: %v expected: %v", matrix, answer)
@@ -117,25 +130,27 @@ func TestQuatMatRotateY(t *testing.T) {
 	//t.Parallel()
 
 	q := QuatRotate(float32(math.Pi), &Vec3{0, 1, 0})
-	q = q.Normalize()
+	q.Normalize()
 	v := Vec3{1, 0, 0}
 
 	result := q.Rotate(&v)
 
 	expected := Rotate3DY(float32(math.Pi)).Mul3x1(&v)
 	t.Logf("Computed from rotation matrix: %v", expected)
-	if !result.ApproxEqualThreshold(expected, 1e-4) {
+	if !result.ApproxEqualThreshold(&expected, 1e-4) {
 		t.Errorf("Quaternion rotating vector doesn't match 3D matrix method. Got: %v, Expected: %v", result, expected)
 	}
-
-	expected = &q.Mul(&Quat{0, v}).Mul(q.Conjugate()).V
+	m := q.Mul(&Quat{0, v})
+	c := q.Conjugated()
+	mcv := m.Mul(&c).V
+	expected = mcv
 	t.Logf("Computed from conjugate method: %v", expected)
-	if !result.ApproxEqualThreshold(expected, 1e-4) {
+	if !result.ApproxEqualThreshold(&expected, 1e-4) {
 		t.Errorf("Quaternion rotating vector doesn't match slower conjugate method. Got: %v, Expected: %v", result, expected)
 	}
 
-	expected = &Vec3{-1, 0, 0}
-	if !result.ApproxEqualThreshold(expected, 4e-4) { // The result we get for z is like 8e-8, but a 1e-4 threshold juuuuuust causes it to freak out when compared to 0.0
+	expected = Vec3{-1, 0, 0}
+	if !result.ApproxEqualThreshold(&expected, 4e-4) { // The result we get for z is like 8e-8, but a 1e-4 threshold juuuuuust causes it to freak out when compared to 0.0
 		t.Errorf("Quaternion rotating vector doesn't match hand-computed result. Got: %v, Expected: %v", result, expected)
 	}
 }
@@ -148,10 +163,11 @@ func BenchmarkQuatRotateOptimized(b *testing.B) {
 		b.StopTimer()
 		q := QuatRotate(rand.Float32(), &Vec3{rand.Float32(), rand.Float32(), rand.Float32()})
 		v := &Vec3{rand.Float32(), rand.Float32(), rand.Float32()}
-		q = q.Normalize()
+		q.Normalized()
 		b.StartTimer()
 
-		v = q.Rotate(v)
+		s := q.Rotate(v)
+		_ = s
 	}
 }
 
@@ -163,10 +179,13 @@ func BenchmarkQuatRotateConjugate(b *testing.B) {
 		b.StopTimer()
 		q := QuatRotate(rand.Float32(), &Vec3{rand.Float32(), rand.Float32(), rand.Float32()})
 		v := Vec3{rand.Float32(), rand.Float32(), rand.Float32()}
-		q = q.Normalize()
+		q.Normalized()
 		b.StartTimer()
 
-		v = q.Mul(&Quat{0, v}).Mul(q.Conjugate()).V
+		m := q.Mul(&Quat{0, v})
+		c := q.Conjugated()
+
+		v = m.Mul(&c).V
 	}
 }
 
@@ -199,6 +218,8 @@ func BenchmarkQuatFuncElementAccess(b *testing.B) {
 func TestMat4ToQuat(t *testing.T) {
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/examples/index.htm
 
+	iden := Ident4()
+	qiden := QuatIdent()
 	tests := []struct {
 		Description string
 		Rotation    *Mat4
@@ -206,8 +227,8 @@ func TestMat4ToQuat(t *testing.T) {
 	}{
 		{
 			"forward",
-			Ident4(),
-			QuatIdent(),
+			&iden,
+			&qiden,
 		},
 		{
 			"heading 90 degree",
@@ -260,6 +281,7 @@ func TestMat4ToQuat(t *testing.T) {
 }
 
 func TestQuatRotate(t *testing.T) {
+	qiden := QuatIdent()
 	tests := []struct {
 		Description string
 		Angle       float32
@@ -269,7 +291,7 @@ func TestQuatRotate(t *testing.T) {
 		{
 			"forward",
 			0, &Vec3{0, 0, 0},
-			QuatIdent(),
+			&qiden,
 		},
 		{
 			"heading 90 degree",
@@ -303,7 +325,7 @@ func TestQuatRotate(t *testing.T) {
 
 func TestQuatLookAtV(t *testing.T) {
 	// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/transforms/examples/index.htm
-
+	qiden := QuatIdent()
 	tests := []struct {
 		Description     string
 		Eye, Center, Up *Vec3
@@ -314,7 +336,7 @@ func TestQuatLookAtV(t *testing.T) {
 			&Vec3{0, 0, 0},
 			&Vec3{0, 0, -1},
 			&Vec3{0, 1, 0},
-			QuatIdent(),
+			&qiden,
 		},
 		{
 			"heading 90 degree",
@@ -469,18 +491,20 @@ func TestCompareLookAt(t *testing.T) {
 		for i, p := range c.Pos {
 			t.Log(c.Description, i)
 			o, e := p[0], p[1]
-			rm := m.Mul4x1(o.Vec4(0)).Vec3()
+			v4 := o.Vec4(0)
+			mv4 := m.Mul4x1(&v4)
+			rm := mv4.Vec3()
 			rq := q.Rotate(o)
 
-			if !rq.ApproxEqualThreshold(rm, threshold) {
+			if !rq.ApproxEqualThreshold(&rm, threshold) {
 				t.Errorf("%v failed: QuatLookAtV() != LookAtV()", c.Description)
 			}
 
-			if !e.ApproxEqualThreshold(rm, threshold) {
+			if !e.ApproxEqualThreshold(&rm, threshold) {
 				t.Errorf("%v failed: (%v).Mul4x1(%v) != %v (got %v)", c.Description, m, o, e, rm)
 			}
 
-			if !e.ApproxEqualThreshold(rq, threshold) {
+			if !e.ApproxEqualThreshold(&rq, threshold) {
 				t.Errorf("%v failed: (%v).Rotate(%v) != %v (got %v)", c.Description, q, o, e, rq)
 			}
 		}
@@ -510,7 +534,7 @@ func TestQuatMatConversion(t *testing.T) {
 		q1 := Mat4ToQuat(m1)
 		q2 := QuatRotate(c.Angle, c.Axis)
 
-		if !FloatEqualThreshold(Abs(q1.Dot(q2)), 1, 1e-4) {
+		if !FloatEqualThreshold(Abs(q1.Dot(&q2)), 1, 1e-4) {
 			t.Errorf("Quaternions for %v %v do not match:\n%v\n%v", RadToDeg(c.Angle), c.Axis, q1, q2)
 		}
 	}
@@ -665,7 +689,7 @@ func TestQuatNormalize(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.Rotation.Normalize(); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := c.Rotation.Normalized(); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
 			t.Errorf("Quat(%v).Normalize() != %v (got %v)", c.Rotation, c.Expected, r)
 		}
 	}
@@ -744,4 +768,39 @@ func TestQuatBetweenVector3(t *testing.T) {
 	v1 := Vec3{1, 0, 0}
 	v2 := Vec3{-1, 0, 0}
 	QuatBetweenVectors(&v1, &v2)
+}
+
+func TestQuatLerp(t *testing.T) {
+	tests := []struct {
+		A, B     Quat
+		Amount   float32
+		Expected Quat
+	}{
+		{Quat{0, Vec3{0, 0, 0}}, Quat{0, Vec3{0, 0, 0}}, 0, Quat{0, Vec3{0, 0, 0}}},
+		{Quat{0, Vec3{1, 2, 3}}, Quat{0, Vec3{4, 5, 6}}, 0.5, Quat{0, Vec3{2.5, 3.5, 4.5}}},
+		{Quat{4, Vec3{1, 2, 3}}, Quat{8, Vec3{5, 6, 7}}, 0.75, Quat{7, Vec3{4, 5, 6}}},
+	}
+
+	for _, c := range tests {
+		if r := QuatLerp(&c.A, &c.B, c.Amount); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+			t.Errorf("QuatLerp(Quat(%v), (Quat(%v))) != %v (got %v)", c.A, c.B, c.Expected, r)
+		}
+	}
+}
+
+func TestQuatBetweenVectors(t *testing.T) {
+	tests := []struct {
+		A, B     Vec3
+		Expected Quat
+	}{
+		{Vec3{0, 0, 1}, Vec3{1, 1, 0}, Quat{0.70710677, Vec3{-0.49999997, 0.49999997, 0}}},
+		{Vec3{1, 2, 3}, Vec3{4, 5, 6}, Quat{0.9936377, Vec3{-0.04597839, 0.09195679, -0.045978405}}},
+		{Vec3{1, 2, 3}, Vec3{5, 6, 7}, Quat{0.99205077, Vec3{-0.051373072, 0.10274618, -0.0513731}}},
+	}
+
+	for _, c := range tests {
+		if r := QuatBetweenVectors(&c.A, &c.B); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+			t.Errorf("QuatBetweenVectors(Vec3(%v), (Vec3(%v))) != %v (got %v)", c.A, c.B, c.Expected, r)
+		}
+	}
 }

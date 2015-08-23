@@ -10,6 +10,7 @@ import (
 )
 
 func TestHomogRotate3D(t *testing.T) {
+	iden := Ident4()
 	tests := []struct {
 		Description string
 		Angle       float32
@@ -19,7 +20,7 @@ func TestHomogRotate3D(t *testing.T) {
 		{
 			"forward",
 			0, &Vec3{0, 0, 0},
-			Ident4(),
+			&iden,
 		},
 		{
 			"heading 90 degree",
@@ -72,18 +73,26 @@ func TestHomogRotate3D(t *testing.T) {
 }
 
 func TestExtract3DScale(t *testing.T) {
+
+	t1 := Translate3D(10, 12, -5)
+	h := HomogRotate3D(math.Pi/2, &Vec3{1, 0, 0})
+	s := Scale3D(2, 3, 4)
+	t2 := t1.Mul4(h)
+	t3 := t2.Mul4(s)
+
+	iden := Ident4()
 	tests := []struct {
 		M       *Mat4
 		X, Y, Z float32
 	}{
 		{
-			Ident4(),
+			&iden,
 			1, 1, 1,
 		}, {
 			Scale3D(1, 2, 3),
 			1, 2, 3,
 		}, {
-			Translate3D(10, 12, -5).Mul4(HomogRotate3D(math.Pi/2, &Vec3{1, 0, 0})).Mul4(Scale3D(2, 3, 4)),
+			&t3,
 			2, 3, 4,
 		},
 	}
@@ -97,18 +106,25 @@ func TestExtract3DScale(t *testing.T) {
 }
 
 func TestExtractMaxScale(t *testing.T) {
+	t1 := Translate3D(10, 12, -5)
+	h := HomogRotate3D(math.Pi/2, &Vec3{1, 0, 0})
+	s := Scale3D(2, 3, 4)
+	t2 := t1.Mul4(h)
+	t3 := t2.Mul4(s)
+
+	iden := Ident4()
 	tests := []struct {
 		M *Mat4
 		V float32
 	}{
 		{
-			Ident4(),
+			&iden,
 			1,
 		}, {
 			Scale3D(1, 2, 3),
 			3,
 		}, {
-			Translate3D(10, 12, -5).Mul4(HomogRotate3D(math.Pi/2, &Vec3{1, 0, 0})).Mul4(Scale3D(2, 3, 4)),
+			&t3,
 			4,
 		},
 	}
@@ -122,36 +138,47 @@ func TestExtractMaxScale(t *testing.T) {
 }
 
 func TestTransformCoordinate(t *testing.T) {
+
+	t1 := Translate3D(0, 1, 1)
+	s := Scale3D(2, 2, 2)
+	t3 := t1.Mul4(s)
+
+	iden := Ident4()
 	tests := [...]struct {
 		v *Vec3
 		m *Mat4
 
 		out *Vec3
 	}{
-		{&Vec3{1, 1, 1}, Ident4(), &Vec3{1, 1, 1}},
-		{&Vec3{1, 1, 1}, Translate3D(0, 1, 1).Mul4(Scale3D(2, 2, 2)), &Vec3{2, 3, 3}},
+		{&Vec3{1, 1, 1}, &iden, &Vec3{1, 1, 1}},
+		{&Vec3{1, 1, 1}, &t3, &Vec3{2, 3, 3}},
 	}
 
 	for _, test := range tests {
-		if v := TransformCoordinate(test.v, test.m); !test.out.ApproxEqualThreshold(v, 1e-4) {
+		if v := TransformCoordinate(test.v, test.m); !test.out.ApproxEqualThreshold(&v, 1e-4) {
 			t.Errorf("TransformCoordinate on vector %v and matrix %v fails to give result %v (got %v)", test.v, test.m, test.out, v)
 		}
 	}
 }
 
 func TestTransformNormal(t *testing.T) {
+	t1 := Translate3D(0, 1, 1)
+	s := Scale3D(2, 2, 2)
+	t3 := t1.Mul4(s)
+
+	iden := Ident4()
 	tests := [...]struct {
 		v *Vec3
 		m *Mat4
 
 		out *Vec3
 	}{
-		{&Vec3{1, 1, 1}, Ident4(), &Vec3{1, 1, 1}},
-		{&Vec3{1, 1, 1}, Translate3D(0, 1, 1).Mul4(Scale3D(2, 2, 2)), &Vec3{2, 2, 2}},
+		{&Vec3{1, 1, 1}, &iden, &Vec3{1, 1, 1}},
+		{&Vec3{1, 1, 1}, &t3, &Vec3{2, 2, 2}},
 	}
 
 	for _, test := range tests {
-		if v := TransformNormal(test.v, test.m); !test.out.ApproxEqualThreshold(v, 1e-4) {
+		if v := TransformNormal(test.v, test.m); !test.out.ApproxEqualThreshold(&v, 1e-4) {
 			t.Errorf("TransformNormal on vector %v and matrix %v fails to give result %v (got %v)", test.v, test.m, test.out, v)
 		}
 	}

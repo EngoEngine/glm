@@ -21,7 +21,7 @@ import (
 // are being executed when you change this.
 var Epsilon float32 = 1e-10
 
-// A direct copy of the math package's Abs. This is here for the mgl32
+// Abs is a direct copy of the math package's Abs. This is here for the mgl32
 // package, to prevent rampant type conversions during equality tests.
 func Abs(a float32) float32 {
 	if a < 0 {
@@ -51,13 +51,19 @@ func FloatEqualFunc(epsilon float32) func(float32, float32) bool {
 }
 
 var (
+	// MinNormal is the smallest normal value possible.
 	MinNormal = float32(1.1754943508222875e-38) // 1 / 2**(127 - 1)
-	MinValue  = float32(math.SmallestNonzeroFloat32)
-	MaxValue  = float32(math.MaxFloat32)
+	// MinValue is the smallest non zero value possible.
+	MinValue = float32(math.SmallestNonzeroFloat32)
+	// MaxValue is the highest value a float32 can have.
+	MaxValue = float32(math.MaxFloat32)
 
+	// InfPos is the positive infinity value.
 	InfPos = float32(math.Inf(1))
+	// InfNeg is the positive infinity value.
 	InfNeg = float32(math.Inf(-1))
-	NaN    = float32(math.NaN())
+	// NaN is a shortcut for not a number
+	NaN = float32(math.NaN())
 )
 
 // FloatEqualThreshold is a utility function to compare floats.
@@ -96,7 +102,7 @@ func Clamp(a, low, high float32) float32 {
 	return a
 }
 
-// CampFunc generates a closure that always checks if the value
+// ClampFunc generates a closure that always checks if the value
 // passed in is between two constant values.
 func ClampFunc(low, high float32) func(float32) float32 {
 	return func(a float32) float32 {
@@ -107,7 +113,7 @@ func ClampFunc(low, high float32) func(float32) float32 {
 /* The IsClamped functions use strict equality (meaning: not the FloatEqual function)
 there shouldn't be any major issues with this since clamp is often used to fix minor errors*/
 
-// Checks if a is clamped between low and high as if
+// IsClamped checks if a is clamped between low and high as if
 // Clamp(a, low, high) had been called.
 //
 // In most cases it's probably better to just call Clamp
@@ -116,14 +122,14 @@ func IsClamped(a, low, high float32) bool {
 	return a >= low && a <= high
 }
 
-// If a > b, then a will be set to the value of b.
+// SetMin does: If a > b, then a will be set to the value of b.
 func SetMin(a, b *float32) {
 	if *b < *a {
 		*a = *b
 	}
 }
 
-// If a < b, then a will be set to the value of b.
+// SetMax does: If a < b, then a will be set to the value of b.
 func SetMax(a, b *float32) {
 	if *a < *b {
 		*a = *b
