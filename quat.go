@@ -216,7 +216,7 @@ func (q1 *Quat) Normalized() Quat {
 	if FloatEqual(1, length) {
 		return *q1
 	}
-	if length == 0 {
+	if FloatEqual(length, 0) {
 		return QuatIdent()
 	}
 	if length == InfPos {
@@ -334,7 +334,24 @@ func (q1 *Quat) Rotate(v *Vec3) Vec3 {
 	return out
 }
 
+// RotateByVector ... I'm actually not sure what this does.
+func (q1 *Quat) RotateByVector(v1 *Vec3) {
+	q2 := Quat{0, *v1}
+	q1.MulWith(&q2)
+}
+
+// AddScaledVec scales the amount of the vector to add. <- really what does that even mean?
+func (q1 *Quat) AddScaledVec(v1 *Vec3, scale float32) {
+	q2 := Quat{0, Vec3{v1[0] * scale, v1[1] * scale, v1[2] * scale}}
+	q2.MulWith(q1)
+	q1.W += q2.W * 0.5
+	q1.V[0] += q2.V[0] * 0.5
+	q1.V[1] += q2.V[1] * 0.5
+	q1.V[2] += q2.V[2] * 0.5
+}
+
 // Mat4 returns the homogeneous 3D rotation matrix corresponding to the quaternion.
+// with last row and last column as [0 0 0 1]
 func (q1 *Quat) Mat4() Mat4 {
 	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
 	return Mat4{
@@ -342,6 +359,16 @@ func (q1 *Quat) Mat4() Mat4 {
 		2*x*y - 2*w*z, 1 - 2*x*x - 2*z*z, 2*y*z + 2*w*x, 0,
 		2*x*z + 2*w*y, 2*y*z - 2*w*x, 1 - 2*x*x - 2*y*y, 0,
 		0, 0, 0, 1,
+	}
+}
+
+// Mat3 returns the homogeneous 3D rotation matrix corresponding to the quaternion.
+func (q1 *Quat) Mat3() Mat3 {
+	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
+	return Mat3{
+		1 - 2*y*y - 2*z*z, 2*x*y + 2*w*z, 2*x*z - 2*w*y,
+		2*x*y - 2*w*z, 1 - 2*x*x - 2*z*z, 2*y*z + 2*w*x,
+		2*x*z + 2*w*y, 2*y*z - 2*w*x, 1 - 2*x*x - 2*y*y,
 	}
 }
 

@@ -218,3 +218,43 @@ func TransformNormal(v *Vec3, m *Mat4) Vec3 {
 
 	return t.Vec3()
 }
+
+// LocalToWorld applies the transform matrix to the local vector. Its a shortcut when using 3x4 matrices.
+func LocalToWorld(local *Vec3, transform *Mat3x4) Vec3 {
+	return transform.Transform(local)
+}
+
+// LocalToWorldIn is the same as LocalToWorld but with destination vector.
+func LocalToWorldIn(local *Vec3, transform *Mat3x4, dst *Vec3) {
+	transform.TransformIn(local, dst)
+}
+
+// WorldToLocal applies the inverse of the transform to the vector.
+func WorldToLocal(world *Vec3, transform *Mat3x4) Vec3 {
+	return transform.TransformInverse(world)
+}
+
+// WorldToLocalIn is a memory friendly version of WorldToLocal.
+func WorldToLocalIn(world *Vec3, transform *Mat3x4, dst *Vec3) {
+	transform.TransformInverseIn(world, dst)
+}
+
+// LocalToWorldDirn transforms this direction by this matrix.
+func LocalToWorldDirn(local *Vec3, transform *Mat3x4) Vec3 {
+	return transform.TransformDirection(local)
+}
+
+// LocalToWorldDirnIn is a memory friendly version of LocalToWorldDirn.
+func LocalToWorldDirnIn(local *Vec3, transform *Mat3x4, dst *Vec3) {
+	transform.TransformDirectionIn(local, dst)
+}
+
+// WorldToLocalDirn inverse transforms this direction by this matrix.
+func WorldToLocalDirn(world *Vec3, transform *Mat3x4) Vec3 {
+	return transform.TransformInverseDirection(world)
+}
+
+// WorldToLocalDirnIn is a memory friendly version of WorldToLocalDirn.
+func WorldToLocalDirnIn(world *Vec3, transform *Mat3x4, dst *Vec3) {
+	transform.TransformInverseDirectionIn(world, dst)
+}

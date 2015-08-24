@@ -122,6 +122,18 @@ func (m1 *Mat4) Mat3() Mat3 {
 	)
 }
 
+// Mat3x4 returns
+// [m m m m]
+// [m m m m]
+// [m m m m]
+// [? ? ? ?]
+func (m1 *Mat4) Mat3x4() Mat3x4 {
+	return Mat3x4{m1[0], m1[1], m1[2],
+		m1[4], m1[5], m1[6],
+		m1[8], m1[9], m1[10],
+		m1[12], m1[13], m1[14]}
+}
+
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
 func (m1 *Mat2) SetCol(col int, v *Vec2) {
 	m1[col*2+0], m1[col*2+1] = v[0], v[1]
@@ -934,7 +946,20 @@ func (m1 *Mat3) Iden() {
 	m1[6] = 0
 	m1[7] = 0
 	m1[8] = 1
+}
 
+// SetOrientation sets this matrix to the orientation matrix represented by that quaternion.
+func (m1 *Mat3) SetOrientation(q1 *Quat) {
+	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
+	m1[0] = 1 - 2*y*y - 2*z*z
+	m1[1] = 2*x*y + 2*w*z
+	m1[2] = 2*x*z - 2*w*y
+	m1[3] = 2*x*y - 2*w*z
+	m1[4] = 1 - 2*x*x - 2*z*z
+	m1[5] = 2*y*z + 2*w*x
+	m1[6] = 2*x*z + 2*w*y
+	m1[7] = 2*y*z - 2*w*x
+	m1[8] = 1 - 2*x*x - 2*y*y
 }
 
 // String pretty prints the matrix
@@ -1747,67 +1772,218 @@ func (m1 *Mat4) String() string {
 	return buf.String()
 }
 
-//mat4x3 stuff
+// Mat3x4 stuff
 
-// Mat4x3 is the representation of a 4 row 3 column matrix. This struct is here ONLY for lux physics engine.
-type Mat4x3 [12]float32
+//Mat3x4 is a 3 row 4 column matrix.
+type Mat3x4 [12]float32
+
+// Mat4 returns a mat4 with the last row as [0 0 0 1].
+func (m1 *Mat3x4) Mat4() Mat4 {
+	return Mat4{m1[0], m1[1], m1[2], 0,
+		m1[3], m1[4], m1[5], 0,
+		m1[6], m1[7], m1[8], 0,
+		m1[9], m1[10], m1[11], 1}
+}
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
-func (m1 *Mat4x3) SetCol(col int, v *Vec4) {
-	m1[col*4], m1[col*4+1], m1[col*4+2], m1[col*4+3] = v[0], v[1], v[2], v[3]
+func (m1 *Mat3x4) SetCol(col int, v *Vec3) {
+	m1[col*3+0], m1[col*3+1], m1[col*3+2] = v[0], v[1], v[2]
 }
 
 // SetRow sets a Row within the Matrix, so it mutates the calling matrix.
-func (m1 *Mat4x3) SetRow(row int, v *Vec3) {
-	m1[row], m1[row+4], m1[row+8] = v[0], v[1], v[2]
+func (m1 *Mat3x4) SetRow(row int, v *Vec4) {
+	m1[row+0], m1[row+3], m1[row+6], m1[row+9] = v[0], v[1], v[2], v[3]
 }
 
-// Mat4x3FromRows builds a new matrix from row vectors.
+// Mat3x4FromRows builds a new matrix from row vectors.
 // The resulting matrix will still be in column major order, but this can be
 // good for hand-building matrices.
-func Mat4x3FromRows(row0, row1, row2, row3 *Vec3) Mat4x3 {
-	return Mat4x3{row0[0], row1[0], row2[0], row3[0], row0[1], row1[1], row2[1], row3[1], row0[2], row1[2], row2[2], row3[2]}
+func Mat3x4FromRows(row0, row1, row2 *Vec4) Mat3x4 {
+	return Mat3x4{row0[0], row1[0], row2[0], row0[1], row1[1], row2[1], row0[2], row1[2], row2[2], row0[3], row1[3], row2[3]}
 }
 
-// Mat4x3FromCols builds a new matrix from column vectors.
-func Mat4x3FromCols(col0, col1, col2 *Vec4) Mat4x3 {
-	return Mat4x3{col0[0], col0[1], col0[2], col0[3], col1[0], col1[1], col1[2], col1[3], col2[0], col2[1], col2[2], col2[3]}
+// Mat3x4FromCols builds a new matrix from column vectors.
+func Mat3x4FromCols(col0, col1, col2, col3 *Vec3) Mat3x4 {
+	return Mat3x4{col0[0], col0[1], col0[2], col1[0], col1[1], col1[2], col2[0], col2[1], col2[2], col3[0], col3[1], col3[2]}
 }
 
 // Add performs an element-wise addition of two matrices, this is
 // equivalent to iterating over every element of m1 and adding the corresponding value of m2.
-func (m1 *Mat4x3) Add(m2 *Mat4x3) Mat4x3 {
-	return Mat4x3{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3], m1[4] + m2[4], m1[5] + m2[5], m1[6] + m2[6], m1[7] + m2[7], m1[8] + m2[8], m1[9] + m2[9], m1[10] + m2[10], m1[11] + m2[11]}
+func (m1 *Mat3x4) Add(m2 *Mat3x4) Mat3x4 {
+	return Mat3x4{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3], m1[4] + m2[4], m1[5] + m2[5], m1[6] + m2[6], m1[7] + m2[7], m1[8] + m2[8], m1[9] + m2[9], m1[10] + m2[10], m1[11] + m2[11]}
 }
 
 // Sub performs an element-wise subtraction of two matrices, this is
 // equivalent to iterating over every element of m1 and subtracting the corresponding value of m2.
-func (m1 *Mat4x3) Sub(m2 Mat4x3) Mat4x3 {
-	return Mat4x3{m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3], m1[4] - m2[4], m1[5] - m2[5], m1[6] - m2[6], m1[7] - m2[7], m1[8] - m2[8], m1[9] - m2[9], m1[10] - m2[10], m1[11] - m2[11]}
+func (m1 *Mat3x4) Sub(m2 *Mat3x4) Mat3x4 {
+	return Mat3x4{m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3], m1[4] - m2[4], m1[5] - m2[5], m1[6] - m2[6], m1[7] - m2[7], m1[8] - m2[8], m1[9] - m2[9], m1[10] - m2[10], m1[11] - m2[11]}
 }
 
 // Mul performs a scalar multiplcation of the matrix. This is equivalent to iterating
 // over every element of the matrix and multiply it by c.
-func (m1 *Mat4x3) Mul(c float32) Mat4x3 {
-	return Mat4x3{m1[0] * c, m1[1] * c, m1[2] * c, m1[3] * c, m1[4] * c, m1[5] * c, m1[6] * c, m1[7] * c, m1[8] * c, m1[9] * c, m1[10] * c, m1[11] * c}
+func (m1 *Mat3x4) Mul(c float32) Mat3x4 {
+	return Mat3x4{m1[0] * c, m1[1] * c, m1[2] * c, m1[3] * c, m1[4] * c, m1[5] * c, m1[6] * c, m1[7] * c, m1[8] * c, m1[9] * c, m1[10] * c, m1[11] * c}
 }
 
-// Mul3x1 performs a "matrix product" between this matrix
+// Mul4x1 performs a "matrix product" between this matrix
 // and another of the given dimension. For any two matrices of dimensionality
 // MxN and NxO, the result will be MxO. For instance, Mat4 multiplied using
 // Mul4x2 will result in a Mat4x2.
-func (m1 *Mat4x3) Mul3x1(m2 *Vec3) Vec4 {
-	return Vec4{
-		m1[0]*m2[0] + m1[4]*m2[1] + m1[8]*m2[2],
-		m1[1]*m2[0] + m1[5]*m2[1] + m1[9]*m2[2],
-		m1[2]*m2[0] + m1[6]*m2[1] + m1[10]*m2[2],
-		m1[3]*m2[0] + m1[7]*m2[1] + m1[11]*m2[2],
+func (m1 *Mat3x4) Mul4x1(v1 *Vec4) Vec3 {
+	return Vec3{
+		m1[0]*v1[0] + m1[3]*v1[1] + m1[6]*v1[2] + m1[9]*v1[3],
+		m1[1]*v1[0] + m1[4]*v1[1] + m1[7]*v1[2] + m1[10]*v1[3],
+		m1[2]*v1[0] + m1[5]*v1[1] + m1[8]*v1[2] + m1[11]*v1[3],
 	}
+}
+
+// Mul3x1 is a cheat function that assumes the last row is [0 0 0 1] and the vectors last coordinate is 1. It's used in the physics engine to transform coordinates.
+func (m1 *Mat3x4) Mul3x1(v1 *Vec3) Vec3 {
+	return Vec3{
+		m1[0]*v1[0] + m1[3]*v1[1] + m1[6]*v1[2] + m1[9],
+		m1[1]*v1[0] + m1[4]*v1[1] + m1[7]*v1[2] + m1[10],
+		m1[2]*v1[0] + m1[5]*v1[1] + m1[8]*v1[2] + m1[11],
+	}
+}
+
+// Mul3x1In is a memory friendly version of Mul3x1, its declaration differs from the rest of the memory utility function to keep the api clean.
+func (m1 *Mat3x4) Mul3x1In(v1, dst *Vec3) {
+	dst[0] = m1[0]*v1[0] + m1[3]*v1[1] + m1[6]*v1[2] + m1[9]
+	dst[1] = m1[1]*v1[0] + m1[4]*v1[1] + m1[7]*v1[2] + m1[10]
+	dst[2] = m1[2]*v1[0] + m1[5]*v1[1] + m1[8]*v1[2] + m1[11]
+}
+
+// Mul3x4 is a cheat function that assumes the last row of both matrices
+// is [0 0 0 1] and performs a 4x4 matrix multiplication.
+func (m1 *Mat3x4) Mul3x4(m2 *Mat3x4) Mat3x4 {
+	return Mat3x4{
+		m1[0]*m2[0] + m1[3]*m2[1] + m1[6]*m2[2],
+		m1[1]*m2[0] + m1[4]*m2[1] + m1[7]*m2[2],
+		m1[2]*m2[0] + m1[5]*m2[1] + m1[8]*m2[2],
+
+		m1[0]*m2[3] + m1[3]*m2[4] + m1[6]*m2[5],
+		m1[1]*m2[3] + m1[4]*m2[4] + m1[7]*m2[5],
+		m1[2]*m2[3] + m1[5]*m2[4] + m1[8]*m2[5],
+
+		m1[0]*m2[6] + m1[3]*m2[7] + m1[6]*m2[8],
+		m1[1]*m2[6] + m1[4]*m2[7] + m1[7]*m2[8],
+		m1[2]*m2[6] + m1[5]*m2[7] + m1[8]*m2[8],
+
+		m1[0]*m2[9] + m1[3]*m2[10] + m1[6]*m2[11] + m1[9],
+		m1[1]*m2[9] + m1[4]*m2[10] + m1[7]*m2[11] + m1[10],
+		m1[2]*m2[9] + m1[5]*m2[10] + m1[8]*m2[11] + m1[11],
+	}
+}
+
+// Mul3x4Of is a memory friendly version fo Mul3x4.
+func (m1 *Mat3x4) Mul3x4Of(m2, m3 *Mat3x4) {
+	m1[0] = m2[0]*m3[0] + m2[3]*m3[1] + m2[6]*m3[2]
+	m1[1] = m2[1]*m3[0] + m2[4]*m3[1] + m2[7]*m3[2]
+	m1[2] = m2[2]*m3[0] + m2[5]*m3[1] + m2[8]*m3[2]
+
+	m1[3] = m2[0]*m3[3] + m2[3]*m3[4] + m2[6]*m3[5]
+	m1[4] = m2[1]*m3[3] + m2[4]*m3[4] + m2[7]*m3[5]
+	m1[5] = m2[2]*m3[3] + m2[5]*m3[4] + m2[8]*m3[5]
+
+	m1[6] = m2[0]*m3[6] + m2[3]*m3[7] + m2[6]*m3[8]
+	m1[7] = m2[1]*m3[6] + m2[4]*m3[7] + m2[7]*m3[8]
+	m1[8] = m2[2]*m3[6] + m2[5]*m3[7] + m2[8]*m3[8]
+
+	m1[9] = m2[0]*m3[9] + m2[3]*m3[10] + m2[6]*m3[11] + m2[9]
+	m1[10] = m2[1]*m3[9] + m2[4]*m3[10] + m2[7]*m3[11] + m2[10]
+	m1[11] = m2[2]*m3[9] + m2[5]*m3[10] + m2[8]*m3[11] + m2[11]
+}
+
+// Mul3x4With is a memory friendly version fo Mul3x4.
+func (m1 *Mat3x4) Mul3x4With(m2 *Mat3x4) {
+	v0 := m1[0]
+	v1 := m1[1]
+	v2 := m1[2]
+	v3 := m1[3]
+	v4 := m1[4]
+	v5 := m1[5]
+	v6 := m1[6]
+	v7 := m1[7]
+	v8 := m1[8]
+	v9 := m1[9]
+	v10 := m1[10]
+	v11 := m1[11]
+	m1[0] = v0*m2[0] + v3*m2[1] + v6*m2[2]
+	m1[1] = v1*m2[0] + v4*m2[1] + v7*m2[2]
+	m1[2] = v2*m2[0] + v5*m2[1] + v8*m2[2]
+
+	m1[3] = v0*m2[3] + v3*m2[4] + v6*m2[5]
+	m1[4] = v1*m2[3] + v4*m2[4] + v7*m2[5]
+	m1[5] = v2*m2[3] + v5*m2[4] + v8*m2[5]
+
+	m1[6] = v0*m2[6] + v3*m2[7] + v6*m2[8]
+	m1[7] = v1*m2[6] + v4*m2[7] + v7*m2[8]
+	m1[8] = v2*m2[6] + v5*m2[7] + v8*m2[8]
+
+	m1[9] = v0*m2[9] + v3*m2[10] + v6*m2[11] + v9
+	m1[10] = v1*m2[9] + v4*m2[10] + v7*m2[11] + v10
+	m1[11] = v2*m2[9] + v5*m2[10] + v8*m2[11] + v11
+}
+
+// Mul4 performs a "matrix product" between this matrix
+// and another of the given dimension. For any two matrices of dimensionality
+// MxN and NxO, the result will be MxO. For instance, Mat4 multiplied using
+// Mul4x2 will result in a Mat4x2.
+func (m1 *Mat3x4) Mul4(m2 *Mat4) Mat3x4 {
+	return Mat3x4{
+		m1[0]*m2[0] + m1[3]*m2[1] + m1[6]*m2[2] + m1[9]*m2[3],
+		m1[1]*m2[0] + m1[4]*m2[1] + m1[7]*m2[2] + m1[10]*m2[3],
+		m1[2]*m2[0] + m1[5]*m2[1] + m1[8]*m2[2] + m1[11]*m2[3],
+		m1[0]*m2[4] + m1[3]*m2[5] + m1[6]*m2[6] + m1[9]*m2[7],
+		m1[1]*m2[4] + m1[4]*m2[5] + m1[7]*m2[6] + m1[10]*m2[7],
+		m1[2]*m2[4] + m1[5]*m2[5] + m1[8]*m2[6] + m1[11]*m2[7],
+		m1[0]*m2[8] + m1[3]*m2[9] + m1[6]*m2[10] + m1[9]*m2[11],
+		m1[1]*m2[8] + m1[4]*m2[9] + m1[7]*m2[10] + m1[10]*m2[11],
+		m1[2]*m2[8] + m1[5]*m2[9] + m1[8]*m2[10] + m1[11]*m2[11],
+		m1[0]*m2[12] + m1[3]*m2[13] + m1[6]*m2[14] + m1[9]*m2[15],
+		m1[1]*m2[12] + m1[4]*m2[13] + m1[7]*m2[14] + m1[10]*m2[15],
+		m1[2]*m2[12] + m1[5]*m2[13] + m1[8]*m2[14] + m1[11]*m2[15],
+	}
+}
+
+// Det on 3x4 matrix is a cheat, it assumes the last row is [0 0 0 1].
+// [a d g j]
+// [b e h k]
+// [c f i l]
+// [0 0 0 1]
+// aei - afh - bdi + bfg + cdh - ceg
+func (m1 *Mat3x4) Det() float32 {
+	return m1[0]*m1[4]*m1[8] - m1[0]*m1[5]*m1[7] - m1[1]*m1[3]*m1[8] + m1[1]*m1[5]*m1[6] + m1[2]*m1[3]*m1[7] - m1[2]*m1[4]*m1[6]
+}
+
+// Inverse is a cheat function that returns the inverse of this matrix as if it was a 4x4 matrix.
+func (m1 *Mat3x4) Inverse() Mat3x4 {
+
+	det := m1.Det()
+	if FloatEqual(det, float32(0.0)) {
+		return Mat3x4{}
+	}
+
+	retMat := Mat3x4{
+		m1[4]*m1[8] - m1[5]*m1[7],
+		m1[2]*m1[7] - m1[1]*m1[8],
+		m1[1]*m1[5] - m1[2]*m1[4],
+		m1[5]*m1[6] - m1[3]*m1[8],
+		m1[0]*m1[8] - m1[2]*m1[6],
+		m1[2]*m1[3] - m1[0]*m1[5],
+		m1[3]*m1[7] - m1[4]*m1[6],
+		m1[1]*m1[6] - m1[0]*m1[7],
+		m1[0]*m1[4] - m1[1]*m1[3],
+		m1[5]*m1[7]*m1[9] - m1[4]*m1[8]*m1[9] - m1[5]*m1[6]*m1[10] + m1[3]*m1[8]*m1[10] + m1[4]*m1[6]*m1[11] - m1[3]*m1[7]*m1[11],
+		-m1[2]*m1[9]*m1[7] + m1[1]*m1[9]*m1[8] + m1[2]*m1[10]*m1[6] - m1[0]*m1[10]*m1[8] - m1[1]*m1[6]*m1[11] + m1[0]*m1[7]*m1[11],
+		m1[2]*m1[9]*m1[4] - m1[1]*m1[9]*m1[5] - m1[2]*m1[10]*m1[3] + m1[0]*m1[10]*m1[5] + m1[1]*m1[3]*m1[11] - m1[0]*m1[4]*m1[11],
+	}
+	return retMat.Mul(1.0 / det)
 }
 
 // ApproxEqual performs an element-wise approximate equality test between two matrices,
 // as if FloatEqual had been used.
-func (m1 *Mat4x3) ApproxEqual(m2 *Mat4x3) bool {
+func (m1 *Mat3x4) ApproxEqual(m2 *Mat3x4) bool {
 	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) &&
 		FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) &&
 		FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11])
@@ -1815,7 +1991,7 @@ func (m1 *Mat4x3) ApproxEqual(m2 *Mat4x3) bool {
 
 // ApproxEqualThreshold performs an element-wise approximate equality test between two matrices
 // with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat4x3) ApproxEqualThreshold(m2 *Mat4x3, threshold float32) bool {
+func (m1 *Mat3x4) ApproxEqualThreshold(m2 *Mat3x4, threshold float32) bool {
 	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
 		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) &&
 		FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold)
@@ -1824,7 +2000,7 @@ func (m1 *Mat4x3) ApproxEqualThreshold(m2 *Mat4x3, threshold float32) bool {
 // ApproxFuncEqual performs an element-wise approximate equality test between two matrices
 // with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
 // function may be used in practice.
-func (m1 Mat4x3) ApproxFuncEqual(m2 Mat4x3, eq func(float32, float32) bool) bool {
+func (m1 *Mat3x4) ApproxFuncEqual(m2 *Mat3x4, eq func(float32, float32) bool) bool {
 	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3]) &&
 		eq(m1[4], m2[4]) && eq(m1[5], m2[5]) && eq(m1[6], m2[6]) && eq(m1[7], m2[7]) &&
 		eq(m1[8], m2[8]) && eq(m1[9], m2[9]) && eq(m1[10], m2[10]) && eq(m1[11], m2[11])
@@ -1836,8 +2012,8 @@ func (m1 Mat4x3) ApproxFuncEqual(m2 Mat4x3, eq func(float32, float32) bool) bool
 //
 // This method is garbage-in garbage-out. For instance, on a Mat4 asking for
 // At(5,0) will work just like At(1,1). Or it may panic if it's out of bounds.
-func (m1 *Mat4x3) At(row, col int) float32 {
-	return m1[col*4+row]
+func (m1 *Mat3x4) At(row, col int) float32 {
+	return m1[col*3+row]
 }
 
 // Set sets the corresponding matrix element at the given row and column.
@@ -1845,8 +2021,8 @@ func (m1 *Mat4x3) At(row, col int) float32 {
 //
 // This method is garbage-in garbage-out. For instance, on a Mat4 asking for
 // Set(5,0,val) will work just like Set(1,1,val). Or it may panic if it's out of bounds.
-func (m1 *Mat4x3) Set(row, col int, value float32) {
-	m1[col*4+row] = value
+func (m1 *Mat3x4) Set(row, col int, value float32) {
+	m1[col*3+row] = value
 }
 
 // Index returns the index of the given row and column, to be used with direct
@@ -1855,43 +2031,124 @@ func (m1 *Mat4x3) Set(row, col int, value float32) {
 // This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
 // (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
 // a panic if you try to access the array with it if it's truly out of bounds.
-func (Mat4x3) Index(row, col int) int {
-	return col*4 + row
+func (Mat3x4) Index(row, col int) int {
+	return col*3 + row
 }
 
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecM for a MxN matrix.
-func (m1 *Mat4x3) Row(row int) Vec3 {
-	return Vec3{m1[row+0], m1[row+4], m1[row+8]}
+func (m1 *Mat3x4) Row(row int) Vec4 {
+	return Vec4{m1[row+0], m1[row+3], m1[row+6], m1[row+9]}
 }
 
 // Rows decomposes a matrix into its corresponding row vectors.
 // This is equivalent to calling mat.Row for each row.
-func (m1 *Mat4x3) Rows() (row0, row1, row2, row3 Vec3) {
-	return m1.Row(0), m1.Row(1), m1.Row(2), m1.Row(3)
+func (m1 *Mat3x4) Rows() (row0, row1, row2 Vec4) {
+	return m1.Row(0), m1.Row(1), m1.Row(2)
 }
 
 // Col returns a vector representing the corresponding column (starting at col 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecN for a MxN matrix.
-func (m1 *Mat4x3) Col(col int) Vec4 {
-	return Vec4{m1[col*4+0], m1[col*4+1], m1[col*4+2], m1[col*4+3]}
+func (m1 *Mat3x4) Col(col int) Vec3 {
+	return Vec3{m1[col*3+0], m1[col*3+1], m1[col*3+2]}
 }
 
 // Cols decomposes a matrix into its corresponding column vectors.
 // This is equivalent to calling mat.Col for each column.
-func (m1 *Mat4x3) Cols() (col0, col1, col2 Vec4) {
-	return m1.Col(0), m1.Col(1), m1.Col(2)
+func (m1 *Mat3x4) Cols() (col0, col1, col2, col3 Vec3) {
+	return m1.Col(0), m1.Col(1), m1.Col(2), m1.Col(3)
 }
 
 // Abs returns the element-wise absolute value of this matrix
-func (m1 *Mat4x3) Abs() Mat4x3 {
-	return Mat4x3{math.Abs(m1[0]), math.Abs(m1[1]), math.Abs(m1[2]), math.Abs(m1[3]), math.Abs(m1[4]), math.Abs(m1[5]), math.Abs(m1[6]), math.Abs(m1[7]), math.Abs(m1[8]), math.Abs(m1[9]), math.Abs(m1[10]), math.Abs(m1[11])}
+func (m1 *Mat3x4) Abs() Mat3x4 {
+	return Mat3x4{math.Abs(m1[0]), math.Abs(m1[1]), math.Abs(m1[2]), math.Abs(m1[3]), math.Abs(m1[4]), math.Abs(m1[5]), math.Abs(m1[6]), math.Abs(m1[7]), math.Abs(m1[8]), math.Abs(m1[9]), math.Abs(m1[10]), math.Abs(m1[11])}
+}
+
+// SetOrientationAndPos sets this matrix to represent this quaternion's orientation and this vector's position.
+func (m1 *Mat3x4) SetOrientationAndPos(q1 *Quat, v1 *Vec3) {
+	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
+	m1[0] = 1 - 2*y*y - 2*z*z
+	m1[1] = 2*x*y + 2*w*z
+	m1[2] = 2*x*z - 2*w*y
+	m1[3] = 2*x*y - 2*w*z
+	m1[4] = 1 - 2*x*x - 2*z*z
+	m1[5] = 2*y*z + 2*w*x
+	m1[6] = 2*x*z + 2*w*y
+	m1[7] = 2*y*z - 2*w*x
+	m1[8] = 1 - 2*x*x - 2*y*y
+	m1[9] = v1[0]
+	m1[10] = v1[1]
+	m1[11] = v1[2]
+}
+
+// Transform is really just calling Mul3x1 but for the physics engine we'll redeclare it that way.
+func (m1 *Mat3x4) Transform(v1 *Vec3) Vec3 {
+	return m1.Mul3x1(v1)
+}
+
+// TransformIn is really just calling Mul3x1In but for the physics engine we'll redeclare it that way.
+func (m1 *Mat3x4) TransformIn(v1, dst *Vec3) {
+	m1.Mul3x1In(v1, dst)
+}
+
+// TransformInverse will transform v1 by using shortcut. Like assuming that the 4th
+// column is a translation and that the inner 3x3 matrix is a rotation matrix (meaning
+// that we can use the transpose.
+func (m1 *Mat3x4) TransformInverse(v1 *Vec3) Vec3 {
+	x := v1[0] - m1[9]
+	y := v1[1] - m1[10]
+	z := v1[2] - m1[11]
+	return Vec3{
+		x*m1[0] + y*m1[1] + z*m1[2],
+		x*m1[3] + y*m1[4] + z*m1[5],
+		x*m1[6] + y*m1[7] + z*m1[8],
+	}
+}
+
+// TransformInverseIn is a memory friendly version of TransformInverse.
+func (m1 *Mat3x4) TransformInverseIn(v1, dst *Vec3) {
+	x := v1[0] - m1[9]
+	y := v1[1] - m1[10]
+	z := v1[2] - m1[11]
+
+	dst[0] = x*m1[0] + y*m1[1] + z*m1[2]
+	dst[1] = x*m1[3] + y*m1[4] + z*m1[5]
+	dst[2] = x*m1[6] + y*m1[7] + z*m1[8]
+}
+
+// TransformDirection transforms the given direction by this inner rotation matrix.
+func (m1 *Mat3x4) TransformDirection(v1 *Vec3) Vec3 {
+	return Vec3{v1[0]*m1[0] + v1[1]*m1[3] + v1[2]*m1[6],
+		v1[0]*m1[1] + v1[1]*m1[4] + v1[2]*m1[7],
+		v1[0]*m1[2] + v1[1]*m1[5] + v1[2]*m1[8]}
+}
+
+// TransformDirectionIn is a memory friendly version of TransformDirection.
+func (m1 *Mat3x4) TransformDirectionIn(v1, dst *Vec3) {
+	dst[0] = v1[0]*m1[0] + v1[1]*m1[3] + v1[2]*m1[6]
+	dst[1] = v1[0]*m1[1] + v1[1]*m1[4] + v1[2]*m1[7]
+	dst[2] = v1[0]*m1[2] + v1[1]*m1[5] + v1[2]*m1[8]
+}
+
+// TransformInverseDirection uses the fact that the inner 3x3 matrix is a
+// rotation matrix to use the transpose to do the inverse of TransformDirection.
+func (m1 *Mat3x4) TransformInverseDirection(v1 *Vec3) Vec3 {
+	return Vec3{v1[0]*m1[0] + v1[1]*m1[1] + v1[2]*m1[2],
+		v1[0]*m1[3] + v1[1]*m1[4] + v1[2]*m1[5],
+		v1[0]*m1[6] + v1[1]*m1[7] + v1[2]*m1[8]}
+}
+
+// TransformInverseDirectionIn is a memory friendly version of TransformInverseDirection.
+func (m1 *Mat3x4) TransformInverseDirectionIn(v1, dst *Vec3) {
+	dst[0] = v1[0]*m1[0] + v1[1]*m1[1] + v1[2]*m1[2]
+	dst[1] = v1[0]*m1[3] + v1[1]*m1[4] + v1[2]*m1[5]
+	dst[2] = v1[0]*m1[6] + v1[1]*m1[7] + v1[2]*m1[8]
 }
 
 // String pretty prints the matrix
-func (m1 *Mat4x3) String() string {
+func (m1 *Mat3x4) String() string {
 	buf := new(bytes.Buffer)
 	w := tabwriter.NewWriter(buf, 4, 4, 1, ' ', tabwriter.AlignRight)
 	for i := 0; i < 3; i++ {
