@@ -988,14 +988,6 @@ func (m1 *Mat3) String() string {
 	return buf.String()
 }
 
-func SetCol() {
-	/*
-
-
-	*/
-	panic("dont forget to setcol")
-}
-
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
 func (m1 *Mat4) SetCol(col int, v *Vec4) {
 	m1[col*4+0], m1[col*4+1], m1[col*4+2], m1[col*4+3] = v[0], v[1], v[2], v[3]

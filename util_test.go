@@ -311,12 +311,12 @@ func TestSetMax(t *testing.T) {
 	a, b := float32(0), float32(5)
 	SetMax(&a, &b)
 	if a != 5 {
-		t.Errorf("SetMax failed: %d %d", a, b)
+		t.Errorf("SetMax failed: %f %f", a, b)
 	}
 	a, b = float32(1), float32(0)
 	SetMax(&a, &b)
 	if a != 1 {
-		t.Errorf("SetMax failed: %d %d", a, b)
+		t.Errorf("SetMax failed: %f %f", a, b)
 	}
 }
 
@@ -324,12 +324,12 @@ func TestSetMin(t *testing.T) {
 	a, b := float32(0), float32(5)
 	SetMin(&a, &b)
 	if a != 0 {
-		t.Errorf("SetMin failed: %d %d", a, b)
+		t.Errorf("SetMin failed: %f %f", a, b)
 	}
 	a, b = float32(1), float32(0)
 	SetMin(&a, &b)
 	if a != 0 {
-		t.Errorf("SetMin failed: %d %d", a, b)
+		t.Errorf("SetMin failed: %f %f", a, b)
 	}
 }
 
