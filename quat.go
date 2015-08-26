@@ -70,6 +70,12 @@ func QuatRotate(angle float32, axis *Vec3) Quat {
 	return Quat{c, axis.Mul(s)}
 }
 
+// Iden sets this quaternion to the identity quaternion.
+func (q1 *Quat) Iden() {
+	q1.W = 1
+	q1.V = Vec3{0, 0, 0}
+}
+
 // X is a convenient alias for q.V[0]
 func (q1 Quat) X() float32 {
 	return q1.V[0]
@@ -341,7 +347,7 @@ func (q1 *Quat) RotateByVector(v1 *Vec3) {
 }
 
 // AddScaledVec scales the amount of the vector to add. <- really what does that even mean?
-func (q1 *Quat) AddScaledVec(v1 *Vec3, scale float32) {
+func (q1 *Quat) AddScaledVec(scale float32, v1 *Vec3) {
 	q2 := Quat{0, Vec3{v1[0] * scale, v1[1] * scale, v1[2] * scale}}
 	q2.MulWith(q1)
 	q1.W += q2.W * 0.5

@@ -620,6 +620,13 @@ func (m1 *Mat3) Mul3x1(m2 *Vec3) Vec3 {
 	}
 }
 
+// Mul3x1In is a memory friendly version of Mul3x1
+func (m1 *Mat3) Mul3x1In(m2, dst *Vec3) {
+	dst[0] = m1[0]*m2[0] + m1[3]*m2[1] + m1[6]*m2[2]
+	dst[1] = m1[1]*m2[0] + m1[4]*m2[1] + m1[7]*m2[2]
+	dst[2] = m1[2]*m2[0] + m1[5]*m2[1] + m1[8]*m2[2]
+}
+
 // Mul3 performs a "matrix product" between this matrix
 // and another of the given dimension. For any two matrices of dimensionality
 // MxN and NxO, the result will be MxO. For instance, Mat4 multiplied using
@@ -813,6 +820,8 @@ func (m1 *Mat3) InverseOf(m2 *Mat3) {
 	m1[6] = v3*v7 - v4*v6
 	m1[7] = v1*v6 - v0*v7
 	m1[8] = v0*v4 - v1*v3
+
+	m1.MulWith(1.0 / det)
 }
 
 // ApproxEqual performs an element-wise approximate equality test between two matrices,
@@ -1783,6 +1792,15 @@ func (m1 *Mat3x4) Mat4() Mat4 {
 		m1[3], m1[4], m1[5], 0,
 		m1[6], m1[7], m1[8], 0,
 		m1[9], m1[10], m1[11], 1}
+}
+
+// Mat4In is a memory friendly version of Mat4.
+func (m1 *Mat3x4) Mat4In(m2 *Mat4) {
+	m2[0], m2[4], m2[8], m2[12] = m1[0], m1[3], m1[6], m1[9]
+	m2[1], m2[5], m2[9], m2[13] = m1[1], m1[4], m1[7], m1[10]
+	m2[2], m2[6], m2[10], m2[14] = m1[2], m1[5], m1[8], m1[11]
+	m2[3], m2[7], m2[11], m2[15] = 0, 0, 0, 1
+
 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
