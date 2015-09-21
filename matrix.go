@@ -1778,6 +1778,14 @@ func (m1 *Mat4) String() string {
 //Mat3x4 is a 3 row 4 column matrix.
 type Mat3x4 [12]float32
 
+// Ident3x4 returns the cheating matrix 3x4 with its diagonal as [1,1,1]
+func Ident3x4() Mat3x4 {
+	return Mat3x4{1, 0, 0,
+		0, 1, 0,
+		0, 0, 1,
+		0, 0, 0}
+}
+
 // Mat4 returns a mat4 with the last row as [0 0 0 1].
 func (m1 *Mat3x4) Mat4() Mat4 {
 	return Mat4{m1[0], m1[1], m1[2], 0,
@@ -2155,6 +2163,16 @@ func (m1 *Mat3x4) TransformInverseDirectionIn(v1, dst *Vec3) {
 	dst[0] = v1[0]*m1[0] + v1[1]*m1[1] + v1[2]*m1[2]
 	dst[1] = v1[0]*m1[3] + v1[1]*m1[4] + v1[2]*m1[5]
 	dst[2] = v1[0]*m1[6] + v1[1]*m1[7] + v1[2]*m1[8]
+}
+
+// GetAxis return one of the axis of the matrix. i needs to be between 0 and 3
+// or else this will panic
+func (m1 *Mat3x4) GetAxis(i int) Vec3 {
+	return Vec3{
+		m1[i*3+0],
+		m1[i*3+1],
+		m1[i*3+2],
+	}
 }
 
 // String pretty prints the matrix
