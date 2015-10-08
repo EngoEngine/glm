@@ -6,7 +6,7 @@ package glm
 
 import (
 	"errors"
-	"luxengine.net/math"
+	"github.com/luxengine/math"
 )
 
 // Ortho returns a Mat4 that represents a orthographic projection from the given arguments.

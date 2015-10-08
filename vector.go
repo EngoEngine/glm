@@ -8,7 +8,7 @@
 package glm
 
 import (
-	"luxengine.net/math"
+	"github.com/luxengine/math"
 )
 
 // Vec2 is the representation of a vector with 2 components.

@@ -5,7 +5,7 @@
 package glm
 
 import (
-	"luxengine.net/math"
+	"github.com/luxengine/math"
 	"testing"
 )
 

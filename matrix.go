@@ -10,7 +10,7 @@ package glm
 import (
 	"bytes"
 	"fmt"
-	"luxengine.net/math"
+	"github.com/luxengine/math"
 	"text/tabwriter"
 )
 
