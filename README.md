@@ -1,4 +1,5 @@
 # glm ![Build Status](http://jenkins.hydroflame.net/job/glm/lastBuild/artifact/status.svg) ![Tests](http://jenkins.hydroflame.net/job/glm/lastBuild/artifact/tests.svg) ![Coverage](http://jenkins.hydroflame.net/job/glm/lastBuild/artifact/coverage.svg)
+[![GoDoc](https://godoc.org/github.com/luxengine/glm?status.svg)](https://godoc.org/github.com/luxengine/glm)
 
 More efficient version then go-gl math lib and better name (math32 is too long to type).
 
