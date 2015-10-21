@@ -620,6 +620,16 @@ func (m1 *Mat3) Mul3x1(m2 *Vec3) Vec3 {
 	}
 }
 
+// Mul3x1Transpose is the same as Mul3x1 except it uses the inplace transpose of
+// this matrix.
+func (m1 *Mat3) Mul3x1Transpose(v *Vec3) Vec3 {
+	return Vec3{
+		m1[0]*v[0] + m1[1]*v[1] + m1[2]*v[2],
+		m1[3]*v[0] + m1[4]*v[1] + m1[5]*v[2],
+		m1[6]*v[0] + m1[7]*v[1] + m1[8]*v[2],
+	}
+}
+
 // Mul3x1In is a memory friendly version of Mul3x1
 func (m1 *Mat3) Mul3x1In(m2, dst *Vec3) {
 	dst[0] = m1[0]*m2[0] + m1[3]*m2[1] + m1[6]*m2[2]
