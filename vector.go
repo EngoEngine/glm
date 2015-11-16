@@ -755,3 +755,13 @@ func (v1 *Vec4) SetNormalizeOf(v2 *Vec4) {
 	v1[2] = l * v2[2]
 	v1[3] = l * v2[3]
 }
+
+func (v1 *Vec2) Dotf(x, y float32) float32 {
+	return v1[0]*x + v1[1]*y
+}
+func (v1 *Vec3) Dotf(x, y, z float32) float32 {
+	return v1[0]*x + v1[1]*y + v1[2]*z
+}
+func (v1 *Vec4) Dotf(x, y, z, w float32) float32 {
+	return v1[0]*x + v1[1]*y + v1[2]*z + v1[3]*w
+}
