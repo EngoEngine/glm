@@ -8,17 +8,30 @@
 package glm
 
 import (
+	"fmt"
 	"github.com/luxengine/math"
 )
 
 // Vec2 is the representation of a vector with 2 components.
 type Vec2 [2]float32
 
+func (v1 *Vec2) String() string {
+	return fmt.Sprintf("{%.6f, %.6f}", v1[0], v1[1])
+}
+
 // Vec3 is the representation of a vector with 3 components.
 type Vec3 [3]float32
 
+func (v1 *Vec3) String() string {
+	return fmt.Sprintf("{%.6f, %.6f, %.6f}", v1[0], v1[1], v1[2])
+}
+
 // Vec4 is the representation of a vector with 4 components.
 type Vec4 [4]float32
+
+func (v1 *Vec4) String() string {
+	return fmt.Sprintf("{%.6f, %.6f, %.6f, %.6f}", v1[0], v1[1], v1[2], v1[2])
+}
 
 // Vec3 return a Vec3 from this Vec2 with {z}.
 func (v1 *Vec2) Vec3(z float32) Vec3 {
@@ -756,12 +769,20 @@ func (v1 *Vec4) SetNormalizeOf(v2 *Vec4) {
 	v1[3] = l * v2[3]
 }
 
+// Dotf is the same as Dot but takes 2 float32 as input instead (API convinience
+// function)
 func (v1 *Vec2) Dotf(x, y float32) float32 {
 	return v1[0]*x + v1[1]*y
 }
+
+// Dotf is the same as Dot but takes 3 float32 as input instead (API convinience
+// function)
 func (v1 *Vec3) Dotf(x, y, z float32) float32 {
 	return v1[0]*x + v1[1]*y + v1[2]*z
 }
+
+// Dotf is the same as Dot but takes 4 float32 as input instead (API convinience
+// function)
 func (v1 *Vec4) Dotf(x, y, z, w float32) float32 {
 	return v1[0]*x + v1[1]*y + v1[2]*z + v1[3]*w
 }
