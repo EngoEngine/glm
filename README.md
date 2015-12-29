@@ -2,9 +2,9 @@
 
 More efficient version then go-gl math lib and better name (math32 is too long to type).
 
-The problem with go-gl implementation is that every operation returns a new matrix, you can reuse memory. Benchmark reflect that this causes quite the slowdown. see [issue 29](https://github.com/go-gl/mathgl/issues/29) on mathgl github. This library is basically a copy of mgl32 but a ton of methods we're added in order to allow the user to have more control over the memory. First, most methods take pointer argument and second there is more then 1 method to do the same operation.
+The problem with go-gl implementation is that every operation returns a new matrix/quaternion/vector, you can't reuse memory. Benchmark reflect that this causes quite the slowdown. see [issue 29](https://github.com/go-gl/mathgl/issues/29). This library is a fork of mgl32 but a ton of methods we're added in order to allow the user to have more control over the memory. First, most methods take pointer argument and second there is more then 1 method to do the same operation.
 
-This library uses lux math, so essentially everytime a new pure float32 function comes out this library will get faster as well. 
+This library uses lux math (native float32 math) instead of the standard library math. 
 
 In the future, when we have more knowledge of plan9 we intend to insert some SIMD operations for the more hardcore stuff.
 ```Go

@@ -4,6 +4,27 @@ import (
 	"testing"
 )
 
+func TestVec2_String(t *testing.T) {
+	v := Vec2{1, 1}
+	if s := v.String(); s != "{1.000000, 1.000000}" {
+		t.Errorf("(%v).String() = %s, want {1.000000, 1.000000}", v, s)
+	}
+}
+
+func TestVec3_String(t *testing.T) {
+	v := Vec3{1, 1, 1}
+	if s := v.String(); s != "{1.000000, 1.000000, 1.000000}" {
+		t.Errorf("(%v).String() = %s, want {1.000000, 1.000000, 1.000000}", v, s)
+	}
+}
+
+func TestVec4_String(t *testing.T) {
+	v := Vec4{1, 1, 1, 1}
+	if s := v.String(); s != "{1.000000, 1.000000, 1.000000, 1.000000}" {
+		t.Errorf("(%v).String() = %s, want {1.000000, 1.000000, 1.000000, 1.000000}", v, s)
+	}
+}
+
 func TestVec2_Vec3(t *testing.T) {
 	tests := []struct {
 		vec2 Vec2
@@ -961,6 +982,99 @@ func TestVec4_Normalize(t *testing.T) {
 		c.Normalize()
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
 			t.Errorf("%v.Normal() = %v, want %v", test.v1, c, test.normal)
+		}
+	}
+}
+
+func TestVec2_AddScaled(t *testing.T) {
+	for _, test := range vec2Tests {
+		tmp := test.v2.Mul(test.f)
+		tmp.AddWith(&test.v1)
+		c := test.v1
+		c.AddScaledVec(test.f, &test.v2)
+		if !c.ApproxEqualThreshold(&tmp, 1e-4) {
+			t.Errorf("v1.AddScaled(f, v2) = %v, want %v", c, tmp)
+		}
+	}
+}
+
+func TestVec3_AddScaled(t *testing.T) {
+	for _, test := range vec3Tests {
+		tmp := test.v2.Mul(test.f)
+		tmp.AddWith(&test.v1)
+		c := test.v1
+		c.AddScaledVec(test.f, &test.v2)
+		if !c.ApproxEqualThreshold(&tmp, 1e-4) {
+			t.Errorf("v1.AddScaled(f, v2) = %v, want %v", c, tmp)
+		}
+	}
+}
+
+func TestVec4_AddScaled(t *testing.T) {
+	for _, test := range vec4Tests {
+		tmp := test.v2.Mul(test.f)
+		tmp.AddWith(&test.v1)
+		c := test.v1
+		c.AddScaledVec(test.f, &test.v2)
+		if !c.ApproxEqualThreshold(&tmp, 1e-4) {
+			t.Errorf("v1.AddScaled(f, v2) = %v, want %v", c, tmp)
+		}
+	}
+}
+
+func TestNormalizeVec2(t *testing.T) {
+	for _, test := range vec2Tests {
+		c := NormalizeVec2(test.v1)
+		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
+			t.Errorf("NormalizeVec2(c) = %v, want %v", c, test.normal)
+		}
+	}
+}
+
+func TestNormalizeVec3(t *testing.T) {
+	for _, test := range vec3Tests {
+		c := NormalizeVec3(test.v1)
+		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
+			t.Errorf("NormalizeVec3(c) = %v, want %v", c, test.normal)
+		}
+	}
+}
+
+func TestNormalizeVec4(t *testing.T) {
+	for _, test := range vec4Tests {
+		c := NormalizeVec4(test.v1)
+		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
+			t.Errorf("NormalizeVec4(c) = %v, want %v", c, test.normal)
+		}
+	}
+}
+
+func TestVec2_SetNormalizeOf(t *testing.T) {
+	for _, test := range vec2Tests {
+		var c Vec2
+		c.SetNormalizeOf(&test.v1)
+		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
+			t.Errorf("c.SetNormalizeOf(v1) = %v, want %v", c, test.normal)
+		}
+	}
+}
+
+func TestVec3_SetNormalizeOf(t *testing.T) {
+	for _, test := range vec3Tests {
+		var c Vec3
+		c.SetNormalizeOf(&test.v1)
+		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
+			t.Errorf("c.SetNormalizeOf(v1) = %v, want %v", c, test.normal)
+		}
+	}
+}
+
+func TestVec4_SetNormalizeOf(t *testing.T) {
+	for _, test := range vec4Tests {
+		var c Vec4
+		c.SetNormalizeOf(&test.v1)
+		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
+			t.Errorf("c.SetNormalizeOf(v1) = %v, want %v", c, test.normal)
 		}
 	}
 }

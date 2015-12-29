@@ -1,7 +1,3 @@
-// Copyright 2014 The go-gl Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package glm
 
 import (
@@ -22,11 +18,11 @@ func Ortho2D(left, right, bottom, top float32) Mat4 {
 }
 
 // Perspective returns a Mat4 representing a perspective projection of the given arguments.
-func Perspective(fovy, aspect, near, far float32) *Mat4 {
+func Perspective(fovy, aspect, near, far float32) Mat4 {
 	// fovy = (fovy * math.Pi) / 180.0 // convert from degrees to radians
 	nmf, f := near-far, 1./math.Tan(fovy/2.0)
 
-	return &Mat4{float32(f / aspect), 0, 0, 0, 0, float32(f), 0, 0, 0, 0, float32((near + far) / nmf), -1, 0, 0, float32((2. * far * near) / nmf), 0}
+	return Mat4{float32(f / aspect), 0, 0, 0, 0, float32(f), 0, 0, 0, 0, float32((near + far) / nmf), -1, 0, 0, float32((2. * far * near) / nmf), 0}
 }
 
 // Frustum returns a Mat4 representing a frustrum transform (squared pyramid with the top cut off)
@@ -38,12 +34,12 @@ func Frustum(left, right, bottom, top, near, far float32) Mat4 {
 }
 
 // LookAt returns a Mat4 that represents a camera transform from the given arguments.
-func LookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ float32) *Mat4 {
+func LookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ float32) Mat4 {
 	return LookAtV(&Vec3{eyeX, eyeY, eyeZ}, &Vec3{centerX, centerY, centerZ}, &Vec3{upX, upY, upZ})
 }
 
 // LookAtV generates a transform matrix from world space into the specific eye space
-func LookAtV(eye, center, up *Vec3) *Mat4 {
+func LookAtV(eye, center, up *Vec3) Mat4 {
 	var f Vec3
 	f.SubOf(center, eye)
 	f.Normalize()
@@ -62,8 +58,9 @@ func LookAtV(eye, center, up *Vec3) *Mat4 {
 		0, 0, 0, 1,
 	}
 
-	ret := M.Mul4(Translate3D(float32(-eye.X()), float32(-eye.Y()), float32(-eye.Z())))
-	return &ret
+	t := Translate3D(float32(-eye.X()), float32(-eye.Y()), float32(-eye.Z()))
+	ret := M.Mul4(&t)
+	return ret
 }
 
 // Project transforms a set of coordinates from object space (in obj) to window coordinates (with depth)

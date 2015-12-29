@@ -1,7 +1,3 @@
-// Copyright 2014 The go-gl Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package glm
 
 import (
@@ -172,7 +168,7 @@ func TestTransposeSquare(t *testing.T) {
 func TestAtSet(t *testing.T) {
 	//t.Parallel()
 
-	m := &Mat3{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	m := Mat3{1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	v := m.At(0, 2)
 
@@ -188,9 +184,9 @@ func TestAtSet(t *testing.T) {
 		t.Errorf("Value set by Set not gotten by At: %v, expected %v", v, 9001)
 	}
 
-	correctMat := &Mat3{1, 2, 3, 4, 5, 6, 9001, 8, 9}
+	correctMat := Mat3{1, 2, 3, 4, 5, 6, 9001, 8, 9}
 
-	if !correctMat.ApproxEqualThreshold(m, 1e-4) {
+	if !correctMat.ApproxEqualThreshold(&m, 1e-4) {
 		t.Errorf("After set, not equal to matrix that should be identical. Got: %v, expected: %v", m, correctMat)
 	}
 }

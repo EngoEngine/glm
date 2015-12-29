@@ -1,7 +1,3 @@
-// Copyright 2014 The go-gl Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package glm
 
 import (
@@ -13,30 +9,19 @@ import (
 // rotations will be transformed for the purposes of AnglesToQuat
 type RotationOrder int
 
+// All the possible rotation orders quaternion can take.
 const (
-	// XYX , shut up golint
 	XYX RotationOrder = iota
-	// XYZ , shut up golint
 	XYZ
-	// XZX , shut up golint
 	XZX
-	// XZY , shut up golint
 	XZY
-	// YXY , shut up golint
 	YXY
-	// YXZ , shut up golint
 	YXZ
-	// YZY , shut up golint
 	YZY
-	// YZX , shut up golint
 	YZX
-	// ZYZ , shut up golint
 	ZYZ
-	// ZYX , shut up golint
 	ZYX
-	// ZXZ , shut up golint
 	ZXZ
-	// ZXY , shut up golint
 	ZXY
 )
 
@@ -119,7 +104,7 @@ func (q1 *Quat) Sub(q2 *Quat) Quat {
 
 // SubOf is a memory friendly version of add. q1 = q2 + q3
 func (q1 *Quat) SubOf(q2, q3 *Quat) {
-	q1.W = q2.W + q3.W
+	q1.W = q2.W - q3.W
 	q1.V.SubOf(&q2.V, &q3.V)
 }
 
@@ -127,7 +112,7 @@ func (q1 *Quat) SubOf(q2, q3 *Quat) {
 // In quaternion cases you COULD use SubOf with q1 twice: q1.SubOf(&q1,&q2).
 // This is here just for API consistency.
 func (q1 *Quat) SubWith(q2 *Quat) {
-	q1.W += q2.W
+	q1.W -= q2.W
 	q1.V.SubWith(&q2.V)
 }
 
@@ -340,15 +325,17 @@ func (q1 *Quat) Rotate(v *Vec3) Vec3 {
 	return out
 }
 
-// RotateByVector ... I'm actually not sure what this does.
-func (q1 *Quat) RotateByVector(v1 *Vec3) {
-	q2 := Quat{0, *v1}
-	q1.MulWith(&q2)
-}
+// RotateByVector ... I'm actually not sure what this does. This isn't called by
+// tornago... so I'm not sure why it's here.
+//func (q1 *Quat) RotateByVector(v1 *Vec3) {
+//	q2 := Quat{0, *v1}
+//	q1.MulWith(&q2)
+//}
 
-// AddScaledVec scales the amount of the vector to add. <- really what does that even mean?
-func (q1 *Quat) AddScaledVec(scale float32, v1 *Vec3) {
-	q2 := Quat{0, Vec3{v1[0] * scale, v1[1] * scale, v1[2] * scale}}
+// AddScaledVec takes an input vector and scaled it by f then adds that rotation
+// to q1. Mostly used by tornago.
+func (q1 *Quat) AddScaledVec(f float32, v1 *Vec3) {
+	q2 := Quat{0, Vec3{v1[0] * f, v1[1] * f, v1[2] * f}}
 	q2.MulWith(q1)
 	q1.W += q2.W * 0.5
 	q1.V[0] += q2.V[0] * 0.5
