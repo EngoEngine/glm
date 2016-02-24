@@ -25,10 +25,10 @@ func TestPlane3_Plane3FromPoints(t *testing.T) {
 			},
 		},
 		{ // 2. down, near origin
-			points: [3]glm.Vec3{glm.Vec3{0, 1, 1}, glm.Vec3{0, 1, 0}, glm.Vec3{1, 1, 0}},
+			points: [3]glm.Vec3{glm.Vec3{0, 0, 0}, glm.Vec3{1, 0, 0}, glm.Vec3{0, 0, 1}},
 			plane: Plane3{
 				N: glm.Vec3{0, -1, 0},
-				D: 1,
+				D: 0,
 			},
 		},
 		{ // 3. up, at -1
@@ -69,32 +69,32 @@ func TestPlane2_Plane2FromPoints(t *testing.T) {
 		points [2]glm.Vec2
 		plane  Plane2
 	}{
-		{
+		{ // 0
 			points: [2]glm.Vec2{glm.Vec2{0, 0}, glm.Vec2{1, 0}},
 			plane: Plane2{
 				N: glm.Vec2{0, 1},
 				D: 0,
 			},
 		},
-		{
+		{ // 1
 			points: [2]glm.Vec2{glm.Vec2{0, 0}, glm.Vec2{1, 1}},
 			plane: Plane2{
 				N: glm.Vec2{-0.7072, 0.7072},
 				D: 0,
 			},
 		},
-		{
+		{ // 2
 			points: [2]glm.Vec2{glm.Vec2{0, 0}, glm.Vec2{1, -1}},
 			plane: Plane2{
 				N: glm.Vec2{0.7072, 0.7072},
 				D: 0,
 			},
 		},
-		{
+		{ // 3
 			points: [2]glm.Vec2{glm.Vec2{0, 1}, glm.Vec2{1, 0}},
 			plane: Plane2{
 				N: glm.Vec2{0.7072, 0.7072},
-				D: 1,
+				D: 0.7072,
 			},
 		},
 	}
@@ -111,6 +111,14 @@ func TestPlane2_Plane2FromPoints(t *testing.T) {
 }
 
 func TestPlane2_DistanceToPlane(t *testing.T) {
-	tests := []struct {
-	}{}
+	p := Plane2{
+		N: glm.Vec2{0, 1},
+		D: 1,
+	}
+	v := glm.Vec2{5, 2}
+
+	want := float32(1.0)
+	if d := p.DistanceToPlane(&v); !glm.FloatEqualThreshold(d, want, 1e-4) {
+		t.Errorf("DistanceToPlane = %f, want %f", d, want)
+	}
 }
