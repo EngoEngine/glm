@@ -17,13 +17,13 @@ func Quickhull2(points []glm.Vec2) []glm.Vec2 {
 	var minx, maxx float32 = math.MaxFloat32, -math.MaxFloat32
 
 	for n := range pts {
-		if pts[n].X() < minx {
-			minx = pts[n].X()
+		if pts[n][0] < minx {
+			minx = pts[n][0]
 			imin = n
 		}
 
-		if pts[n].X() > maxx {
-			maxx = pts[n].X()
+		if pts[n][0] > maxx {
+			maxx = pts[n][0]
 			imax = n
 		}
 	}
