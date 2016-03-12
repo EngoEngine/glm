@@ -1,0 +1,2 @@
+# geo
+package geo is a collection of geometric utility function. It's based on Christer Ericson's Real time collision detection (ISBN: 978-1-55860-732-3) and https://www.geometrictools.com/. As of today everything is in the same folder, the API is absolutelly not stable, if you need this code, either copy it or vendor it. Don't use the latest version just yet
