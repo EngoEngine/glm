@@ -23,3 +23,9 @@ func (a *AABB2) Intersects(b *AABB2) bool {
 
 	return true
 }
+
+// UpdateAABB updates this AABB by the transformed AABB3 b, a cannot be the same
+// as b.
+func (a *AABB2) UpdateAABB(b AABB2, r glm.Mat2, t glm.Vec2) {
+
+}
