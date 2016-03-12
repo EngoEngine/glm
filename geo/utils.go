@@ -119,12 +119,6 @@ func MostSeparatePointsOnAABB2(points []glm.Vec2) (min, max int) {
 		if points[i][1] > points[maxy][1] {
 			maxy = i
 		}
-		/*if points[i][2] < points[minz][2] {
-			minz = i
-		}
-		if points[i][2] > points[maxz][2] {
-			maxz = i
-		}*/
 	}
 
 	// Compute the squared distances for the three pairs of points
@@ -211,7 +205,7 @@ func CovarianceMatrix3(cov *glm.Mat3, points []glm.Vec3) {
 }
 
 // CovarianceMatrix2 computes the covariance matrix of the given set of points.
-func CovarianceMatrix2(cov *glm.Mat2, points []glm.Vec2) {
+func CovarianceMatrix2(cov *glm.Mat3, points []glm.Vec3) {
 	oon := float32(1.0) / float32(len(points))
 	var c glm.Vec3
 	var e00, e11, e01 float32
