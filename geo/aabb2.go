@@ -36,3 +36,39 @@ func (a *AABB2) UpdateAABB(b *AABB2, transform glm.Mat2x3) {
 		}
 	}
 }
+
+// ClosestPoint returns the point in or on the AABB2 closest to 'p'
+func (a *AABB2) ClosestPoint(p *glm.Vec2) glm.Vec2 {
+	return glm.Vec2{
+		math.Clamp(p[0], a.Center[0]-a.Radius[0], a.Center[0]+a.Radius[0]),
+		math.Clamp(p[1], a.Center[1]-a.Radius[1], a.Center[1]+a.Radius[1]),
+	}
+}
+
+// SqDistOfPoint returns the square distance of 'p' to the AABB2
+func (a *AABB2) SqDistOfPoint(p *glm.Vec2) float32 {
+	var sqDist float32
+
+	// For each axis count any excess distance outside box extents
+	v := p[0]
+	min := a.Center[0] - a.Radius[0]
+	max := a.Center[0] + a.Radius[0]
+	if v < min {
+		sqDist += (min - v) * (min - v)
+	}
+	if v > max {
+		sqDist += (v - max) * (v - max)
+	}
+
+	v = p[1]
+	min = a.Center[1] - a.Radius[1]
+	max = a.Center[1] + a.Radius[1]
+	if v < min {
+		sqDist += (min - v) * (min - v)
+	}
+	if v > max {
+		sqDist += (v - max) * (v - max)
+	}
+
+	return sqDist
+}

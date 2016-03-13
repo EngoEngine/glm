@@ -12,6 +12,55 @@ type OBB3 struct {
 	Radius      glm.Vec3
 }
 
+// ClosestPoint returns the point in or on the OBB closest to 'p'
+func (a *OBB3) ClosestPoint(p *glm.Vec3) glm.Vec3 {
+	var closestPoint glm.Vec3
+
+	d := p.Sub(&a.Center)
+
+	// Start result at center of box; make steps from there
+
+	// For each OBB axis...
+	for i := 0; i < len(a.Radius); i++ {
+		// ...project d onto that axis and get the distance along the axis of d
+		// from the box center
+		dist := d.Dot(&a.Orientation[i])
+
+		// If distance farther than the box extents, clamp to the box
+		if dist > a.Radius[i] {
+			dist = a.Radius[i]
+		} else if dist < -a.Radius[i] {
+			dist = -a.Radius[i]
+		}
+
+		closestPoint.AddScaledVec(dist, &a.Orientation[i])
+	}
+	return closestPoint
+}
+
+// SqDistOfPoint returns the square distance of 'p' to the OBB3
+func (a *OBB3) SqDistOfPoint(p *glm.Vec3) float32 {
+	v := p.Sub(&a.Center)
+
+	var sqDist float32
+
+	for i := 0; i < len(a.Center); i++ {
+		// Project vector from box center to 'p' on each axis, getting the
+		// distance of 'p' along that axis, and count any excess distance
+		// outside box extents
+		var excess float32
+		d := v.Dot(&a.Orientation[i])
+
+		if d < -a.Radius[i] {
+			excess = d + a.Radius[i]
+		} else if d > a.Radius[i] {
+			excess = d - a.Radius[i]
+		}
+		sqDist += excess * excess
+	}
+	return sqDist
+}
+
 // Intersects returns true if these OBB overlap.
 func (a *OBB3) Intersects(b *OBB3) bool {
 	// TODO find a good value for that said epsilon

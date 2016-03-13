@@ -499,3 +499,237 @@ func SqDistPointSegment3(a, b, c *glm.Vec3) float32 {
 
 	return ac.Len2() - e*e/f
 }
+
+// ClosestPointOnLine3 returns the point on ab closest to c. Also returns t for
+// the position of d, d(t) = a + t*(b - a)
+func ClosestPointOnLine3(a, b, c *glm.Vec3) (t float32, point glm.Vec3) {
+	ab := b.Sub(a)
+
+	// Project c onto ab, but deferring the division by ab.Dot(ab)
+	cma := c.Sub(a)
+	t = cma.Dot(&ab)
+	if t <= 0 {
+		// 'c' projects outside the [a, b] interval, on the 'a' side; clamp to
+		// 'a'
+		return 0, *a
+	}
+
+	denom := ab.Dot(&ab)
+	if t >= denom {
+		// 'c' projects outside the [a, b] interval, on the 'b' side; clamp to
+		// 'b'
+		return 1, *b
+	}
+
+	// 'c' projects inside the [a, b] interval; most do the deferred divide now
+	t = t / denom
+	point = *a
+	point.AddScaledVec(t, &ab)
+
+	return
+}
+
+// ClosestPointOnLine2 returns the point on ab closest to c. Also returns t for
+// the position of d, d(t) = a + t*(b - a)
+func ClosestPointOnLine2(a, b, c *glm.Vec2) (t float32, point glm.Vec2) {
+	ab := b.Sub(a)
+
+	// Project c onto ab, but deferring the division by ab.Dot(ab)
+	cma := c.Sub(a)
+	t = cma.Dot(&ab)
+
+	if t <= 0 {
+		// 'c' projects outside the [a, b] interval, on the 'a' side; clamp to
+		// 'a'
+		return 0, *a
+	}
+
+	denom := ab.Dot(&ab)
+	if t >= denom {
+		// 'c' projects outside the [a, b] interval, on the 'b' side; clamp to
+		// 'b'
+		return 1, *b
+	}
+
+	// 'c' projects inside the [a, b] interval; most do the deferred divide now
+	t = t / denom
+	point = *a
+	point.AddScaledVec(t, &ab)
+
+	return
+}
+
+// ClosestPointRect is a shortcut for Rect3.ClosestPoint where the rectangle is
+// defined by the span of [ab, ac].
+func ClosestPointRect(p, a, b, c *glm.Vec3) glm.Vec3 {
+	ab := b.Sub(a)
+	ac := c.Sub(a)
+	d := p.Sub(a)
+
+	// Start result at top-left corner of rect; make steps from there
+	closestPoint := *a
+
+	// Clamp p' (projection of p to plane of r) to rectangle in the across
+	// direction
+	dist := d.Dot(&ab)
+	maxDist := ab.Len2()
+
+	if dist >= maxDist {
+		closestPoint.AddWith(&ab)
+	} else if dist > 0 {
+		closestPoint.AddScaledVec(dist/maxDist, &ab)
+	}
+
+	// Clamp p' to rectangle in the down direction
+	dist = d.Dot(&ac)
+	maxDist = ac.Len2()
+
+	if dist >= maxDist {
+		closestPoint.AddWith(&ac)
+	} else if dist > 0 {
+		closestPoint.AddScaledVec(dist/maxDist, &ac)
+	}
+
+	return closestPoint
+}
+
+// ClosestPointInTriangle returns the point on the triangle abc that is closest
+// to `p`
+func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
+	ab, ac, ap := b.Sub(a), c.Sub(a), p.Sub(a)
+
+	// Check if P in vertex region outside A
+	d1, d2 := ab.Dot(&ap), ac.Dot(&ap)
+	if d1 <= 0 && d2 <= 0 {
+		return *a // barycentric coordinates (1, 0, 0)
+	}
+
+	bp := p.Sub(b)
+	d3, d4 := ab.Dot(&bp), ac.Dot(&ap)
+	if d3 >= 0 && d4 <= d3 {
+		return *b // barycentric coordinates (0, 1, 0)
+	}
+
+	// Check if P in edge region of AB, if so return projection of P onto AB
+	vc := d1*d4 - d3*d2
+	if vc <= 0 && d1 >= 0 && d3 <= 0 {
+		ret := *a
+		ret.AddScaledVec(d1/(d1-d3), &ab)
+		return ret
+	}
+
+	// Check if P in vertex region outside C
+	cp := p.Sub(c)
+	d5, d6 := ab.Dot(&cp), ac.Dot(&cp)
+	if d6 >= 0 && d5 <= d6 {
+		return *c // barycentric coordinates (0, 0, 1)
+	}
+
+	vb := d5*d2 - d1*d6
+	if vb <= 0 && d2 >= 0 && d6 <= 0 {
+		ret := *a
+		ret.AddScaledVec(d2/(d2-d6), &ac)
+		return ret
+	}
+
+	// Check if P in edge region of BC, if so return projection of P onto BC
+	va := d3*d6 - d5*d4
+	if va <= 0 && (d4-d3) >= 0 && (d5-d6) >= 0 {
+		bc := c.Sub(b)
+		ret := *b
+		ret.AddScaledVec((d4-d3)/((d4-d3)+(d5-d6)), &bc)
+		return ret // barycentric coordinates (0, 1-w, w)
+	}
+
+	// P inside face region. Compute Q through it's barycentric coordinates
+	denom := 1 / (va + vb + vc)
+	v := vb * denom
+	w := vc * denom
+	ret := *a
+	ret.AddScaledVec(v, &ab)
+	ret.AddScaledVec(w, &ac)
+	return ret
+}
+
+/*
+// ClosestPointInTriangle returns the point on the triangle abc that is closest
+// to 'p'
+func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
+	ab, ac, bc := b.Sub(a), c.Sub(a), c.Sub(b)
+
+	ap := p.Sub(a)
+	ba := a.Sub(b)
+	ca := a.Sub(c)
+	bp := p.Sub(b)
+	cp := p.Sub(c)
+	// Compute parametric position s for projection p' of p on ab
+	snom, sdenom := ap.Dot(&ab), bp.Dot(&ba)
+
+	// Compute parametric position t for projection p' of p on ac
+	tnom, tdenom := ap.Dot(&ac), cp.Dot(&ca)
+
+	if snom <= 0 && tnom <= 0 {
+		return *a // Vertex region early out
+	}
+
+	cb := b.Sub(c)
+	// Compute parametric position u for projection p' of p on bc
+	unom, udenom := bp.Dot(&bc), cp.Dot(&cb)
+
+	if sdenom <= 0 && unom <= 0 {
+		return *b // Vertex region early out
+	}
+	if tdenom <= 0 && udenom <= 0 {
+		return *c // Vertex region early out
+	}
+
+	// P is outside (or on) ab if the triple scalar product [n pa pb] <= 0
+	n := ab.Cross(&ac)
+	pa := a.Sub(p)
+	pb := b.Sub(p)
+	m := pa.Cross(&pb)
+	vc := n.Dot(&m)
+
+	// If p outside ab and within feature region of ab, return projection of p
+	// onto ab
+	if vc <= 0 && snom >= 0 && sdenom >= 0 {
+		ret := *a
+		ret.AddScaledVec(snom/(snom+sdenom), &ab)
+		return ret
+	}
+
+	// P is outside (or on) bc if the triple scalar product [n pb pc] <= 0
+	pc := c.Sub(p)
+	m = pb.Cross(&pc)
+	va := n.Dot(&m)
+
+	// If p outside bc and within feature region of bc, return projection of p
+	// onto bc
+	if va <= 0 && unom >= 0 && udenom >= 0 {
+		ret := *b
+		ret.AddScaledVec(unom/(unom+udenom), &bc)
+		return ret
+	}
+
+	// P is outside (or on) ca if the triple scalar product [n pb pa] <= 0
+	m = pc.Cross(&pa)
+	vb := n.Dot(&m)
+
+	// If p outside bc and within feature region of bc, return projection of p
+	// onto bc
+	if vb <= 0 && tnom >= 0 && tdenom >= 0 {
+		ret := *a
+		ret.AddScaledVec(tnom/(tnom+tdenom), &ac)
+		return ret
+	}
+
+	// P must project inside face region. Compute Q using barycentric coordinates
+	u := va / (va + vb + vc)
+	v := vb / (va + vb + vc)
+	w := 1 - u - v
+	var ret glm.Vec3
+	ret.AddScaledVec(u, a)
+	ret.AddScaledVec(v, b)
+	ret.AddScaledVec(w, c)
+	return ret
+}*/
