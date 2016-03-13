@@ -26,6 +26,13 @@ func (a *AABB2) Intersects(b *AABB2) bool {
 
 // UpdateAABB updates this AABB by the transformed AABB3 b, a cannot be the same
 // as b.
-func (a *AABB2) UpdateAABB(b AABB2, r glm.Mat2, t glm.Vec2) {
-
+func (a *AABB2) UpdateAABB(b *AABB2, transform glm.Mat2x3) {
+	for i := 0; i < 2; i++ {
+		b.Center[i] = transform[i+4]
+		b.Radius[i] = 0
+		for j := 0; j < 2; j++ {
+			b.Center[i] += transform[j*2+i] * a.Center[j]
+			b.Radius[i] += math.Abs(transform[j*2+i]) * a.Radius[j]
+		}
+	}
 }

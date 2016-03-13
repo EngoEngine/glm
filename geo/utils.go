@@ -338,3 +338,164 @@ func Jacobi(a, v *glm.Mat3) {
 		prevoff = off
 	}
 }
+
+// MinimumAreaRectangle returns the center point and axis orientation of the
+// minimum area rectangle in the xy plane.
+func MinimumAreaRectangle(points []glm.Vec2) (minArea float32, center glm.Vec2, orientation [2]glm.Vec2) {
+	minArea = float32(math.MaxFloat32)
+
+	// Loop through all edges; j trails i by 1, modulo len(points)
+	for i, j := 0, len(points)-1; i < len(points); i++ {
+		// Get current edge e0 (e0x, e0y), normalized
+		e0 := points[i].Sub(&points[j])
+		e0.Normalize()
+
+		// Get an axis e1 orthogonal to edge e0
+		e1 := glm.Vec2{-e0[1], e0[0]}
+
+		var min0, min1, max0, max1 float32
+		for k := 0; k < len(points); k++ {
+			// Project points onto axes e0 and e1 and keep track of minimum and
+			// maximum values along both axes.
+			d := points[k].Sub(&points[j])
+
+			dot := d.Dot(&e0)
+			if dot < min0 {
+				min0 = dot
+			}
+
+			if dot > max0 {
+				max0 = dot
+			}
+
+			dot = d.Dot(&e1)
+			if dot < min1 {
+				min1 = dot
+			}
+
+			if dot > max1 {
+				max1 = dot
+			}
+		}
+		area := (max0 - min0) * (max1 - min1)
+
+		// If best so far, remember area, center, and axes.
+		if area < minArea {
+			minArea = area
+			orientation[0] = e0
+			orientation[1] = e1
+
+			t0 := e0.Mul(min0 + max0)
+			t1 := e1.Mul(min1 + max1)
+			t0.AddWith(&t1)
+			t0.MulWith(0.5)
+
+			center = points[j].Add(&t0)
+		}
+
+		// trail i
+		j = i
+	}
+	return
+}
+
+// ClosestPointSegmentSegment computes points C₁ and C₂ of
+// S₁(s) = p₁ + s * (q₁-p₁) and S₂(t) = p₂ + t * (q₂-p₂), returning 's', 't', and the
+// squared distance 'u' between S₁(s) and S₂(t).
+func ClosestPointSegmentSegment(p1, q1, p2, q2 *glm.Vec3) (s, t, u float32, c1, c2 glm.Vec3) {
+	const (
+		epsilon = 0.000
+	)
+
+	d1 := q1.Sub(p1)
+	d2 := q2.Sub(p2)
+	r := p1.Sub(p2)
+	a, e, f := d1.Len2(), d2.Len2(), d2.Dot(&r)
+
+	// Check if either or both segments degenerate into points
+	if a <= epsilon && e <= epsilon {
+		return 0, 0, r.Len2(), *p1, *p2
+	}
+
+	if a <= epsilon {
+		// First segment degenerates into a point.
+		s = 0
+		t = f / e
+		t = math.Clamp(t, 0, 1)
+	} else {
+		c := d1.Dot(&r)
+		if e <= epsilon {
+			// Second segment denegerates into a point.
+			t = 0
+			s = math.Clamp(-c/a, 0, 1)
+		} else {
+			// The general non-degenerate case starts here
+			b := d1.Dot(&d2)
+			denom := a*e - b*b // Always positive
+
+			// If segments are not parallel, compute closest point on L₁ to L₂
+			// and clamp to segment S₁. Else pick arbitrary 's' (here 0)
+			if denom != 0 {
+				s = math.Clamp((b*f-c*e)/denom, 0, 1)
+			} else {
+				s = 0
+			}
+
+			t = (b*s + f) / e
+
+			if t < 0 {
+				t = 0
+				s = math.Clamp(-c/a, 0, 1)
+			} else {
+				t = 1
+				s = math.Clamp((b-c)/a, 0, 1)
+			}
+		}
+	}
+
+	c1 = *p1
+	c2 = *p2
+
+	c1.AddScaledVec(s, &d1)
+	c2.AddScaledVec(s, &d2)
+
+	c1mc2 := c1.Sub(&c2)
+
+	u = c1mc2.Len2()
+
+	return
+}
+
+// SqDistPointSegment2 returns the squared distance between point c and segment
+// ab
+func SqDistPointSegment2(a, b, c *glm.Vec2) float32 {
+	ab, ac, bc := b.Sub(a), c.Sub(a), b.Sub(c)
+	e := ac.Dot(&ab)
+
+	if e <= 0 {
+		return ac.Len2()
+	}
+	f := ab.Len2()
+	if e >= f {
+		return bc.Len2()
+	}
+
+	return ac.Len2() - e*e/f
+}
+
+// SqDistPointSegment3 returns the squared distance between point c and segment
+// ab
+func SqDistPointSegment3(a, b, c *glm.Vec3) float32 {
+	ab, ac, bc := b.Sub(a), c.Sub(a), b.Sub(c)
+	e := ac.Dot(&ab)
+
+	if e <= 0 {
+		return ac.Len2()
+	}
+	f := ab.Len2()
+	if e >= f {
+		return bc.Len2()
+	}
+
+	return ac.Len2() - e*e/f
+}
