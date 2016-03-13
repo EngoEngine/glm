@@ -651,85 +651,64 @@ func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
 	return ret
 }
 
-/*
-// ClosestPointInTriangle returns the point on the triangle abc that is closest
-// to 'p'
-func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
-	ab, ac, bc := b.Sub(a), c.Sub(a), c.Sub(b)
-
+func PointOutsideOfPlane(p, a, b, c, d *glm.Vec3) bool {
 	ap := p.Sub(a)
-	ba := a.Sub(b)
-	ca := a.Sub(c)
-	bp := p.Sub(b)
-	cp := p.Sub(c)
-	// Compute parametric position s for projection p' of p on ab
-	snom, sdenom := ap.Dot(&ab), bp.Dot(&ba)
+	ad := d.Sub(a)
+	ab := b.Sub(a)
+	ac := c.Sub(a)
 
-	// Compute parametric position t for projection p' of p on ac
-	tnom, tdenom := ap.Dot(&ac), cp.Dot(&ca)
+	abac := ab.Cross(&ac)
 
-	if snom <= 0 && tnom <= 0 {
-		return *a // Vertex region early out
+	signp := ap.Dot(&abac)
+	signd := ad.Dot(&abac)
+
+	return signp*signd < 0
+}
+
+// ClosestPointInTetrahedron returns the closes point in or on tetrahedron ABCD
+func ClosestPointInTetrahedron(p, a, b, c, d *glm.Vec3) glm.Vec3 {
+	// Start out assuming point inside all halfspaces, so closest to itself
+	closestPoint := *p
+	bestSqDist := float32(math.MaxFloat32)
+
+	if PointOutsideOfPlane(p, a, b, c, d) {
+		q := ClosestPointInTriangle(p, a, b, c)
+		pq := q.Sub(p)
+		sqDist := pq.Len2()
+		if sqDist < bestSqDist {
+			bestSqDist = sqDist
+			closestPoint = q
+		}
 	}
 
-	cb := b.Sub(c)
-	// Compute parametric position u for projection p' of p on bc
-	unom, udenom := bp.Dot(&bc), cp.Dot(&cb)
-
-	if sdenom <= 0 && unom <= 0 {
-		return *b // Vertex region early out
-	}
-	if tdenom <= 0 && udenom <= 0 {
-		return *c // Vertex region early out
-	}
-
-	// P is outside (or on) ab if the triple scalar product [n pa pb] <= 0
-	n := ab.Cross(&ac)
-	pa := a.Sub(p)
-	pb := b.Sub(p)
-	m := pa.Cross(&pb)
-	vc := n.Dot(&m)
-
-	// If p outside ab and within feature region of ab, return projection of p
-	// onto ab
-	if vc <= 0 && snom >= 0 && sdenom >= 0 {
-		ret := *a
-		ret.AddScaledVec(snom/(snom+sdenom), &ab)
-		return ret
+	if PointOutsideOfPlane(p, a, c, d, b) {
+		q := ClosestPointInTriangle(p, a, c, d)
+		pq := q.Sub(p)
+		sqDist := pq.Len2()
+		if sqDist < bestSqDist {
+			bestSqDist = sqDist
+			closestPoint = q
+		}
 	}
 
-	// P is outside (or on) bc if the triple scalar product [n pb pc] <= 0
-	pc := c.Sub(p)
-	m = pb.Cross(&pc)
-	va := n.Dot(&m)
-
-	// If p outside bc and within feature region of bc, return projection of p
-	// onto bc
-	if va <= 0 && unom >= 0 && udenom >= 0 {
-		ret := *b
-		ret.AddScaledVec(unom/(unom+udenom), &bc)
-		return ret
+	if PointOutsideOfPlane(p, a, d, b, c) {
+		q := ClosestPointInTriangle(p, a, d, b)
+		pq := q.Sub(p)
+		sqDist := pq.Len2()
+		if sqDist < bestSqDist {
+			bestSqDist = sqDist
+			closestPoint = q
+		}
 	}
 
-	// P is outside (or on) ca if the triple scalar product [n pb pa] <= 0
-	m = pc.Cross(&pa)
-	vb := n.Dot(&m)
-
-	// If p outside bc and within feature region of bc, return projection of p
-	// onto bc
-	if vb <= 0 && tnom >= 0 && tdenom >= 0 {
-		ret := *a
-		ret.AddScaledVec(tnom/(tnom+tdenom), &ac)
-		return ret
+	if PointOutsideOfPlane(p, b, d, c, a) {
+		q := ClosestPointInTriangle(p, b, d, c)
+		pq := q.Sub(p)
+		sqDist := pq.Len2()
+		if sqDist < bestSqDist {
+			bestSqDist = sqDist
+			closestPoint = q
+		}
 	}
-
-	// P must project inside face region. Compute Q using barycentric coordinates
-	u := va / (va + vb + vc)
-	v := vb / (va + vb + vc)
-	w := 1 - u - v
-	var ret glm.Vec3
-	ret.AddScaledVec(u, a)
-	ret.AddScaledVec(v, b)
-	ret.AddScaledVec(w, c)
-	return ret
-}*/
+	return closestPoint
+}
