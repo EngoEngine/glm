@@ -48,9 +48,9 @@ func TestIsConvexQuad(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if IsConvexQuad(&test.a, &test.b, &test.c, &test.d) != test.isconvex {
+		if isconvex := IsConvexQuad(&test.a, &test.b, &test.c, &test.d); isconvex != test.isconvex {
 			t.Errorf("[%d] a(%v), b(%v), c(%v), d(%v) = %T, want %T", i,
-				test.a, test.b, test.c, test.d, test.isconvex)
+				test.a, test.b, test.c, test.d, isconvex, test.isconvex)
 		}
 	}
 }

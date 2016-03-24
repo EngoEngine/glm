@@ -42,6 +42,7 @@ func (f *Face) canSee(point *glm.Vec3) bool {
 	return ap.Dot(&f.Normal) > 0
 }
 
+// CleanVisited clears the visited field of all the faces of the convex hull.
 func CleanVisited(faces []*Face) {
 	for _, face := range faces {
 		face.Visited = false

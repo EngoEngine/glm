@@ -651,6 +651,8 @@ func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
 	return ret
 }
 
+// PointOutsideOfPlane returns true if point p is opposite of d, such that it
+// doesn't matter if abc is CW or CCW
 func PointOutsideOfPlane(p, a, b, c, d *glm.Vec3) bool {
 	ap := p.Sub(a)
 	ad := d.Sub(a)

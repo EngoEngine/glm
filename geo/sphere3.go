@@ -47,6 +47,9 @@ func (a *Sphere3) OfSphereAndPt(v *glm.Vec3) {
 	}
 }
 
+// EigenSphere sets this sphere to the bounding sphere of the given points using
+// eigen values algorithm, this doesn't necessarily wrap all the points so use
+// RitterEigenSphere.
 func (a *Sphere3) EigenSphere(points []glm.Vec3) {
 	var m, v glm.Mat3
 
@@ -88,6 +91,8 @@ func (a *Sphere3) EigenSphere(points []glm.Vec3) {
 	a.Center.MulOf(0.5, &t)
 }
 
+// RitterEigenSphere sets this sphere to wrap all the given points using eigen
+// values algorithm.
 func (a *Sphere3) RitterEigenSphere(points []glm.Vec3) {
 	// Start with sphere from maximum spread
 	a.EigenSphere(points)

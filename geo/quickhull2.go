@@ -87,7 +87,8 @@ func (c *ConvexHull2) SupportSlow(dir *glm.Vec2) glm.Vec2 {
 	return c.vertices[bestIndex].Position
 }
 
-func (c *ConvexHull2) Intersects(o *ConvexHull2) bool { return false }
+// Intersects return true if the 2 convex hulls intersect
+func (c *ConvexHull2) Intersects(o *ConvexHull2) bool { panic("not implemented") }
 
 // Quickhull2 returns the 2D convex hull of the given points.
 func Quickhull2(points []glm.Vec2) ConvexHull2 {
