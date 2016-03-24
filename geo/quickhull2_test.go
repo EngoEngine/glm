@@ -1,10 +1,11 @@
 package geo
 
 import (
+	"testing"
+
 	"github.com/luxengine/glm"
 	"github.com/luxengine/glm/geo/internal/quickhull2"
 	"github.com/luxengine/math"
-	"testing"
 )
 
 func TestQuickhull2(t *testing.T) {
@@ -250,9 +251,9 @@ func TestQuickhull2Support(t *testing.T) {
 	for n := range hull.vertices {
 		pos = append(pos, hull.vertices[n].Position)
 	}
-	t.Error("vertices ", pos)
-	t.Error("support dir ", quickhull2.SupportDirection)
-	t.Error("support cache ", hull.vertices[hull.bestSupport[0]].Position,
+	t.Log("vertices ", pos)
+	t.Log("support dir ", quickhull2.SupportDirection)
+	t.Log("support cache ", hull.vertices[hull.bestSupport[0]].Position,
 		hull.vertices[hull.bestSupport[1]].Position,
 		hull.vertices[hull.bestSupport[2]].Position)
 
