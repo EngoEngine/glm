@@ -6,92 +6,121 @@ import (
 
 // Simplex2 represents a simple in 2d (so either a point, a line, or a triangle)
 type Simplex2 struct {
-	points [3]glm.Vec2 // use an array to keep the memory al in 1 spot
-	size   int
+	Points [3]glm.Vec2 // use an array to keep the memory al in 1 spot
+	Size   int
+}
+
+// Union merges the given vector to the simplex. This will panic if you add a
+// 4th vertex.
+func (s *Simplex2) Union(u *glm.Vec2) {
+	s.Points[s.Size] = *u
+	s.Size++
+}
+
+// Clean removes all the vertices from the simplex.
+func (s *Simplex2) Clean() {
+	// we don't actually need to set them to zero as we never read past the size
+	// of the simplex.
+	s.Size = 0
 }
 
 // NearestToOrigin modifies the simplex to contain only the minimum amount of
 // points required to describe the direction to origin, returns the next
 // direction to search in GJK and true if the origin is contained in the simplex
 func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
-	//TODO finish implementation
-	if s.size == 3 {
-		ab, ac, ap := s.points[1].Sub(&s.points[0]), s.points[2].Sub(&s.points[0]), s.points[0].Inverse()
+	if s.Size == 3 {
+		ab := s.Points[1].Sub(&s.Points[0])
+		ac := s.Points[2].Sub(&s.Points[0])
+		ap := s.Points[0].Inverse()
 
 		// Check if Origin is in vertex region outside A
 		d1, d2 := ab.Dot(&ap), ac.Dot(&ap)
 		if d1 <= 0 && d2 <= 0 {
 			var zero glm.Vec2
-			s.size = 1
-			return ap, s.points[0].ApproxEqual(&zero)
+			s.Size = 1
+			return ap, s.Points[0].ApproxEqual(&zero)
 		}
 
 		// Check if Origin is in vertex region outside B
-		bp := s.points[1].Inverse()
+		bp := s.Points[1].Inverse()
 		d3, d4 := ab.Dot(&bp), ac.Dot(&ap)
 		if d3 >= 0 && d4 <= d3 {
 			var zero glm.Vec2
-			s.size = 1
-			s.points[0] = s.points[1]
-			return bp, s.points[0].ApproxEqual(&zero)
+			s.Size = 1
+			s.Points[0] = s.Points[1]
+			return bp, s.Points[0].ApproxEqual(&zero)
 		}
 
 		// Check if Origin is in edge region of AB, if so return projection of
 		// Origin onto AB
 		vc := d1*d4 - d3*d2
 		if vc <= 0 && d1 >= 0 && d3 <= 0 {
-			s.size = 2
-			return glm.Vec2{-ab[1], ab[0]}, false // TODO check if return false is correct
+			s.Size = 2
+			ret := glm.Vec2{-ab[1], ab[0]}
+			if ret.Dot(&ac) < 0 {
+				return ret, glm.FloatEqual(ab.Cross(&ap), 0)
+			}
+			return ret.Inverse(), glm.FloatEqual(ab.Cross(&ap), 0)
 		}
 
 		// Check if P in vertex region outside C
-		cp := s.points[2].Inverse()
+		cp := s.Points[2].Inverse()
 		d5, d6 := ab.Dot(&cp), ac.Dot(&cp)
 		if d6 >= 0 && d5 <= d6 {
 			var zero glm.Vec2
-			s.size = 1
-			s.points[0] = s.points[2]
-			return cp, s.points[0].ApproxEqual(&zero)
+			s.Size = 1
+			s.Points[0] = s.Points[2]
+			return cp, s.Points[0].ApproxEqual(&zero)
 		}
 
 		// Check if Origin is in edge region of AC, if so return projection of
 		// Origin onto AC
 		vb := d5*d2 - d1*d6
 		if vb <= 0 && d2 >= 0 && d6 <= 0 {
-			s.size = 2
-			s.points[1] = s.points[2]
-			return glm.Vec2{-ac[1], ac[0]}, false // TODO check if return false is correct
+			s.Size = 2
+			s.Points[1] = s.Points[2]
+			ret := glm.Vec2{ac[1], -ac[0]}
+			if ret.Dot(&ab) < 0 {
+				return ret, glm.FloatEqual(ac.Cross(&ap), 0)
+			}
+			return ret.Inverse(), glm.FloatEqual(ac.Cross(&ap), 0)
 		}
 
 		// Check if Origin is in edge region of BC, if so return projection of
 		// Origin onto BC
 		va := d3*d6 - d5*d4
-		bc := s.points[2].Sub(&s.points[1])
 		if va <= 0 && (d4-d3) >= 0 && (d5-d6) >= 0 {
-			s.size = 2
-			s.points[0] = s.points[1]
-			s.points[1] = s.points[2]
-			return glm.Vec2{-bc[1], bc[0]}, false // TODO check if return false is correct
+			bc := s.Points[2].Sub(&s.Points[1])
+			s.Size = 2
+			s.Points[0] = s.Points[1]
+			s.Points[1] = s.Points[2]
+			ib := s.Points[1].Inverse()
+
+			ret := glm.Vec2{-bc[1], bc[0]}
+			if ret.Dot(&ab) > 0 {
+				return ret, glm.FloatEqual(bc.Cross(&ib), 0)
+			}
+			return ret.Inverse(), glm.FloatEqual(bc.Cross(&ib), 0)
 		}
 
 		return glm.Vec2{}, true
 	}
 
-	if s.size == 2 {
-		zto := s.points[1].Sub(&s.points[0]) // zero to one
-		i0, i1 := s.points[0].Inverse(), s.points[1].Inverse()
+	if s.Size == 2 {
+		zto := s.Points[1].Sub(&s.Points[0]) // zero to one
+		i0, i1 := s.Points[0].Inverse(), s.Points[1].Inverse()
 
-		if zto.Dot(&i1) > 0 { // in voronoi zone of points[1]
+		if zto.Dot(&i1) > 0 { // in voronoi zone of Points[1]
 			var zero glm.Vec2
-			s.points[0] = s.points[1]
-			s.size = 1
-			return i1, s.points[0].ApproxEqual(&zero)
+			s.Points[0] = s.Points[1]
+			s.Size = 1
+			return i1, s.Points[0].ApproxEqual(&zero)
 		}
 
-		if zto.Dot(&i0) < 0 { // in voronoi zone of points[0]
+		if zto.Dot(&i0) < 0 { // in voronoi zone of Points[0]
 			var zero glm.Vec2
-			s.size = 1
-			return i0, s.points[0].ApproxEqual(&zero)
+			s.Size = 1
+			return i0, s.Points[0].ApproxEqual(&zero)
 		}
 
 		// check if the origin is on the line
@@ -108,9 +137,9 @@ func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 	}
 
 	var zero glm.Vec2
-	if s.points[0].ApproxEqual(&zero) {
+	if s.Points[0].ApproxEqual(&zero) {
 		return glm.Vec2{}, true
 	}
 
-	return s.points[0].Inverse(), false
+	return s.Points[0].Inverse(), false
 }
