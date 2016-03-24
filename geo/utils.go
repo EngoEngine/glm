@@ -712,3 +712,18 @@ func ClosestPointInTetrahedron(p, a, b, c, d *glm.Vec3) glm.Vec3 {
 	}
 	return closestPoint
 }
+
+// TriangleAreaFromLengths returns the area of a triangle defined by the given
+// lengths. Returns NaN if the triangle does not exist.
+func TriangleAreaFromLengths(a, b, c float32) float32 {
+	po2 := (a + b + c) / 2
+	return math.Sqrt(po2 * (po2 - a) * (po2 - b) * (po2 - c))
+}
+
+// DistToTriangle returns the distance of p to triangle {a b c}, CCW order
+func DistToTriangle(p, a, b, c *glm.Vec3) float32 {
+	l1, l2, l3 := b.Sub(a), c.Sub(a), p.Sub(a)
+	cross := l2.Cross(&l1)
+	cross.Normalize()
+	return cross.Dot(&l3)
+}

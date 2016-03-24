@@ -2,6 +2,8 @@ package geo
 
 import (
 	"github.com/luxengine/glm"
+	"github.com/luxengine/glm/geo/internal/quickhull2"
+	"github.com/luxengine/math"
 	"testing"
 )
 
@@ -229,12 +231,39 @@ func TestQuickhull2(t *testing.T) {
 
 	for i, test := range tests {
 		hull := Quickhull2(test.points)
-		for n, v := range hull {
-			if !v.ApproxEqual(&test.hull[n]) {
+		for n, v := range hull.vertices {
+			if !v.Position.ApproxEqual(&test.hull[n]) {
 				t.Errorf("[%d] %+v", i, test.points)
 				t.Errorf("[%d]\n\thull %v\n\twant %v", i, hull, test.hull)
 				break
 			}
 		}
+	}
+}
+
+func TestQuickhull2Support(t *testing.T) {
+	points := []glm.Vec2{{-0.1, -0.1}, {0.5, -0.1}, {1, 0}, {1.1, 1}, {0, 1}, {0.5, 0.5}, {-0.4, 0.5}, {0.4, 0.4}, {0.5, 0.4}, {0.6, 0.6}}
+	//hull := []glm.Vec2{{-0.4, 0.5}, {0, 1}, {1.1, 1}, {1, 0}, {0.5, -0.1}, {0, 0}},
+	hull := Quickhull2(points)
+
+	var pos []glm.Vec2
+	for n := range hull.vertices {
+		pos = append(pos, hull.vertices[n].Position)
+	}
+	t.Error("vertices ", pos)
+	t.Error("support dir ", quickhull2.SupportDirection)
+	t.Error("support cache ", hull.vertices[hull.bestSupport[0]].Position,
+		hull.vertices[hull.bestSupport[1]].Position,
+		hull.vertices[hull.bestSupport[2]].Position)
+
+	const sep = 16
+	for n := 0; n < sep; n++ {
+		dir := glm.Vec2{math.Cos(float32(n) * 2.0 * math.Pi / float32(sep)), math.Sin(float32(n) * 2.0 * math.Pi / float32(sep))}
+		s := hull.Support(&dir)
+		_ = s
+		//ss := hull.SupportSlow(&dir)
+		//if !s.ApproxEqualThreshold(&ss, 1e-4) {
+		//	t.Errorf("[%d] dir %+v, s %+v, ss %+v", n, dir, s, ss)
+		//}
 	}
 }
