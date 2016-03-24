@@ -71,6 +71,21 @@ func (v1 Vec4) Elem() (x, y, z, w float32) {
 	return v1[0], v1[1], v1[2], v1[3]
 }
 
+// Perp returns the vector perpendicular to v1
+func (v1 *Vec2) Perp() Vec2 {
+	return Vec2{-v1[1], v1[0]}
+}
+
+// SetPerp sets this vector to its perpendicular
+func (v1 *Vec2) SetPerp() {
+	v1[0], v1[1] = -v1[1], v1[0]
+}
+
+// Cross computes the pseudo 2D cross product, Dot(Perp(u), v)
+func (v1 *Vec2) Cross(v2 *Vec2) float32 {
+	return v1[1]*v2[0] - v1[0]*v2[1]
+}
+
 // Cross is an operation only defined on 3D vectors, commonly refered to as "the cross product". It is equivalent to
 // Vec3{v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]}.
 // Another interpretation is that it's the vector whose magnitude is |v1||v2|sin(theta)
