@@ -4,7 +4,8 @@ import (
 	"github.com/luxengine/glm"
 )
 
-// Simplex2 represents a simple in 2d (so either a point, a line, or a triangle)
+// Simplex2 represents a simplex in 2D. Either a point, a line, or a triangle.
+// We use this in GJK to explore the Minskowski difference.
 type Simplex2 struct {
 	Points [3]glm.Vec2 // use an array to keep the memory al in 1 spot
 	Size   int
@@ -25,7 +26,7 @@ func (s *Simplex2) Clean() {
 }
 
 // NearestToOrigin modifies the simplex to contain only the minimum amount of
-// points required to describe the direction to origin, returns the next
+// points required to describe the direction to origin, it also returns the next
 // direction to search in GJK and true if the origin is contained in the simplex
 func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 	if s.Size == 3 {
@@ -43,7 +44,7 @@ func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 
 		// Check if Origin is in vertex region outside B
 		bp := s.Points[1].Inverse()
-		d3, d4 := ab.Dot(&bp), ac.Dot(&ap)
+		d3, d4 := ab.Dot(&bp), ac.Dot(&bp)
 		if d3 >= 0 && d4 <= d3 {
 			var zero glm.Vec2
 			s.Size = 1
@@ -53,7 +54,7 @@ func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 
 		// Check if Origin is in edge region of AB, if so return projection of
 		// Origin onto AB
-		vc := d1*d4 - d3*d2
+		vc := d1*d4 - d2*d3
 		if vc <= 0 && d1 >= 0 && d3 <= 0 {
 			s.Size = 2
 			ret := glm.Vec2{-ab[1], ab[0]}
