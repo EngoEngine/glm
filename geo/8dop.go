@@ -20,8 +20,8 @@ func (d *DOP8) Intersects(o *DOP8) bool {
 	return true
 }
 
-// ComputeFromPoints recomputes the 8-DOP from the given points in world space.
-func (d *DOP8) ComputeFromPoints(points []glm.Vec3) {
+// ComputeFromPoints3 recomputes the 8-DOP from the given points in world space.
+func (d *DOP8) ComputeFromPoints3(points []glm.Vec3) {
 	// Reinitialize the 8-DOP to an empty volume.
 	d.Min = [4]float32{}
 	d.Max = [4]float32{}

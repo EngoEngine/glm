@@ -18,6 +18,8 @@ type ConvexHull2 struct {
 
 // Support returns the support of this convex hull in the given direcion.
 func (c *ConvexHull2) Support(dir *glm.Vec2) glm.Vec2 {
+	// TODO finish implementation
+
 	// find the index of the support we should start using at first. We could
 	// use the dot product for quickhull2.SupportDirection but this is just a
 	// couple of load, compare, and jumps so it's way faster
@@ -43,7 +45,9 @@ func (c *ConvexHull2) Support(dir *glm.Vec2) glm.Vec2 {
 			i = 2
 		}
 	}
+	_ = i
 	return glm.Vec2{}
+
 	/*dot := c.vertices[i].Position.Dot(dir)
 
 	var useNext bool

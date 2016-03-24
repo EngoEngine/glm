@@ -9,6 +9,7 @@ import (
 
 // Quickhull3 returns the 3D convex hull of the given points.
 func Quickhull3(points []glm.Vec3) {
+	// TODO finish implementation
 
 	// 1 Find Initial tetrahedron
 	// 1.1 Find Initial Triangle

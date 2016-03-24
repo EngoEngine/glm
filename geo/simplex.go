@@ -6,7 +6,7 @@ import (
 
 // Simplex2 represents a simple in 2d (so either a point, a line, or a triangle)
 type Simplex2 struct {
-	points [3]glm.Vec3 // use an array to keep the memory al in 1 spot
+	points [3]glm.Vec2 // use an array to keep the memory al in 1 spot
 	size   int
 }
 
@@ -14,6 +14,7 @@ type Simplex2 struct {
 // points required to describe the direction to origin, returns the next
 // direction to search in GJK and true if the origin is contained in the simplex
 func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
+	//TODO finish implementation
 	if s.size == 3 {
 		ab, ac, ap := s.points[1].Sub(&s.points[0]), s.points[2].Sub(&s.points[0]), s.points[0].Inverse()
 
@@ -65,6 +66,7 @@ func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 		// Check if Origin is in edge region of BC, if so return projection of
 		// Origin onto BC
 		va := d3*d6 - d5*d4
+		bc := s.points[2].Sub(&s.points[1])
 		if va <= 0 && (d4-d3) >= 0 && (d5-d6) >= 0 {
 			s.size = 2
 			s.points[0] = s.points[1]
@@ -72,7 +74,7 @@ func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 			return glm.Vec2{-bc[1], bc[0]}, false // TODO check if return false is correct
 		}
 
-		return glm.Vec2, true
+		return glm.Vec2{}, true
 	}
 
 	if s.size == 2 {
@@ -99,13 +101,14 @@ func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
 		}
 
 		perp = glm.Vec2{-zto[1], zto[0]}
-		if perp.Dot(&i0) > 0 && perp.Dot(&i1) {
+		if perp.Dot(&i0) > 0 && perp.Dot(&i1) > 0 {
 			return perp, false
 		}
 		return perp.Inverse(), false
 	}
 
-	if s.points[0].ApproxEqual(glm.Vec2{}) {
+	var zero glm.Vec2
+	if s.points[0].ApproxEqual(&zero) {
 		return glm.Vec2{}, true
 	}
 
