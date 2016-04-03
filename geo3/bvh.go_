@@ -1,0 +1,25 @@
+package geo3
+
+/*
+
+pseudo top down bv
+func TopDownBVTree(tree *Node, objects []interface{}) {
+	const (
+		MIN_OBJECTS_PER_LEAF = 1
+	)
+
+	pNode := new(Node)
+	*tree = pNode
+
+	pNode.BV = ComputeBoundingVolume(objects)
+	if len(objects) <= MIN_OBJECTS_PER_LEAF {
+		pNode.Type = LEAF
+		pNode.NumObjects = len(objects)
+		pNode.Objects = objects
+	} else {
+		pNode.Type = NODE
+		k := PartitionObjects(objects)
+		TopDownBVTree(&pNode.Left, objects[:k])
+		TopDownBVTree(&pNode.Right, objects[k:])
+	}
+}*/
