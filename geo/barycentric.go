@@ -2,7 +2,6 @@ package geo
 
 import (
 	"github.com/luxengine/glm"
-	"github.com/luxengine/math"
 )
 
 // Barycentric returns the barycentric coordinates for a point in a triangle.
@@ -49,8 +48,8 @@ func BarycentricCacheFromTriangle(a, b, c *glm.Vec3) BarycentricCache {
 	}
 }
 
-// Barycentric returns the barycentric coordinates for a point in a triangle.
-func (b *BarycentricCache) Barycentric(p *glm.Vec3) (u, v, w float32) {
+// BarycentricWithCache returns the barycentric coordinates for a point in a triangle.
+func BarycentricWithCache(b *BarycentricCache, p *glm.Vec3) (u, v, w float32) {
 	v2 := p.Sub(&b.a)
 
 	d20 := v2.Dot(&b.v0)
@@ -72,43 +71,4 @@ func IsPointInTriangle(p, a, b, c *glm.Vec3) bool {
 
 func triArea2D(x1, y1, x2, y2, x3, y3 float32) float32 {
 	return (x1-x2)*(y2-y3) - (x2-x3)*(y1-y2)
-}
-
-// candidate for optimized barycentric. Actually fails so far. But weird
-// inlining might be at fault
-func barycentric2(a, b, c, p *glm.Vec3) (u, v, w float32) {
-	// Unnormalized triangle normal
-	//bma := glm.Vec3{b[0] - a[0], b[1] - a[1], b[2] - a[2]}
-	//cma := glm.Vec3{c[0] - a[0], c[1] - a[1], c[2] - a[2]}
-	bma, cma := b.Sub(a), c.Sub(a)
-	m := bma.Cross(&cma)
-
-	// Nominators and one-over-denominator for u and v ratios
-	var nu, nv, ood float32
-
-	// Absolute components for determining projection plane
-	x, y, z := math.Abs(m[0]), math.Abs(m[1]), math.Abs(m[2])
-
-	// Compute areas in plane of largest projection
-	if x >= y && x >= z {
-		// x is largest, project to the yz plane
-		nu = triArea2D(p[1], p[2], b[1], b[2], c[1], c[2]) // Area of PBC in yz plane
-		nv = triArea2D(p[1], p[2], c[1], c[2], a[1], a[2]) // Area of PCA in yz plane
-		ood = 1 / m[0]                                     // 1/(2*area of ABC in yz plane)
-	} else if y >= x && y >= z {
-		// y is largest, project to the xz plane
-		nu = triArea2D(p[0], p[2], b[0], b[2], c[0], c[2])
-		nv = triArea2D(p[0], p[2], c[0], c[2], a[0], a[2])
-		ood = 1 / -m[1]
-	} else {
-		// z is largest, project to the xy plane
-		nu = triArea2D(p[0], p[1], b[0], b[1], c[0], c[1])
-		nv = triArea2D(p[0], p[1], c[0], c[1], a[0], a[1])
-		ood = 1 / m[2]
-	}
-
-	u = nu * ood
-	v = nv * ood
-	w = 1 - u - v
-	return
 }

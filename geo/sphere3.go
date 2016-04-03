@@ -11,46 +11,47 @@ type Sphere3 struct {
 	Radius, Radius2 float32
 }
 
-// Intersects return true if the spheres overlap.
-func (a *Sphere3) Intersects(b *Sphere3) bool {
+// TestSphere3Sphere3 return true if the spheres overlap.
+func TestSphere3Sphere3(a, b *Sphere3) bool {
 	d := b.Center.Sub(&a.Center)
 	l2 := d.Len2()
 	r := a.Radius + b.Radius
 	return l2 <= r*r
 }
 
-// AABB3 returns the AABB bounding this sphere.
+// AABB3FromSphere3 returns the AABB bounding this sphere.
 //
 // NOTE: If you need to use this function you better start questioning the
 // algorithm you're implementing as the sphere is both faster and bounds the
 // underlying object better.
-func (a *Sphere3) AABB3() AABB3 {
+func AABB3FromSphere3(s *Sphere3) AABB3 {
 	return AABB3{
-		Center: a.Center,
-		Radius: glm.Vec3{a.Radius, a.Radius, a.Radius},
+		Center: s.Center,
+		Radius: glm.Vec3{s.Radius, s.Radius, s.Radius},
 	}
 }
 
-// OfSphereAndPt updates the bounding sphere to encompass v if needed.
-func (a *Sphere3) OfSphereAndPt(v *glm.Vec3) {
+// MergeSphere3Point updates the bounding sphere to encompass v if needed.
+func MergeSphere3Point(s *Sphere3, v *glm.Vec3) {
 	// Compute squared distance between point and sphere center
-	d := v.Sub(&a.Center)
+	d := v.Sub(&s.Center)
 	dist2 := d.Len2()
 	// Only update s if point p is outside it
-	if dist2 > a.Radius*a.Radius {
+	if dist2 > s.Radius*s.Radius {
 		dist := math.Sqrt(dist2)
-		newRadius := (a.Radius + dist) * 0.5
-		k := (newRadius - a.Radius) / dist
-		a.Radius = newRadius
-		a.Center.AddScaledVec(k, &d)
-		a.Radius2 = a.Radius * a.Radius
+		newRadius := (s.Radius + dist) * 0.5
+		k := (newRadius - s.Radius) / dist
+		s.Radius = newRadius
+		s.Center.AddScaledVec(k, &d)
+		s.Radius2 = s.Radius * s.Radius
 	}
 }
 
-// EigenSphere sets this sphere to the bounding sphere of the given points using
+// EigenSphere3 sets this sphere to the bounding sphere of the given points using
 // eigen values algorithm, this doesn't necessarily wrap all the points so use
 // RitterEigenSphere.
-func (a *Sphere3) EigenSphere(points []glm.Vec3) {
+func EigenSphere3(points []glm.Vec3) Sphere3 {
+	var s Sphere3
 	var m, v glm.Mat3
 
 	// Compute the covariance matrix m
@@ -83,21 +84,23 @@ func (a *Sphere3) EigenSphere(points []glm.Vec3) {
 	imin, imax := ExtremePointsAlongDirection3(&e, points)
 	minpt := points[imin]
 	maxpt := points[imax]
-	s := maxpt.Sub(&minpt)
-	dist := s.Len()
-	a.Radius = dist * 0.5
+	u := maxpt.Sub(&minpt)
+	dist := u.Len()
+	s.Radius = dist * 0.5
 
 	t := minpt.Add(&maxpt)
-	a.Center.MulOf(0.5, &t)
+	s.Center.MulOf(0.5, &t)
+	return s
 }
 
 // RitterEigenSphere sets this sphere to wrap all the given points using eigen
 // values algorithm.
-func (a *Sphere3) RitterEigenSphere(points []glm.Vec3) {
+func RitterEigenSphere(points []glm.Vec3) Sphere3 {
 	// Start with sphere from maximum spread
-	a.EigenSphere(points)
+	s := EigenSphere3(points)
 	// Grow sphere to include all points
 	for i := range points {
-		a.OfSphereAndPt(&points[i])
+		MergeSphere3Point(&s, &points[i])
 	}
+	return s
 }

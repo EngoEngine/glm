@@ -12,8 +12,8 @@ type OBB3 struct {
 	Radius      glm.Vec3
 }
 
-// ClosestPoint returns the point in or on the OBB closest to 'p'
-func (a *OBB3) ClosestPoint(p *glm.Vec3) glm.Vec3 {
+// ClosestPointOBB3Point returns the point in or on the OBB closest to 'p'
+func ClosestPointOBB3Point(a *OBB3, p *glm.Vec3) glm.Vec3 {
 	var closestPoint glm.Vec3
 
 	d := p.Sub(&a.Center)
@@ -38,8 +38,8 @@ func (a *OBB3) ClosestPoint(p *glm.Vec3) glm.Vec3 {
 	return closestPoint
 }
 
-// SqDistOfPoint returns the square distance of 'p' to the OBB3
-func (a *OBB3) SqDistOfPoint(p *glm.Vec3) float32 {
+// SqDistOBB3Point returns the square distance of 'p' to the OBB3
+func SqDistOBB3Point(a *OBB3, p *glm.Vec3) float32 {
 	v := p.Sub(&a.Center)
 
 	var sqDist float32
@@ -61,8 +61,8 @@ func (a *OBB3) SqDistOfPoint(p *glm.Vec3) float32 {
 	return sqDist
 }
 
-// Intersects returns true if these OBB overlap.
-func (a *OBB3) Intersects(b *OBB3) bool {
+// TestOBB3OBB3 returns true if these OBB overlap.
+func TestOBB3OBB3(a, b *OBB3) bool {
 	// TODO find a good value for that said epsilon
 	const (
 		epsilon = 0.000

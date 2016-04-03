@@ -11,24 +11,17 @@ type Simplex2 struct {
 	Size   int
 }
 
-// Union merges the given vector to the simplex. This will panic if you add a
+// Simplex2MergeVec merges the given vector to the simplex. This will panic if you add a
 // 4th vertex.
-func (s *Simplex2) Union(u *glm.Vec2) {
+func Simplex2MergeVec(s *Simplex2, u *glm.Vec2) {
 	s.Points[s.Size] = *u
 	s.Size++
 }
 
-// Clean removes all the vertices from the simplex.
-func (s *Simplex2) Clean() {
-	// we don't actually need to set them to zero as we never read past the size
-	// of the simplex.
-	s.Size = 0
-}
-
-// NearestToOrigin modifies the simplex to contain only the minimum amount of
+// Simplex2NearestToOrigin modifies the simplex to contain only the minimum amount of
 // points required to describe the direction to origin, it also returns the next
 // direction to search in GJK and true if the origin is contained in the simplex
-func (s *Simplex2) NearestToOrigin() (direction glm.Vec2, containsOrigin bool) {
+func Simplex2NearestToOrigin(s *Simplex2) (direction glm.Vec2, containsOrigin bool) {
 	if s.Size == 3 {
 		ab := s.Points[1].Sub(&s.Points[0])
 		ac := s.Points[2].Sub(&s.Points[0])

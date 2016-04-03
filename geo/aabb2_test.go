@@ -79,7 +79,7 @@ func TestAABB2_Intersects(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if test.a.Intersects(&test.b) != test.intersects {
+		if TestAABB2AABB2(&test.a, &test.b) != test.intersects {
 			t.Errorf("[%d] Intersection test failed %v %v", i, test.a, test.b)
 		}
 	}
@@ -95,6 +95,6 @@ func BenchmarkAABB2_Intersects(tb *testing.B) {
 		Radius: glm.Vec2{1, 1},
 	}
 	for n := 0; n < tb.N; n++ {
-		a.Intersects(&b)
+		TestAABB2AABB2(&a, &b)
 	}
 }

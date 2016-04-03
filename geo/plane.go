@@ -21,8 +21,8 @@ func Plane3FromPoints(a, b, c *glm.Vec3) Plane3 {
 	}
 }
 
-// DistanceToPlane returns the distance of v to plane p.
-func (p *Plane3) DistanceToPlane(v *glm.Vec3) float32 {
+// DistanceToPlane3 returns the distance of v to plane p.
+func DistanceToPlane3(p *Plane3, v *glm.Vec3) float32 {
 	// transform the point and the plane such that the plane pass by {0,0,0}
 	w := glm.Vec3{v[0], v[1] - p.D, v[2]}
 	return p.N.Dot(&w)
@@ -46,8 +46,8 @@ func Plane2FromPoints(a, b *glm.Vec2) Plane2 {
 	}
 }
 
-// DistanceToPlane returns the distance of v to plane p.
-func (p *Plane2) DistanceToPlane(v *glm.Vec2) float32 {
+// DistanceToPlane2 returns the distance of v to plane p.
+func DistanceToPlane2(p *Plane2, v *glm.Vec2) float32 {
 	w := glm.Vec2{v[0], v[1] - p.D}
 	return p.N.Dot(&w)
 }

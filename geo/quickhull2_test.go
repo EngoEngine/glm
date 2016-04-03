@@ -1,15 +1,13 @@
 package geo
 
 import (
-	"testing"
-
 	"github.com/luxengine/glm"
 	"github.com/luxengine/glm/geo/internal/quickhull2"
 	"github.com/luxengine/math"
+	"testing"
 )
 
 func TestQuickhull2(t *testing.T) {
-
 	// These tests we're visualised and verified by hand, then the data was
 	// exported here
 	tests := []struct {
@@ -251,16 +249,16 @@ func TestQuickhull2Support(t *testing.T) {
 	for n := range hull.vertices {
 		pos = append(pos, hull.vertices[n].Position)
 	}
-	t.Log("vertices ", pos)
-	t.Log("support dir ", quickhull2.SupportDirection)
-	t.Log("support cache ", hull.vertices[hull.bestSupport[0]].Position,
+	t.Error("vertices ", pos)
+	t.Error("support dir ", qh2.SupportDirection)
+	t.Error("support cache ", hull.vertices[hull.bestSupport[0]].Position,
 		hull.vertices[hull.bestSupport[1]].Position,
 		hull.vertices[hull.bestSupport[2]].Position)
 
 	const sep = 16
 	for n := 0; n < sep; n++ {
 		dir := glm.Vec2{math.Cos(float32(n) * 2.0 * math.Pi / float32(sep)), math.Sin(float32(n) * 2.0 * math.Pi / float32(sep))}
-		s := hull.Support(&dir)
+		s := ConvexHull2Support(&hull, &dir)
 		_ = s
 		//ss := hull.SupportSlow(&dir)
 		//if !s.ApproxEqualThreshold(&ss, 1e-4) {

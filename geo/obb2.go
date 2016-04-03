@@ -11,8 +11,8 @@ type OBB2 struct {
 	Radius      glm.Vec2
 }
 
-// ClosestPoint returns the point in or on the OBB closest to 'p'
-func (a *OBB2) ClosestPoint(p *glm.Vec2) glm.Vec2 {
+// ClosestPointOBB2Point returns the point in or on the OBB closest to 'p'
+func ClosestPointOBB2Point(a *OBB2, p *glm.Vec2) glm.Vec2 {
 	var closestPoint glm.Vec2
 
 	d := p.Sub(&a.Center)
@@ -37,8 +37,8 @@ func (a *OBB2) ClosestPoint(p *glm.Vec2) glm.Vec2 {
 	return closestPoint
 }
 
-// SqDistOfPoint returns the square distance of 'p' to the OBB2
-func (a *OBB2) SqDistOfPoint(p *glm.Vec2) float32 {
+// SqDistOBB2Point returns the square distance of 'p' to the OBB2
+func SqDistOBB2Point(a *OBB2, p *glm.Vec2) float32 {
 	v := p.Sub(&a.Center)
 
 	var sqDist float32

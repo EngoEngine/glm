@@ -11,8 +11,8 @@ type Rect3 struct {
 	Radius      glm.Vec2
 }
 
-// ClosestPoint returns the point on the rectangle closest to 'p'
-func (r *Rect3) ClosestPoint(p *glm.Vec3) glm.Vec3 {
+// ClosestPointRect3Point returns the point on the rectangle closest to 'p'
+func ClosestPointRect3Point(r *Rect3, p *glm.Vec3) glm.Vec3 {
 	d := p.Sub(&r.Center)
 	closestPoint := r.Center
 
@@ -36,8 +36,8 @@ func (r *Rect3) ClosestPoint(p *glm.Vec3) glm.Vec3 {
 	return closestPoint
 }
 
-// SqDistOfPoint returns the square distance of 'p' to the OBB3
-func (r *Rect3) SqDistOfPoint(p *glm.Vec3) float32 {
+// SqDistRect3Point returns the square distance of 'p' to the OBB3
+func SqDistRect3Point(r *Rect3, p *glm.Vec3) float32 {
 	v := p.Sub(&r.Center)
 
 	var sqDist float32

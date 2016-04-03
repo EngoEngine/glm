@@ -1,4 +1,4 @@
-package quickhull3
+package qh3
 
 import (
 	"fmt"

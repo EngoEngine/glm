@@ -10,14 +10,18 @@ import (
 
 // ConvexHull2 is a convex hull in 2D
 type ConvexHull2 struct {
-	memory      *byte // pointer to the memory backing up the convex hull
-	vertices    []quickhull2.Vertex
-	edges       []quickhull2.Edge
+	// pointer to the memory backing up the convex hull
+	// we need to keep this because go doesn't like keeping track of slices that
+	// are products of unsafe casting. Linters will say this is unused but
+	// whatever
+	mem         *byte
+	vertices    []qh2.Vertex
+	edges       []qh2.Edge
 	bestSupport [3]int
 }
 
-// Support returns the support of this convex hull in the given direcion.
-func (c *ConvexHull2) Support(dir *glm.Vec2) glm.Vec2 {
+// ConvexHull2Support returns the support of this convex hull in the given direcion.
+func ConvexHull2Support(c *ConvexHull2, dir *glm.Vec2) glm.Vec2 {
 	// TODO finish implementation
 
 	// find the index of the support we should start using at first. We could
@@ -73,9 +77,9 @@ func (c *ConvexHull2) Support(dir *glm.Vec2) glm.Vec2 {
 	}*/
 }
 
-// SupportSlow is like Support but the implementation is much simpler and
+// ConvexHull2SupportSlow is like Support but the implementation is much simpler and
 // probably correct, however it's kinda slow.
-func (c *ConvexHull2) SupportSlow(dir *glm.Vec2) glm.Vec2 {
+func ConvexHull2SupportSlow(c *ConvexHull2, dir *glm.Vec2) glm.Vec2 {
 	var bestDot float32
 	var bestIndex int
 	for n := range c.vertices {
@@ -87,8 +91,10 @@ func (c *ConvexHull2) SupportSlow(dir *glm.Vec2) glm.Vec2 {
 	return c.vertices[bestIndex].Position
 }
 
-// Intersects return true if the 2 convex hulls intersect
-func (c *ConvexHull2) Intersects(o *ConvexHull2) bool { panic("not implemented") }
+// TestConvexHull2ConvexHull2 return true if the 2 convex hulls intersect
+func TestConvexHull2ConvexHull2(a, b *ConvexHull2) bool {
+	panic("not implemented")
+}
 
 // Quickhull2 returns the 2D convex hull of the given points.
 func Quickhull2(points []glm.Vec2) ConvexHull2 {
@@ -146,8 +152,8 @@ func Quickhull2(points []glm.Vec2) ConvexHull2 {
 }
 
 func convexHull2FromPoints(points []glm.Vec2) ConvexHull2 {
-	vertexArraySize := len(points) * int(unsafe.Sizeof(quickhull2.Vertex{}))
-	edgeArraySize := len(points) * int(unsafe.Sizeof(quickhull2.Edge{}))
+	vertexArraySize := len(points) * int(qh2.VertexSize)
+	edgeArraySize := len(points) * int(qh2.EdgeSize)
 	vecArraySize := len(points) * int(unsafe.Sizeof(glm.Vec2{}))
 	backup := make([]byte, vertexArraySize+edgeArraySize+vecArraySize)
 
@@ -164,21 +170,21 @@ func convexHull2FromPoints(points []glm.Vec2) ConvexHull2 {
 	}
 
 	hull := ConvexHull2{
-		memory:   &backup[0],
-		vertices: *(*[]quickhull2.Vertex)(unsafe.Pointer(&vertexSliceHeader)),
-		edges:    *(*[]quickhull2.Edge)(unsafe.Pointer(&edgeSliceHeader)),
+		mem:      &backup[0],
+		vertices: *(*[]qh2.Vertex)(unsafe.Pointer(&vertexSliceHeader)),
+		edges:    *(*[]qh2.Edge)(unsafe.Pointer(&edgeSliceHeader)),
 	}
 
 	var bestSupport [3]int
 	var bestSupportDot [3]float32
 
 	for n := range points {
-		hull.vertices[n] = quickhull2.Vertex{
+		hull.vertices[n] = qh2.Vertex{
 			Position: points[n],
 			Prev:     (n - 1 + len(points)) % len(points),
 			Next:     (n + 1) % len(points),
 		}
-		hull.edges[n] = quickhull2.Edge{
+		hull.edges[n] = qh2.Edge{
 			Vertices: [2]int{n, (n + 1) % len(points)},
 			PrevEdge: (n - 1 + len(points)) % len(points),
 			NextEdge: (n + 1) % len(points),
@@ -193,9 +199,9 @@ func convexHull2FromPoints(points []glm.Vec2) ConvexHull2 {
 	avg.MulWith(1 / float32(len(hull.vertices)))
 
 	for n := range hull.vertices {
-		for m := range quickhull2.SupportDirection {
+		for m := range qh2.SupportDirection {
 			tmp := hull.vertices[n].Position.Sub(&avg)
-			if d := quickhull2.SupportDirection[m].Dot(&tmp); d > bestSupportDot[m] {
+			if d := qh2.SupportDirection[m].Dot(&tmp); d > bestSupportDot[m] {
 				bestSupport[m] = n
 				bestSupportDot[m] = d
 			}

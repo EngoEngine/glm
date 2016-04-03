@@ -10,16 +10,16 @@ type Capsule3 struct {
 	Radius float32
 }
 
-// Intersects returns true if these Capsules overlap.
-func (c *Capsule3) Intersects(o *Capsule3) bool {
-	_, _, u, _, _ := ClosestPointSegmentSegment(&c.A, &c.B, &o.A, &o.B)
+// TestCapsule3Capsule3 returns true if these Capsules overlap.
+func TestCapsule3Capsule3(a, b *Capsule3) bool {
+	_, _, u, _, _ := ClosestPointSegmentSegment(&a.A, &a.B, &b.A, &b.B)
 	// If squared distance is smaller than squared sum of radii, they collide
-	radius := c.Radius + o.Radius
+	radius := a.Radius + b.Radius
 	return u <= radius*radius
 }
 
-// IntersectsSphere returns true if the capsule and the sphere overlap.
-func (c *Capsule3) IntersectsSphere(s *Sphere3) bool {
+// TestCapsule3Sphere3 returns true if the capsule and the sphere overlap.
+func TestCapsule3Sphere3(c *Capsule3, s *Sphere3) bool {
 	dist2 := SqDistPointSegment3(&c.A, &c.B, &s.Center)
 	radius := s.Radius + c.Radius
 	return dist2 <= radius*radius

@@ -8,8 +8,8 @@ This library uses lux math (native float32 math) instead of the standard library
 
 In the future, when we have more knowledge of plan9 we intend to insert some SIMD operations for the more hardcore stuff.
 ```Go
-func (m1 *Mat2) Add(m2 *Mat2) Mat2 {
-	return Mat2{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3]}
+func (m1 *Mat2) Add(m2 *Mat2) *Mat2 {
+	return &Mat2{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3]}
 }
 
 func (m1 *Mat2) SumOf(m2, m3 *Mat2) *Mat2 {

@@ -74,10 +74,11 @@ func BenchmarkBarycentricCache(tb *testing.B) {
 
 	tb.ResetTimer()
 	for n := 0; n < tb.N; n++ {
-		cache.Barycentric(&p)
+		BarycentricWithCache(&cache, &p)
 	}
 }
 
+/*
 func BenchmarkBarycentric_OptimizeCandidate(tb *testing.B) {
 	a, b, c, p := glm.Vec3{1, 2, 3}, glm.Vec3{4, 2, 3}, glm.Vec3{1, 2, 5}, glm.Vec3{2, 3, 4}
 
@@ -85,3 +86,4 @@ func BenchmarkBarycentric_OptimizeCandidate(tb *testing.B) {
 		barycentric2(&a, &b, &c, &p)
 	}
 }
+*/

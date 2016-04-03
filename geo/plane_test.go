@@ -59,7 +59,7 @@ func TestPlane3_DistanceToPlane(t *testing.T) {
 	v := glm.Vec3{5, 2, 5}
 
 	want := float32(1.0)
-	if d := p.DistanceToPlane(&v); !glm.FloatEqualThreshold(d, want, 1e-4) {
+	if d := DistanceToPlane3(&p, &v); !glm.FloatEqualThreshold(d, want, 1e-4) {
 		t.Errorf("DistanceToPlane = %f, want %f", d, want)
 	}
 }
@@ -118,7 +118,7 @@ func TestPlane2_DistanceToPlane(t *testing.T) {
 	v := glm.Vec2{5, 2}
 
 	want := float32(1.0)
-	if d := p.DistanceToPlane(&v); !glm.FloatEqualThreshold(d, want, 1e-4) {
+	if d := DistanceToPlane2(&p, &v); !glm.FloatEqualThreshold(d, want, 1e-4) {
 		t.Errorf("DistanceToPlane = %f, want %f", d, want)
 	}
 }

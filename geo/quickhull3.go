@@ -13,10 +13,10 @@ func Quickhull3(points []glm.Vec3) {
 
 	// 1 Find Initial tetrahedron
 	// 1.1 Find Initial Triangle
-	extremumIndices, extremums := quickhull3.FindExtremums(points)
+	extremumIndices, extremums := qh3.FindExtremums(points)
 
 	// 0.2 calculate the epsilon
-	epsilon := quickhull3.CalculateEpsilon(extremums)
+	epsilon := qh3.CalculateEpsilon(extremums)
 
 	// 1.2 Find the 3 most extreme points
 	var triangleIndices [3]int
@@ -51,12 +51,12 @@ func Quickhull3(points []glm.Vec3) {
 		tetraIndex = imax
 	}
 
-	faces := quickhull3.BuildInitialTetrahedron(tetraIndex, extremumIndices[triangleIndices[0]], extremumIndices[triangleIndices[1]], extremumIndices[triangleIndices[2]], points)
+	faces := qh3.BuildInitialTetrahedron(tetraIndex, extremumIndices[triangleIndices[0]], extremumIndices[triangleIndices[1]], extremumIndices[triangleIndices[2]], points)
 
 	for _, face := range faces {
 		for n := range points {
 			if dist := DistToTriangle(&points[n], &points[face.Vertices[0]], &points[face.Vertices[1]], &points[face.Vertices[2]]); dist > epsilon {
-				face.Conflicts = append(face.Conflicts, quickhull3.Conflict{Distance: dist, Index: n})
+				face.Conflicts = append(face.Conflicts, qh3.Conflict{Distance: dist, Index: n})
 			}
 		}
 	}
@@ -71,24 +71,24 @@ func Quickhull3(points []glm.Vec3) {
 	}
 
 	var cnt int
-	for iface, iconflict := quickhull3.NextConflict(faces); iface != -1; iface, iconflict = quickhull3.NextConflict(faces) {
+	for iface, iconflict := qh3.NextConflict(faces); iface != -1; iface, iconflict = qh3.NextConflict(faces) {
 		fmt.Println("conflict", points[faces[iface].Conflicts[iconflict].Index])
 
-		quickhull3.CleanVisited(faces)
+		qh3.CleanVisited(faces)
 		for _, face := range faces {
 			fmt.Printf("%p %t\n", face, face.Visited)
 		}
 
-		horizon := quickhull3.FindHorizon(faces[iface], &points[faces[iface].Conflicts[iconflict].Index])
+		horizon := qh3.FindHorizon(faces[iface], &points[faces[iface].Conflicts[iconflict].Index])
 		fmt.Println("horizon: ", horizon)
-		newfaces := make([]quickhull3.Face, len(horizon), len(horizon))
+		newfaces := make([]qh3.Face, len(horizon), len(horizon))
 
 		for n, edge := range horizon {
 			newfaces[n].Vertices = [3]int{faces[iface].Conflicts[iconflict].Index, edge.Tail, edge.Twin.Tail}
-			newfaces[n].Edges = [3]*quickhull3.Edge{
-				&quickhull3.Edge{Tail: newfaces[n].Vertices[1], Face: &newfaces[n]},
-				&quickhull3.Edge{Tail: newfaces[n].Vertices[0], Face: &newfaces[n], Twin: edge},
-				&quickhull3.Edge{Tail: newfaces[n].Vertices[2], Face: &newfaces[n]},
+			newfaces[n].Edges = [3]*qh3.Edge{
+				&qh3.Edge{Tail: newfaces[n].Vertices[1], Face: &newfaces[n]},
+				&qh3.Edge{Tail: newfaces[n].Vertices[0], Face: &newfaces[n], Twin: edge},
+				&qh3.Edge{Tail: newfaces[n].Vertices[2], Face: &newfaces[n]},
 			}
 			edge.Twin = newfaces[n].Edges[1]
 
@@ -100,20 +100,20 @@ func Quickhull3(points []glm.Vec3) {
 			newfaces[n].Edges[0].Prev = newfaces[n].Edges[2]
 			newfaces[n].Edges[1].Prev = newfaces[n].Edges[0]
 
-			newfaces[n].Faces = [3]*quickhull3.Face{nil, edge.Twin.Face, nil}
+			newfaces[n].Faces = [3]*qh3.Face{nil, edge.Twin.Face, nil}
 			l1, l2 := points[newfaces[n].Vertices[1]].Sub(&points[newfaces[n].Vertices[0]]), points[newfaces[n].Vertices[2]].Sub(&points[newfaces[n].Vertices[0]])
 			newfaces[n].Normal = l2.Cross(&l1)
 			newfaces[n].Point = points[newfaces[n].Vertices[0]]
 
 			for _, c := range faces[iface].Conflicts {
 				if dist := DistToTriangle(&points[c.Index], &points[newfaces[n].Vertices[0]], &points[newfaces[n].Vertices[1]], &points[newfaces[n].Vertices[2]]); dist > epsilon {
-					newfaces[n].Conflicts = append(newfaces[n].Conflicts, quickhull3.Conflict{Distance: dist, Index: c.Index})
+					newfaces[n].Conflicts = append(newfaces[n].Conflicts, qh3.Conflict{Distance: dist, Index: c.Index})
 				}
 			}
 
 			for _, c := range faces[iface].Conflicts {
 				if dist := DistToTriangle(&points[c.Index], &points[newfaces[n].Vertices[0]], &points[newfaces[n].Vertices[1]], &points[newfaces[n].Vertices[2]]); dist > epsilon {
-					newfaces[n].Conflicts = append(newfaces[n].Conflicts, quickhull3.Conflict{Distance: dist, Index: c.Index})
+					newfaces[n].Conflicts = append(newfaces[n].Conflicts, qh3.Conflict{Distance: dist, Index: c.Index})
 				}
 			}
 
@@ -121,7 +121,7 @@ func Quickhull3(points []glm.Vec3) {
 			for _, face := range faces[iface].Faces {
 				for _, c := range face.Conflicts {
 					if dist := DistToTriangle(&points[c.Index], &points[newfaces[n].Vertices[0]], &points[newfaces[n].Vertices[1]], &points[newfaces[n].Vertices[2]]); dist > epsilon {
-						newfaces[n].Conflicts = append(newfaces[n].Conflicts, quickhull3.Conflict{Distance: dist, Index: c.Index})
+						newfaces[n].Conflicts = append(newfaces[n].Conflicts, qh3.Conflict{Distance: dist, Index: c.Index})
 					}
 				}
 			}
@@ -138,7 +138,7 @@ func Quickhull3(points []glm.Vec3) {
 		}
 
 		//clean old faces
-		var oldfaces []*quickhull3.Face
+		var oldfaces []*qh3.Face
 		for _, e := range horizon {
 			var found bool
 			for _, face := range oldfaces {

@@ -53,7 +53,7 @@ func TestSphere3_Intersects(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if test.a.Intersects(&test.b) != test.intersects {
+		if TestSphere3Sphere3(&test.a, &test.b) != test.intersects {
 			t.Errorf("[%d] Intersection test failed %v %v", i, test.a, test.b)
 		}
 	}
@@ -101,7 +101,7 @@ func TestSphere3_AABB3(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		aabb := test.a.AABB3()
+		aabb := AABB3FromSphere3(&test.a)
 		if !aabb.Center.ApproxEqualThreshold(&test.b.Center, 1e-4) ||
 			!aabb.Radius.ApproxEqualThreshold(&test.b.Radius, 1e-4) {
 			t.Errorf("[%d] %v.AABB = %v, want %v", i, test.a, aabb, test.b)
@@ -122,6 +122,6 @@ func BenchmarkSphere3_Intersects(tb *testing.B) {
 	}
 
 	for n := 0; n < tb.N; n++ {
-		a.Intersects(&b)
+		TestSphere3Sphere3(&a, &b)
 	}
 }

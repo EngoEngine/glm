@@ -10,8 +10,8 @@ type DOP8 struct {
 	Max [4]float32
 }
 
-// Intersects returns true if the 8-DOP intersect.
-func (d *DOP8) Intersects(o *DOP8) bool {
+// TestDOP8DOP8 returns true if the 8-DOP intersect.
+func TestDOP8DOP8(d *DOP8, o *DOP8) bool {
 	for n := 0; n < 4; n++ {
 		if d.Min[n] > o.Max[n] || d.Max[n] < o.Min[n] {
 			return false
@@ -20,8 +20,8 @@ func (d *DOP8) Intersects(o *DOP8) bool {
 	return true
 }
 
-// ComputeFromPoints3 recomputes the 8-DOP from the given points in world space.
-func (d *DOP8) ComputeFromPoints3(points []glm.Vec3) {
+// DOP8FromPoints3 recomputes the 8-DOP from the given points in world space.
+func DOP8FromPoints3(d *DOP8, points []glm.Vec3) {
 	// Reinitialize the 8-DOP to an empty volume.
 	d.Min = [4]float32{}
 	d.Max = [4]float32{}

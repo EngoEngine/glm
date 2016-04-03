@@ -1,8 +1,14 @@
-package quickhull2
+package qh2
 
 import (
 	"github.com/luxengine/glm"
 	"github.com/luxengine/math"
+	"unsafe"
+)
+
+const (
+	VertexSize = unsafe.Sizeof(Vertex{})
+	EdgeSize   = unsafe.Sizeof(Edge{})
 )
 
 // SupportDirection is the direction that we use to cache the direction for the
