@@ -551,4 +551,7 @@ func DistToTriangle(p, a, b, c *glm.Vec3) float32 {
 }
 
 // ClosestPointSegmentPoint returns the point on the segment closest to p.
-func ClosestPointSegmentPoint(s1, s2, p *glm.Vec3) (t float32, v glm.Vec3) { panic("not implemented") }
+func ClosestPointSegmentPoint(s1, s2, p *glm.Vec3) (t float32, v glm.Vec3) {
+	// TODO(hydroflame): implement
+	panic("not implemented")
+}

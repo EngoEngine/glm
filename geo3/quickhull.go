@@ -19,6 +19,7 @@ func Quickhull(points []glm.Vec3) {
 	epsilon := qhull.CalculateEpsilon(extremums)
 
 	// 1.2 Find the 3 most extreme points
+	// TODO(hydroflame): make this NOT O(n**3), 10/10 on performance bro
 	var triangleIndices [3]int
 	var maxArea float32
 	for i := 0; i < len(extremums); i++ {
