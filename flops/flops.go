@@ -18,47 +18,31 @@ func refequal(a, b float32) bool {
 func Eq(a, b float32) bool {
 	if a > 0 {
 		if b > 0 {
-			// a>0 b>0
 			if a > b {
-				// a>0 b>0 a>b
 				if a > 1 {
-					// a>0 b>0 a>b a>1
 					return a-b <= epsilon*a
 				}
-				// a>0 b>0 a>b a<1
 				return a-b <= epsilon
 			}
-			// a>0 b>0 a<=b
 			if b > 1 {
-				// a>0 b>0 a<=b b>1
 				return b-a <= epsilon*b
 			}
-			// a>0 b>0 a<=b b<1
 			return b-a <= epsilon
 		}
-		// a>0 b<0
 		return false
 	}
 	if b > 0 {
-		// a<0 b>0
 		return false
 	}
-	// a<0 b<0
 	if a > b {
-		// a<0 b<0 a>b
 		if b < -1 {
-			// a<0 b<0 a>b a<-1
 			return -(b - a) <= epsilon*-b
 		}
-		// a<0 b<0 a>b b>=-1
 		return -(b - a) <= epsilon
 	}
-	// a<0 b<0 a<b
 	if a < -1 {
-		// a<0 b<0 a<b a<-1
 		return -(a - b) <= epsilon*-a
 	}
-	// a<0 b<0 a<b a>=-1
 	return -(a - b) <= epsilon
 }
 
@@ -66,47 +50,31 @@ func Eq(a, b float32) bool {
 func Ne(a, b float32) bool {
 	if a > 0 {
 		if b > 0 {
-			// a>0 b>0
 			if a > b {
-				// a>0 b>0 a>b
 				if a > 1 {
-					// a>0 b>0 a>b a>1
 					return a-b > epsilon*a
 				}
-				// a>0 b>0 a>b a<1
 				return a-b > epsilon
 			}
-			// a>0 b>0 a>b
 			if b > 1 {
-				// a>0 b>0 a>b b>1
 				return b-a > epsilon*b
 			}
-			// a>0 b>0 a>b b<1
 			return b-a > epsilon
 		}
-		// a>0 b<0
 		return true
 	}
 	if b > 0 {
-		// a<0 b>0
 		return true
 	}
-	// a<0 b<0
 	if a > b {
-		// a<0 b<0 a>b
 		if b < -1 {
-			// a<0 b<0 a>b a<-1
 			return -(b - a) > epsilon*-b
 		}
-		// a<0 b<0 a>b b>=-1
 		return -(b - a) > epsilon
 	}
-	// a<0 b<0 a<b
 	if a < -1 {
-		// a<0 b<0 a<b a<-1
 		return -(a - b) > epsilon*-a
 	}
-	// a<0 b<0 a<b a>=-1
 	return -(a - b) > epsilon
 }
 
@@ -143,7 +111,7 @@ func refz(a float32) bool {
 	return false
 }
 
-// Z returns true if a is roughly equal to zero
+// Z returns true if a is roughly equal to zero.
 func Z(a float32) bool {
 	if a > 0 {
 		return a <= epsilon

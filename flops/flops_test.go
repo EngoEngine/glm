@@ -91,6 +91,22 @@ var ztests = []struct {
 		f:      -0.00000001,
 		result: true,
 	},
+	{
+		f:      0.0000001,
+		result: true,
+	},
+	{
+		f:      0.000001,
+		result: true,
+	},
+	{
+		f:      0.00001,
+		result: false,
+	},
+	{
+		f:      0.0001,
+		result: false,
+	},
 }
 
 func TestRefequal(t *testing.T) {
@@ -105,6 +121,10 @@ func TestEq(t *testing.T) {
 	for i, test := range equaltests {
 		if test.result != Eq(test.data[0], test.data[1]) {
 			t.Errorf("[%d] wrong result from %f == %f", i, test.data[0], test.data[1])
+		}
+
+		if test.result == Ne(test.data[0], test.data[1]) {
+			t.Errorf("[%d] wrong result from %f != %f", i, test.data[0], test.data[1])
 		}
 	}
 }
