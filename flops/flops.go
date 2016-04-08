@@ -102,6 +102,26 @@ func Ge(a, b float32) bool {
 	return a > b || Eq(a, b)
 }
 
+// Ltz returns true if a is strictly less than b.zero.
+func Ltz(a float32) bool {
+	return a < 0 && !Z(a)
+}
+
+// Lez returns true if a is less than or equal to zero.
+func Lez(a float32) bool {
+	return a < 0 || Z(a)
+}
+
+// Gtz returns true if a is strictly greater than zero.
+func Gtz(a float32) bool {
+	return a > 0 && !Z(a)
+}
+
+// Gez returns true if a is greater than or equal to zero.
+func Gez(a float32) bool {
+	return a > 0 || Z(a)
+}
+
 // refz returns true if a is close to zero. This is the reference implementation
 // used in testing and benchmarking.
 func refz(a float32) bool {

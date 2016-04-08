@@ -2,6 +2,7 @@ package geo3
 
 import (
 	"github.com/luxengine/glm"
+	"github.com/luxengine/glm/flops"
 	"github.com/luxengine/math"
 )
 
@@ -350,9 +351,9 @@ func SqDistPointSegment(a, b, c *glm.Vec3) float32 {
 	return ac.Len2() - e*e/f
 }
 
-// ClosestPointOnLine returns the point on ab closest to c. Also returns t for
+// ClosestPointSegmentPoint returns the point on ab closest to c. Also returns t for
 // the position of d, d(t) = a + t*(b - a)
-func ClosestPointOnLine(a, b, c *glm.Vec3) (t float32, point glm.Vec3) {
+func ClosestPointSegmentPoint(a, b, c *glm.Vec3) (t float32, point glm.Vec3) {
 	ab := b.Sub(a)
 
 	// Project c onto ab, but deferring the division by ab.Dot(ab)
@@ -413,9 +414,9 @@ func ClosestPointRect(p, a, b, c *glm.Vec3) glm.Vec3 {
 	return closestPoint
 }
 
-// ClosestPointInTriangle returns the point on the triangle abc that is closest
+// ClosestPointTrianglePoint returns the point on the triangle abc that is closest
 // to p
-func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
+func ClosestPointTrianglePoint(p, a, b, c *glm.Vec3) glm.Vec3 {
 	ab, ac, ap := b.Sub(a), c.Sub(a), p.Sub(a)
 
 	// Check if P in vertex region outside A
@@ -471,6 +472,15 @@ func ClosestPointInTriangle(p, a, b, c *glm.Vec3) glm.Vec3 {
 	return ret
 }
 
+// PointOutsidePlane returns true if p is outside or on triangle abc CCW.
+func PointOutsidePlane(p, a, b, c *glm.Vec3) bool {
+	//return Dot(p-a,Cross(b-a,c-a))>=0.0f; //[APABAC]>=0
+	ap, ab, ac := p.Sub(a), b.Sub(a), c.Sub(a)
+	abac := ab.Cross(&ac)
+	d := ap.Dot(&abac)
+	return d > 0 || flops.Z(d)
+}
+
 // PointsOnOppositeSideOfPlane returns true if point p is opposite of d, such that it
 // doesn't matter if abc is CW or CCW
 func PointsOnOppositeSideOfPlane(p1, a, b, c, p2 *glm.Vec3) bool {
@@ -487,14 +497,14 @@ func PointsOnOppositeSideOfPlane(p1, a, b, c, p2 *glm.Vec3) bool {
 	return signp*signd < 0
 }
 
-// ClosestPointInTetrahedron returns the closes point in or on tetrahedron abcd.
-func ClosestPointInTetrahedron(p, a, b, c, d *glm.Vec3) glm.Vec3 {
+// ClosestPointTetrahedronPoint returns the closes point in or on tetrahedron abcd.
+func ClosestPointTetrahedronPoint(p, a, b, c, d *glm.Vec3) glm.Vec3 {
 	// Start out assuming point inside all halfspaces, so closest to itself
 	closestPoint := *p
 	var bestSqDist float32 = math.MaxFloat32
 
 	if PointsOnOppositeSideOfPlane(p, a, b, c, d) {
-		q := ClosestPointInTriangle(p, a, b, c)
+		q := ClosestPointTrianglePoint(p, a, b, c)
 		pq := q.Sub(p)
 		sqDist := pq.Len2()
 		if sqDist < bestSqDist {
@@ -504,7 +514,7 @@ func ClosestPointInTetrahedron(p, a, b, c, d *glm.Vec3) glm.Vec3 {
 	}
 
 	if PointsOnOppositeSideOfPlane(p, a, c, d, b) {
-		q := ClosestPointInTriangle(p, a, c, d)
+		q := ClosestPointTrianglePoint(p, a, c, d)
 		pq := q.Sub(p)
 		sqDist := pq.Len2()
 		if sqDist < bestSqDist {
@@ -514,7 +524,7 @@ func ClosestPointInTetrahedron(p, a, b, c, d *glm.Vec3) glm.Vec3 {
 	}
 
 	if PointsOnOppositeSideOfPlane(p, a, d, b, c) {
-		q := ClosestPointInTriangle(p, a, d, b)
+		q := ClosestPointTrianglePoint(p, a, d, b)
 		pq := q.Sub(p)
 		sqDist := pq.Len2()
 		if sqDist < bestSqDist {
@@ -524,7 +534,7 @@ func ClosestPointInTetrahedron(p, a, b, c, d *glm.Vec3) glm.Vec3 {
 	}
 
 	if PointsOnOppositeSideOfPlane(p, b, d, c, a) {
-		q := ClosestPointInTriangle(p, b, d, c)
+		q := ClosestPointTrianglePoint(p, b, d, c)
 		pq := q.Sub(p)
 		sqDist := pq.Len2()
 		if sqDist < bestSqDist {
@@ -550,8 +560,292 @@ func DistToTriangle(p, a, b, c *glm.Vec3) float32 {
 	return cross.Dot(&l3)
 }
 
-// ClosestPointSegmentPoint returns the point on the segment closest to p.
-func ClosestPointSegmentPoint(s1, s2, p *glm.Vec3) (t float32, v glm.Vec3) {
+// ClosestPointLineTriangle returns the pair of points that are the closest from
+// the line and the triangle.
+func ClosestPointLineTriangle(p, q, a, b, c *glm.Vec3) (u, v glm.Vec3) {
 	// TODO(hydroflame): implement
 	panic("not implemented")
+}
+
+// ClosestPointTriangleTriangle returns the pair of points that are the closest
+// from the triangle pair.
+func ClosestPointTriangleTriangle(a, b, c, d, e, f *glm.Vec3) (u, v glm.Vec3) {
+	// TODO(hydroflame): implement
+	panic("not implemented")
+}
+
+// TestSpherePlane returns true if s and p intersect. The plane
+// normal must be normalized.
+func TestSpherePlane(s *Sphere, p *Plane) bool {
+	// calculate the new center of the sphere as if the plane passed by [0 0]
+	c := s.Center.Sub(&p.P)
+	d := math.Abs(c.Dot(&p.N))
+	return flops.Le(d, s.Radius)
+}
+
+// InsideSpherePlane returns true if s is completely inside plane p.
+func InsideSpherePlane(s *Sphere, p *Plane) bool {
+	c := s.Center.Sub(&p.P)
+	d := c.Dot(&p.N)
+	return flops.Lt(d, -s.Radius)
+}
+
+// TestSphereHalfspace returns true if s is touching or inside halfspace p.
+func TestSphereHalfspace(s *Sphere, p *Plane) bool {
+	c := s.Center.Sub(&p.P)
+	d := c.Dot(&p.N)
+	return flops.Le(d, s.Radius)
+}
+
+// TestOBBPlane returns true if b and p intersect.
+func TestOBBPlane(b *OBB, p *Plane) bool {
+	// Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+	r := b.Radius[0]*math.Abs(p.N.Dot(&b.Orientation[0])) +
+		b.Radius[1]*math.Abs(p.N.Dot(&b.Orientation[1])) +
+		b.Radius[2]*math.Abs(p.N.Dot(&b.Orientation[2]))
+	// Compute distance of box center from plane
+	//float s = Dot(p.n, b.c) - p.d
+	c := b.Center.Sub(&p.P)
+	d := c.Dot(&p.N)
+	// Intersection occurs when distance s falls within [-r,+r] interval
+	return math.Abs(d) <= r
+}
+
+// TestAABBPlane tests if AABB b intersects plane p.
+func TestAABBPlane(b *AABB, p *Plane) bool {
+	// These two lines not necessary with a (center, extents) AABB representation
+	// Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+	r := b.Radius[0]*math.Abs(p.N[0]) +
+		b.Radius[1]*math.Abs(p.N[1]) +
+		b.Radius[2]*math.Abs(p.N[2])
+	// Compute distance of box center from plane
+	c := b.Center.Sub(&p.P)
+	s := c.Dot(&p.N)
+	// Intersection occurs when distance s falls within [-r,+r] interval
+	return math.Abs(s) <= r
+}
+
+// TestSphereAABB returns true if sphere s intersects AABB b
+func TestSphereAABB(s *Sphere, b *AABB) bool {
+	return SqDistAABBPoint(b, &s.Center) <= s.Radius*s.Radius
+}
+
+// TestSphereOBB returns true if sphere s intersects OBB b, false otherwise.
+// The point p on the OBB closest to the sphere center is also returned
+func TestSphereOBB(s *Sphere, b *OBB) bool {
+	// Find point p on OBB closest to sphere center
+	p := ClosestPointOBBPoint(b, &s.Center)
+	// Sphere and OBB intersect if the (squared) distance from sphere
+	// center to point p is less than the (squared) sphere radius
+	v := p.Sub(&s.Center)
+	return v.Dot(&v) <= s.Radius*s.Radius
+}
+
+// TestSphereTriangle returns true if sphere s intersects triangle ABC, false
+// otherwise. The point p on abc closest to the sphere center is also returned.
+func TestSphereTriangle(s *Sphere, a, b, c *glm.Vec3) bool {
+	// Find point P on triangle ABC closest to sphere center
+	p := ClosestPointTrianglePoint(&s.Center, a, b, c)
+	// Sphere and triangle intersect if the (squared) distance from sphere
+	// center to point p is less than the (squared) sphere radius
+	v := p.Sub(&s.Center)
+	return v.Dot(&v) <= s.Radius*s.Radius
+}
+
+// TestTriangleAABB returns true if [v0 v1 v2] intersects b
+func TestTriangleAABB(v0, v1, v2 *glm.Vec3, b *AABB) bool {
+	panic("implementation incomplete")
+	var p0, p2, r float32
+	//var p1 float32
+	// Translate triangle as conceptually moving AABB to origin
+	u0 := v0.Sub(&b.Center)
+	u1 := v1.Sub(&b.Center)
+	u2 := v2.Sub(&b.Center)
+	// Compute edge vectors for triangle
+	f0 := u1.Sub(&u0)
+	f1 := u2.Sub(&u1)
+	//f2 := u0.Sub(&u2)
+
+	// Test axes a00..a22 (category 3)
+	// Test axis a00
+	p0 = u0[2]*u1[1] - u0[1]*u1[2]
+	p2 = u2[2]*(u1[1]-u0[1]) - u2[2]*(u1[2]-u0[2])
+	r = b.Radius[1]*math.Abs(f0[2]) + b.Radius[2]*math.Abs(f0[1])
+	if math.Max(-math.Max(p0, p2), math.Min(p0, p2)) > r {
+		return false // Axis is a separating axis
+	}
+	// Repeat similar tests for remaining axes a01..a22
+	//...
+	// Test the three axes corresponding to the face normals of AABB b (category 1).
+	// Exit if...
+	// ... [-b.Radius[0], b.Radius[0]] and [min(u0[0],u1[0],u2[0]), max(u0[0],u1[0],u2[0])] do not overlap
+	if math.Max(u0[0], math.Max(u1[0], u2[0])) < -b.Radius[0] ||
+		math.Min(u0[0], math.Min(u1[0], u2[0])) > b.Radius[0] {
+		return false
+	}
+	// ... [-b.Radius[1], b.Radius[1]] and [min(u0[1],u1[1],u2[1]), max(u0[1],u1[1],u2[1])] do not overlap
+	if math.Max(u0[1], math.Max(u1[1], u2[1])) < -b.Radius[1] ||
+		math.Min(u0[1], math.Min(u1[1], u2[1])) > b.Radius[1] {
+		return false
+	}
+	// ... [-b.Radius[2], b.Radius[2]] and [min(u0[2],u1[2],u2[2]), max(u0[2],u1[2],u2[2])] do not overlap
+	if math.Max(u0[2], math.Max(u1[2], u2[2])) < -b.Radius[2] ||
+		math.Min(u0[2], math.Min(u1[2], u2[2])) > b.Radius[2] {
+		return false
+	}
+	// Test separating axis corresponding to triangle face normal (category 2)
+	var p Plane
+	p.N = f0.Cross(&f1)
+	p.P = u0
+	return TestAABBPlane(b, &p)
+}
+
+// IntersectSegmentPlane returns how far in the segment, the point in world
+// coordinates and true if the segment and the plane intersect
+func IntersectSegmentPlane(a, b *glm.Vec3, p *Plane) (t float32, q glm.Vec3, overlap bool) {
+	// Compute the t value for the directed line ab intersecting the plane
+	ab := glm.Vec3{
+		(b[0] - p.P[0]) - (a[0] - p.P[0]),
+		(b[1] - p.P[1]) - (a[1] - p.P[1]),
+		(b[2] - p.P[2]) - (a[2] - p.P[2]),
+	}
+	t = p.N.Dot(a) / p.N.Dot(&ab)
+	// If t in [0..1] compute and return intersection point
+	if flops.Gez(t) && flops.Le(t, 1) {
+		q = *a
+		q.AddScaledVec(t, &ab)
+		overlap = true
+		return
+	}
+	// Else no intersection
+	return
+}
+
+// IntersectRaySphere intersects ray r = p + td, |d| = 1, with sphere s and, if intersecting, // returns t value of intersection and intersection point q
+func IntersectRaySphere(p, d *glm.Vec3, s *Sphere) (t float32, q glm.Vec3, overlap bool) {
+	m := p.Sub(&s.Center)
+	b := m.Dot(d)
+	c := m.Dot(&m) - s.Radius*s.Radius
+	// Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0)
+	if flops.Gtz(c) && flops.Gtz(b) {
+		return
+	}
+	discr := b*b - c
+	// A negative discriminant corresponds to ray missing sphere
+	if flops.Ltz(discr) {
+		return // returns false and all zero value
+	}
+	// Ray now found to intersect sphere, compute smallest t value of intersection t = -b - Sqrt(discr);
+	// If t is negative, ray started inside sphere so clamp t to zero
+	if t < 0 {
+		t = 0
+	}
+	q = *p
+	q.AddScaledVec(t, d)
+	overlap = true
+	return
+}
+
+// TestRaySphere tests if ray r = p + td intersects sphere s
+func TestRaySphere(p, d *glm.Vec3, s *Sphere) bool {
+	m := p.Sub(&s.Center)
+	c := m.Dot(&m) - s.Radius*s.Radius
+	// If there is definitely at least one real root, there must be an intersection
+	if flops.Lez(c) {
+		return true
+	}
+	b := m.Dot(d)
+	// Early exit if ray origin outside sphere and ray pointing away from sphere
+	if flops.Gtz(b) {
+		return false
+	}
+	disc := b*b - c
+	// A negative discriminant corresponds to ray missing sphere
+	if flops.Ltz(disc) {
+		return false
+	}
+	// Now ray must hit sphere
+	return true
+}
+
+// IntersectRayAABB intersect ray R(t) = p + t*d against AABB a. When
+// intersecting, return intersection distance t and point q of intersection.
+func IntersectRayAABB(p, d *glm.Vec3, a *AABB) (t float32, q glm.Vec3, overlap bool) {
+	// TODO(hydroflame): find what epsilon to use.
+	const epsilon = 0.00001
+	tmax := float32(math.MaxFloat32) // set to max distance ray can travel (for segment)
+	// For all three slabs
+	for i := 0; i < 3; i++ {
+		if math.Abs(d[i]) < epsilon {
+			// Ray is parallel to slab. No hit if origin not within slab
+			if p[i] < a.Center[i]-a.Radius[i] || p[i] > a.Center[i]+a.Radius[i] {
+				return
+			}
+		} else {
+			// Compute intersection t value of ray with near and far plane of slab
+			ood := 1.0 / d[i]
+			t1 := (a.Center[i] - a.Radius[i] - p[i]) * ood
+			t2 := (a.Center[i] + a.Radius[i] - p[i]) * ood
+			// Make t1 be intersection with near plane, t2 with far plane
+			if t1 > t2 {
+				t1, t2 = t2, t1
+			}
+			// Compute the intersection of slab intersection intervals
+			if t1 > t {
+				t = t1
+			}
+			if t2 > tmax {
+				tmax = t2
+			}
+			// Exit with no collision as soon as slab intersection becomes empty
+			if t > tmax {
+				return
+			}
+
+		}
+	}
+	// Ray intersects all 3 slabs. Return point (q) and intersection t value (tmin)
+	q = *p
+	q.AddScaledVec(t, d)
+	overlap = true
+	return
+}
+
+// TestSegmentAABB tests if segment specified by points p0 and p1 intersects
+// AABB b.
+func TestSegmentAABB(p0, p1 *glm.Vec3, b *AABB) bool {
+	// TODO(hydroflame): find what epsilon to use.
+	const epsilon = 0.00001
+
+	m := p0.Add(p1) // Segment midpoint
+	m.MulWith(0.5)
+	d := p1.Sub(&m)      // Segment halflength vector
+	m = m.Sub(&b.Center) // Translate box and segment to origin
+
+	// Try world coordinate axes as separating axes
+	adx := math.Abs(d[0])
+	if flops.Gt(math.Abs(m[0]), b.Radius[0]+adx) {
+		return false
+	}
+	ady := math.Abs(d[1])
+	if flops.Gt(math.Abs(m[1]), b.Radius[1]+ady) {
+		return false
+	}
+	adz := math.Abs(d[2])
+	if flops.Gt(math.Abs(m[2]), b.Radius[2]+adz) {
+		return false
+	}
+	// Add in an epsilon term to counteract arithmetic errors when segment is
+	// (near) parallel to a coordinate axis (see text for detail)
+	adx += epsilon
+	ady += epsilon
+	adz += epsilon
+	// Try cross products of segment direction vector with coordinate axes
+	if flops.Gt(math.Abs(m[1]*d[2]-m[2]*d[1]), b.Radius[1]*adz+b.Radius[2]*ady) ||
+		flops.Gt(math.Abs(m[2]*d[0]-m[0]*d[2]), b.Radius[0]*adz+b.Radius[2]*adx) ||
+		flops.Gt(math.Abs(m[0]*d[1]-m[1]*d[0]), b.Radius[0]*ady+b.Radius[1]*adx) {
+		return false
+	}
+	// No separating axis found; segment must be overlapping AABB
+	return true
 }
