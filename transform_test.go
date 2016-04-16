@@ -219,7 +219,7 @@ func TestRotate3D(t *testing.T) {
 			angle: math.Pi / 2,
 			start: Vec3{1, 0, 0},
 			endRX: Vec3{1, 0, 0},
-			endRY: Vec3{-0, 0, 1},
+			endRY: Vec3{-0, 0, -1},
 			endRZ: Vec3{0, 1, 0},
 		},
 	}
