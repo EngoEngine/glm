@@ -127,6 +127,16 @@ func (v1 *Vec3) CrossWith(v2 *Vec3) {
 	v1[2] = vx*v2[1] - vy*v2[0]
 }
 
+// ScalarTripleProduct returns Dot(v1, Cross(v2,v3)), its also called the box or
+// mixed product.
+//
+// https://en.wikipedia.org/wiki/Triple_product
+func ScalarTripleProduct(v1, v2, v3 *Vec3) float32 {
+	return v1[0]*(v2[1]*v3[2]-v2[2]*v3[1]) +
+		v1[1]*(v2[2]*v3[0]-v2[0]*v3[2]) +
+		v1[2]*(v2[0]*v3[1]-v2[1]*v3[0])
+}
+
 // Add is equivalent to v3 := v1+v2
 func (v1 *Vec2) Add(v2 *Vec2) Vec2 {
 	return Vec2{v1[0] + v2[0], v1[1] + v2[1]}

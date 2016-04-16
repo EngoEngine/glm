@@ -849,3 +849,202 @@ func TestSegmentAABB(p0, p1 *glm.Vec3, b *AABB) bool {
 	// No separating axis found; segment must be overlapping AABB
 	return true
 }
+
+// Given line pq and ccw triangle abc, return whether line pierces triangle. If
+// so, also return the barycentric coordinates (u,v,w) of the intersection point
+func IntersectSegmentTriangle(p, q, a, b, c *glm.Vec3) (u, v, w float32, overlap bool) {
+	pq := q.Sub(p)
+	pa := a.Sub(p)
+	pb := b.Sub(p)
+	pc := c.Sub(p)
+	// Test if pq is inside the edges bc, ca and ab. Done by testing
+	// that the signed tetrahedral volumes, computed using scalar triple // products, are all positive
+	u = glm.ScalarTripleProduct(&pq, &pc, &pb)
+	if flops.Ltz(u) {
+		return // already false and the other values are junk anyway.
+	}
+	v = glm.ScalarTripleProduct(&pq, &pa, &pc)
+	if flops.Ltz(v) {
+		return // already false and the other values are junk anyway.
+	}
+	w = glm.ScalarTripleProduct(&pq, &pb, &pa)
+	if flops.Ltz(w) {
+		return // already false and the other values are junk anyway.
+	}
+	// Compute the barycentric coordinates (u, v, w) determining the // intersection point r, r = u*a + v*b + w*c
+	denom := 1.0 / (u + v + w)
+	u *= denom
+	v *= denom
+	w *= denom // w = 1.0f - u - v;
+	overlap = true
+	return
+}
+
+// Given line pq and ccw quadrilateral abcd, return whether the line
+// pierces the triangle. If so, also return the point r of intersection
+func IntersectSegmentQuad(p, q, a, b, c, d *glm.Vec3) (glm.Vec3, bool) {
+	pq := q.Sub(p)
+	pa := a.Sub(p)
+	pb := b.Sub(p)
+	pc := c.Sub(p)
+	// Determine which triangle to test against by testing against diagonal first
+	m := pc.Cross(&pq)
+	v := pa.Dot(&m) // glm.ScalarTripleProduct(pq, pa, pc);
+	if flops.Gez(v) {
+		// Test intersection against triangle abc
+		u := -pb.Dot(&m) // glm.ScalarTripleProduct(pq, pc, pb);
+		if flops.Ltz(u) {
+			return glm.Vec3{}, false
+		}
+		w := glm.ScalarTripleProduct(&pq, &pb, &pa)
+		if flops.Ltz(w) {
+			return glm.Vec3{}, false
+		}
+		// Compute r, r = u*a + v*b + w*c, from barycentric coordinates (u, v, w)
+		denom := 1.0 / (u + v + w)
+		u *= denom
+		v *= denom
+		w *= denom // w = 1.0f - u - v;
+		r := a.Mul(u)
+		r.AddScaledVec(v, b)
+		r.AddScaledVec(w, c)
+		return r, true
+	}
+	// Test intersection against triangle dac
+	pd := d.Sub(p)
+	u := pd.Dot(&m) // glm.ScalarTripleProduct(pq, pd, pc);
+	if u < 0 {
+		return glm.Vec3{}, false
+	}
+	w := glm.ScalarTripleProduct(&pq, &pa, &pd)
+	if w < 0 {
+		return glm.Vec3{}, false
+	}
+	v = -v
+	// Compute r, r = u*a + v*d + w*c, from barycentric coordinates (u, v, w)
+	denom := 1.0 / (u + v + w)
+	u *= denom
+	v *= denom
+	w *= denom // w = 1.0f - u - v;
+	r := a.Mul(u)
+	r.AddScaledVec(v, d)
+	r.AddScaledVec(w, c)
+	return r, true
+}
+
+// Given segment pq and triangle abc, returns whether segment intersects
+// triangle and if so, also returns the barycentric coordinates (u,v,w)
+// of the intersection point
+func IntersectSegmentTriangle2(p, q, a, b, c *glm.Vec3) (u, v, w, t float32, overlap bool) {
+	ab := b.Sub(a)
+	ac := c.Sub(a)
+	qp := p.Sub(q)
+	// Compute triangle normal. Can be precalculated or cached if
+	// intersecting multiple segments against the same triangle
+	n := ab.Cross(&ac)
+	// Compute denominator d. If d <= 0, segment is parallel to or points
+	// away from triangle, so exit early
+	d := qp.Dot(&n)
+	if d <= 0 {
+		return
+	}
+	// Compute intersection t value of pq with plane of triangle. A ray
+	// intersects iff 0 <= t. Segment intersects iff 0 <= t <= 1. Delay
+	// dividing by d until intersection has been found to pierce triangle
+	ap := p.Sub(a)
+	t = ap.Dot(&n)
+	if t < 0.0 {
+		return
+	}
+	if t > d { // For segment; exclude this code line for a ray test
+		return
+	}
+	// Compute barycentric coordinate components and test if within bounds
+	e := qp.Cross(&ap)
+	v = ac.Dot(&e)
+	if v < 0.0 || v > d {
+		return
+	}
+	w = -ab.Dot(&e)
+	if w < 0.0 || v+w > d {
+		return
+	}
+	// Segment/ray intersects triangle. Perform delayed division and // compute the last barycentric coordinate component
+	ood := 1.0 / d
+	t *= ood
+	v *= ood
+	w *= ood
+	u = 1.0 - v - w
+	overlap = true
+	return
+}
+
+// IntersectSegmentCylinder intersects segment S(t)=sa+t(sb-sa), 0<=t<=1 against
+// cylinder specified by p, q and r
+func IntersectSegmentCylinder(sa, sb, p, q *glm.Vec3, r float32) (float32, bool) {
+	const Epsilon = 0.00001
+	var t float32
+	d := q.Sub(p)
+	m := sa.Sub(p)
+	n := sb.Sub(sa)
+	md := m.Dot(&d)
+	nd := n.Dot(&d)
+	dd := d.Dot(&d)
+	// Test if segment fully outside either endcap of cylinder
+	if md < 0.0 && md+nd < 0.0 {
+		return 0, false
+	} // Segment outside ’p’ side of cylinder
+	if md > dd && md+nd > dd {
+		return 0, false
+	}
+	// Segment outside ’q’ side of cylinder
+	nn := n.Dot(&n)
+	mn := m.Dot(&n)
+	a := dd*nn - nd*nd
+	k := m.Dot(&m) - r*r
+	c := dd*k - md*md
+	if math.Abs(a) < Epsilon {
+		// Segment runs parallel to cylinder axis
+		if c > 0 {
+			return t, false
+		}
+		// ’a’ and thus the segment lie outside cylinder
+		// Now known that segment intersects cylinder; figure out how it intersects
+		if md < 0 {
+			t = -mn / nn // Intersect segment against ’p’ endcap
+		} else if md > dd {
+			t = (nd - mn) / nn // Intersect segment against ’q’ endcap
+		} else {
+			t = 0 // ’a’ lies inside cylinder
+		}
+		return t, true
+	}
+	b := dd*mn - nd*md
+	discr := b*b - a*c
+	if discr < 0 {
+		return 0, false // No real roots; no intersection
+	}
+	t = (-b - math.Sqrt(discr)) / a
+	if t < 0 || t > 1 {
+		return 0, false // Intersection lies outside segment
+	}
+	if md+t*nd < 0 {
+		// Intersection outside cylinder on ’p’ side
+		if nd <= 0 {
+			return 0, false // Segment pointing away from endcap
+		}
+		t = -md / nd
+		// Keep intersection if Dot(S(t) - p, S(t) - p) <= r∧2
+		return t, k+2*t*(mn+t*nn) <= 0
+	} else if md+t*nd > dd {
+		// Intersection outside cylinder on ’q’ side
+		if nd >= 0 {
+			return 0, false // Segment pointing away from endcap
+		}
+		t = (dd - md) / nd
+		// Keep intersection if Dot(S(t) - q, S(t) - q) <= r∧2
+		return t, k+dd-2*md+t*(2*(mn-nd)+t*nn) <= 0
+	}
+	// Segment intersects cylinder between the endcaps; t is correct
+	return t, true
+}
