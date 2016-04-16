@@ -1,7 +1,6 @@
 package flops
 
 import (
-	"github.com/luxengine/glm"
 	"testing"
 )
 
@@ -142,35 +141,5 @@ func TestZ(t *testing.T) {
 		if test.result != Z(test.f) {
 			t.Errorf("[%d] wrong result from %f == 0", i, test.f)
 		}
-	}
-}
-
-func BenchmarkRefequal(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		refequal(equaltests[n%len(equaltests)].data[0], equaltests[n%len(equaltests)].data[1])
-	}
-}
-
-func BenchmarkEq(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		Eq(equaltests[n%len(equaltests)].data[0], equaltests[n%len(equaltests)].data[1])
-	}
-}
-
-func BenchmarkGLMEq(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		glm.FloatEqual(equaltests[n%len(equaltests)].data[0], equaltests[n%len(equaltests)].data[1])
-	}
-}
-
-func BenchmarkRefz(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		refz(ztests[n%len(ztests)].f)
-	}
-}
-
-func BenchmarkZ(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		Z(ztests[n%len(ztests)].f)
 	}
 }

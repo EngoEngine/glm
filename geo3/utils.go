@@ -2,7 +2,7 @@ package geo3
 
 import (
 	"github.com/luxengine/glm"
-	"github.com/luxengine/glm/flops"
+	"github.com/luxengine/glm/flops/32/flops"
 	"github.com/luxengine/math"
 )
 
@@ -850,8 +850,9 @@ func TestSegmentAABB(p0, p1 *glm.Vec3, b *AABB) bool {
 	return true
 }
 
-// Given line pq and ccw triangle abc, return whether line pierces triangle. If
-// so, also return the barycentric coordinates (u,v,w) of the intersection point
+// IntersectSegmentTriangle is given line pq and ccw triangle abc and return
+// whether line pierces triangle. If so, also return the barycentric coordinates
+// (u,v,w) of the intersection point.
 func IntersectSegmentTriangle(p, q, a, b, c *glm.Vec3) (u, v, w float32, overlap bool) {
 	pq := q.Sub(p)
 	pa := a.Sub(p)
@@ -880,8 +881,9 @@ func IntersectSegmentTriangle(p, q, a, b, c *glm.Vec3) (u, v, w float32, overlap
 	return
 }
 
-// Given line pq and ccw quadrilateral abcd, return whether the line
-// pierces the triangle. If so, also return the point r of intersection
+// IntersectSegmentQuad is given line pq and ccw quadrilateral abcd, return
+// whether the line pierces the triangle. If so, also return the point r of
+// intersection.
 func IntersectSegmentQuad(p, q, a, b, c, d *glm.Vec3) (glm.Vec3, bool) {
 	pq := q.Sub(p)
 	pa := a.Sub(p)
@@ -932,9 +934,9 @@ func IntersectSegmentQuad(p, q, a, b, c, d *glm.Vec3) (glm.Vec3, bool) {
 	return r, true
 }
 
-// Given segment pq and triangle abc, returns whether segment intersects
-// triangle and if so, also returns the barycentric coordinates (u,v,w)
-// of the intersection point
+// IntersectSegmentTriangle2 is given segment pq and triangle abc and returns
+// whether segment intersects triangle and if so, also returns the barycentric
+// coordinates (u,v,w) of the intersection point.
 func IntersectSegmentTriangle2(p, q, a, b, c *glm.Vec3) (u, v, w, t float32, overlap bool) {
 	ab := b.Sub(a)
 	ac := c.Sub(a)

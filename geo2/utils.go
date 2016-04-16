@@ -2,7 +2,7 @@ package geo2
 
 import (
 	"github.com/luxengine/glm"
-	"github.com/luxengine/glm/flops"
+	"github.com/luxengine/glm/flops/32/flops"
 	"github.com/luxengine/math"
 )
 
