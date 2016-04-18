@@ -245,7 +245,6 @@ func TestQuickhull(t *testing.T) {
 
 func TestQuickhullSupport(t *testing.T) {
 	points := []glm.Vec2{{-0.1, -0.1}, {0.5, -0.1}, {1, 0}, {1.1, 1}, {0, 1}, {0.5, 0.5}, {-0.4, 0.5}, {0.4, 0.4}, {0.5, 0.4}, {0.6, 0.6}}
-	//hull := []glm.Vec2{{-0.4, 0.5}, {0, 1}, {1.1, 1}, {1, 0}, {0.5, -0.1}, {0, 0}},
 	hull := Quickhull(points)
 
 	var pos []glm.Vec2
@@ -261,7 +260,7 @@ func TestQuickhullSupport(t *testing.T) {
 	const sep = 16
 	for n := 0; n < sep; n++ {
 		dir := glm.Vec2{math.Cos(float32(n) * 2.0 * math.Pi / float32(sep)), math.Sin(float32(n) * 2.0 * math.Pi / float32(sep))}
-		s := ConvexHullSupport(&hull, &dir)
+		s := hull.Support(&dir)
 		_ = s
 		//ss := hull.SupportSlow(&dir)
 		//if !s.ApproxEqualThreshold(&ss, 1e-4) {

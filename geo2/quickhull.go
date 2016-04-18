@@ -29,14 +29,13 @@ type ConvexHull struct {
 	mem *byte
 }
 
-// ConvexHullSupport returns the support of this convex hull in the given
-// direction.
-func ConvexHullSupport(c *ConvexHull, dir *glm.Vec2) glm.Vec2 {
+// Support returns the support of this convex hull in the given direction.
+func (c *ConvexHull) Support(dir *glm.Vec2) glm.Vec2 {
 	// TODO(hydroflame): finish implementation
 
 	// find the index of the support we should start using at first. We could
 	// use the dot product for quickhull2.SupportDirection but this is just a
-	// couple of load, compare, and jumps so it's way faster
+	// couple of load, compare, and jumps so it's way faster.
 	var i int
 	if dir[0] > 0 {
 		if dir[1] > 0 {

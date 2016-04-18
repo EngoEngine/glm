@@ -29,7 +29,7 @@ type BarycentricCache struct {
 	d00, d01, d11, denom float32
 }
 
-// BarycentricCacheFromTriangle takes a triangle and returns a  barycentric
+// BarycentricCacheFromTriangle takes a triangle and returns a barycentric
 // cache for queries.
 func BarycentricCacheFromTriangle(a, b, c *glm.Vec3) BarycentricCache {
 	v0, v1 := b.Sub(a), c.Sub(a)

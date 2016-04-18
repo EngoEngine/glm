@@ -337,3 +337,9 @@ func TestSegmentSegment(a, b, c, d *glm.Vec2) (t float32, v glm.Vec2, overlap bo
 func Signed2DTriArea(a, b, c *glm.Vec2) float32 {
 	return (a[0]-c[0])*(b[1]-c[1]) - (a[1]-c[1])*(b[0]-c[0])
 }
+
+// ClosestPointLineTriangle returns the pair of points that are the closest from
+// the line and the triangle.
+func ClosestPointLineTriangle(p, q, a, b, c *glm.Vec3) (u, v glm.Vec3) {
+	panic("not implemented")
+}
