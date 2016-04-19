@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/ajstarks/svgo/float"
 	"github.com/luxengine/glm"
-	"github.com/luxengine/glm/geo"
+	"github.com/luxengine/glm/geo2"
 	"os"
 )
 
@@ -15,13 +15,13 @@ func main() {
 	c := svg.New(os.Stdout)
 	c.Start(500, 500)
 
-	s := geo.Simplex2{
-		Points: [3]glm.Vec2{{200, 100}, {100, 100}, {}},
-		Size:   2,
+	s := geo2.Simplex{
+		Points: [3]glm.Vec2{{100, 100}, {}, {}},
+		Size:   1,
 	}
 
-	for n := 0; n < 2; n++ {
-		l := s.Points[(n+1)%2].Sub(&s.Points[n])
+	for n := 0; n < 1; n++ {
+		l := s.Points[(n+1)%1].Sub(&s.Points[n])
 		c.Line(float64(s.Points[n][0]), float64(s.Points[n][1]), float64(s.Points[n][0]+l[0]), float64(s.Points[n][1]+l[1]), "stroke:rgb(0,0,255);stroke-width:2")
 	}
 
@@ -33,9 +33,9 @@ func main() {
 		for m := 0; m < sy; m++ {
 			p := glm.Vec2{float32(n) * float32(width) / float32(sx), float32(m) * float32(height) / float32(sy)}
 
-			s2 := geo.Simplex2{
-				Points: [3]glm.Vec2{s.Points[0].Sub(&p), s.Points[1].Sub(&p), {}},
-				Size:   2,
+			s2 := geo2.Simplex{
+				Points: [3]glm.Vec2{s.Points[0].Sub(&p), {}, {}},
+				Size:   1,
 			}
 
 			dir, contain := s2.NearestToOrigin()
