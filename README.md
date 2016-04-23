@@ -1,4 +1,4 @@
-# glm ![Build Status](http://jenkins.hydroflame.net/job/glm/lastBuild/artifact/status.svg) ![Tests](http://jenkins.hydroflame.net/job/glm/lastBuild/artifact/tests.svg) ![Coverage](http://jenkins.hydroflame.net/job/glm/lastBuild/artifact/coverage.svg) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/luxengine/glm)
+# glm ![Build Status](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/status.svg) ![Tests](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/test.svg) ![Coverage](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/cover.svg) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/luxengine/glm)
 
 More efficient version then go-gl math lib and better name (math32 is too long to type).
 
