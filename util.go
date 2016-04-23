@@ -1,29 +1,19 @@
 package glm
 
 import (
+	math32 "github.com/luxengine/math"
 	"math"
 )
 
-// Epsilon is some tiny value that determines how precisely equal we want our floats to be
-// This is exported and left as a variable in case you want to change the default threshold for the
-// purposes of certain methods (e.g. Unproject uses the default epsilon when determining
-// if the determinant is "close enough" to zero to mean there's no inverse).
+// Epsilon is some tiny value that determines how precisely equal we want our
+// floats to be. This is exported and left as a variable in case you want to
+// change the default threshold for the purposes of certain methods (e.g.
+// Unproject uses the default epsilon when determining if the determinant is
+// "close enough" to zero to mean there's no inverse).
 //
-// This is, obviously, not mutex protected so be **absolutely sure** that no functions using Epsilon
-// are being executed when you change this.
+// This is, obviously, not mutex protected so be **absolutely sure** that no
+// functions using Epsilon are being executed when you change this.
 var Epsilon float32 = 1e-10
-
-// Abs is a direct copy of the math package's Abs. This is here for the mgl32
-// package, to prevent rampant type conversions during equality tests.
-func Abs(a float32) float32 {
-	if a < 0 {
-		return -a
-	} else if a == 0 {
-		return 0
-	}
-
-	return a
-}
 
 // FloatEqual is a safe utility function to compare floats.
 // It's Taken from http://floating-point-gui.de/errors/comparison/
@@ -69,21 +59,18 @@ func FloatEqualThreshold(a, b, epsilon float32) bool {
 		return true
 	}
 
-	diff := Abs(a - b)
+	diff := math32.Abs(a - b)
 	if a*b == 0 || diff < MinNormal { // If a or b are 0 or both are extremely close to it
 		return diff < epsilon*epsilon
 	}
 
 	// Else compare difference
-	return diff/(Abs(a)+Abs(b)) < epsilon
+	return diff/(math32.Abs(a)+math32.Abs(b)) < epsilon
 }
 
-// Clamp takes in a value and two thresholds. If the value is smaller than the low
-// threshold, it returns the low threshold. If it's bigger than the high threshold
-// it returns the high threshold. Otherwise it returns the value.
-//
-// Useful to prevent some functions from freaking out because a value was
-// teeeeechnically out of range.
+// Clamp takes in a value and two thresholds. If the value is smaller than the
+// low threshold, it returns the low threshold. If it's bigger than the high
+// threshold it returns the high threshold. Otherwise it returns the value.
 func Clamp(a, low, high float32) float32 {
 	if a < low {
 		return low
@@ -102,9 +89,6 @@ func ClampFunc(low, high float32) func(float32) float32 {
 	}
 }
 
-/* The IsClamped functions use strict equality (meaning: not the FloatEqual function)
-there shouldn't be any major issues with this since clamp is often used to fix minor errors*/
-
 // IsClamped checks if a is clamped between low and high as if
 // Clamp(a, low, high) had been called.
 //
@@ -114,27 +98,28 @@ func IsClamped(a, low, high float32) bool {
 	return a >= low && a <= high
 }
 
-// SetMin does: If a > b, then a will be set to the value of b.
+// SetMin sets a to the Min(a, b).
 func SetMin(a, b *float32) {
 	if *b < *a {
 		*a = *b
 	}
 }
 
-// SetMax does: If a < b, then a will be set to the value of b.
+// SetMax sets a to the Max(a, b).
 func SetMax(a, b *float32) {
 	if *a < *b {
 		*a = *b
 	}
 }
 
-// Round shortens a float32 value to a specified precision (number of digits after the decimal point)
-// with "round half up" tie-braking rule. Half-way values (23.5) are always rounded up (24).
+// Round shortens a float32 value to a specified precision (number of digits
+// after the decimal point) with "round half up" tie-braking rule. Half-way
+// values (23.5) are always rounded up (24).
 func Round(v float32, precision int) float32 {
-	p := float64(precision)
-	t := float64(v) * math.Pow(10, p)
+	p := float32(precision)
+	t := v * math32.Pow(10, p)
 	if t > 0 {
-		return float32(math.Floor(t+0.5) / math.Pow(10, p))
+		return math32.Floor(t+0.5) / math32.Pow(10, p)
 	}
-	return float32(math.Ceil(t-0.5) / math.Pow(10, p))
+	return math32.Ceil(t-0.5) / math32.Pow(10, p)
 }

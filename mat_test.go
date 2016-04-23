@@ -8,25 +8,23 @@ import (
 )
 
 func TestMulIdent(t *testing.T) {
-	//t.Parallel()
-
-	i1 := [...]float32{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+	i1 := [...]float32{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	}
 	i2 := Ident4()
 	i3 := Ident4()
 
 	mul := i2.Mul4(&i3)
 
-	for i := range mul {
-		if mul[i] != i1[i] {
-			t.Errorf("Multiplication of identities does not yield identity")
-		}
+	if i1 != mul {
+		t.Errorf("Multiplication of identities does not yield identity")
 	}
 }
 
-// Square matrix
 func TestMatRowsSquare(t *testing.T) {
-	t.Parallel()
-
 	v0 := Vec4{1, 2, 3, 4}
 	v1 := Vec4{5, 6, 7, 8}
 	v2 := Vec4{9, 10, 11, 12}
@@ -56,10 +54,8 @@ func TestMatRowsSquare(t *testing.T) {
 	}
 }
 
-// Square matrix
 func TestMatColsSquare(t *testing.T) {
-	t.Skip()
-	//t.Parallel()
+	//t.Skip()
 
 	v0 := Vec4{1, 2, 3, 4}
 	v1 := Vec4{5, 6, 7, 8}
@@ -142,23 +138,17 @@ func TestMatColsSquare(t *testing.T) {
 }
 
 func TestTransposeSquare(t *testing.T) {
-	//t.Parallel()
-
-	m := Mat4FromCols(
-		&Vec4{1, 2, 3, 4},
-		&Vec4{5, 6, 7, 8},
-		&Vec4{9, 10, 11, 12},
-		&Vec4{13, 14, 15, 16},
-	)
+	v := [4]Vec4{
+		{1, 2, 3, 4},
+		{5, 6, 7, 8},
+		{9, 10, 11, 12},
+		{13, 14, 15, 16},
+	}
+	m := Mat4FromCols(&v[0], &v[1], &v[2], &v[3])
 
 	transpose := m.Transposed()
 
-	correct := Mat4FromRows(
-		&Vec4{1, 2, 3, 4},
-		&Vec4{5, 6, 7, 8},
-		&Vec4{9, 10, 11, 12},
-		&Vec4{13, 14, 15, 16},
-	)
+	correct := Mat4FromRows(&v[0], &v[1], &v[2], &v[3])
 
 	if !correct.ApproxEqualThreshold(&transpose, 1e-4) {
 		t.Errorf("Transpose not correct. Got: %v, expected: %v", transpose, correct)
@@ -166,25 +156,27 @@ func TestTransposeSquare(t *testing.T) {
 }
 
 func TestAtSet(t *testing.T) {
-	//t.Parallel()
+	m := Mat3{
+		1, 2, 3,
+		4, 5, 6,
+		7, 8, 9,
+	}
 
-	m := Mat3{1, 2, 3, 4, 5, 6, 7, 8, 9}
-
-	v := m.At(0, 2)
-
-	if !FloatEqualThreshold(v, 7, 1e-4) {
+	if v := m.At(0, 2); !FloatEqualThreshold(v, 7, 1e-4) {
 		t.Errorf("Incorrect value gotten by At: %v, expected %v", v, 3)
 	}
 
 	m.Set(0, 2, 9001)
 
-	v = m.At(0, 2)
-
-	if !FloatEqualThreshold(v, 9001, 1e-4) {
+	if v := m.At(0, 2); !FloatEqualThreshold(v, 9001, 1e-4) {
 		t.Errorf("Value set by Set not gotten by At: %v, expected %v", v, 9001)
 	}
 
-	correctMat := Mat3{1, 2, 3, 4, 5, 6, 9001, 8, 9}
+	correctMat := Mat3{
+		1, 2, 3,
+		4, 5, 6,
+		9001, 8, 9,
+	}
 
 	if !correctMat.ApproxEqualThreshold(&m, 1e-4) {
 		t.Errorf("After set, not equal to matrix that should be identical. Got: %v, expected: %v", m, correctMat)
@@ -192,8 +184,6 @@ func TestAtSet(t *testing.T) {
 }
 
 func TestDiagTrace(t *testing.T) {
-	//t.Parallel()
-
 	m := Diag4(&Vec4{1, 2, 3, 4})
 
 	tr := m.Trace()
@@ -204,14 +194,12 @@ func TestDiagTrace(t *testing.T) {
 }
 
 func TestMatAbs(t *testing.T) {
-	//t.Parallel()
-
-	m := &Mat4{1, -3, 4, 5, -6, 8, -9, 10, 0, 1, 6, 2, 357, 3, 436}
-	result := &Mat4{1, 3, 4, 5, 6, 8, 9, 10, 0, 1, 6, 2, 357, 3, 436}
+	m := Mat4{1, -3, 4, 5, -6, 8, -9, 10, 0, 1, 6, 2, 357, 3, 436}
+	result := Mat4{1, 3, 4, 5, 6, 8, 9, 10, 0, 1, 6, 2, 357, 3, 436}
 
 	m.AbsSelf()
 
-	if !result.ApproxEqualThreshold(m, 1e-6) {
+	if !result.ApproxEqualThreshold(&m, 1e-6) {
 		t.Errorf("Matrix absolute value does not work properly. Got: %v, Expected: %v", m, result)
 	}
 }
@@ -231,7 +219,10 @@ func TestString(t *testing.T) {
 }
 
 func TestMat2Conv(t *testing.T) {
-	m2 := Mat2{1, 0, 0, 1}
+	m2 := Mat2{
+		1, 0,
+		0, 1,
+	}
 	m2tom3 := m2.Mat3()
 	if m2tom3 != Ident3() {
 		t.Errorf("did not get iden from casting Mat2 to Mat3")
@@ -243,7 +234,11 @@ func TestMat2Conv(t *testing.T) {
 }
 
 func TestMat3Conv(t *testing.T) {
-	m3 := Mat3{1, 0, 0, 0, 1, 0, 0, 0, 1}
+	m3 := Mat3{
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1,
+	}
 	m3tom2 := m3.Mat2()
 	if m3tom2 != Ident2() {
 		t.Errorf("did not get iden from casting Mat3 to Mat2")
@@ -255,14 +250,19 @@ func TestMat3Conv(t *testing.T) {
 }
 
 func TestMat4Conv(t *testing.T) {
-	m4 := Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+	m4 := Mat4{
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	}
 	m4tom2 := m4.Mat2()
 	if m4tom2 != Ident2() {
-		t.Errorf("did not get iden from casting Mat4 to Mat2")
+		t.Errorf("did not get identity from casting Mat4 to Mat2")
 	}
 	m4tom3 := m4.Mat3()
 	if m4tom3 != Ident3() {
-		t.Errorf("did not get iden from casting Mat4 to Mat3")
+		t.Errorf("did not get identity from casting Mat4 to Mat3")
 	}
 }
 func TestMat2SetCol(t *testing.T) {

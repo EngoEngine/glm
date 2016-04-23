@@ -257,14 +257,10 @@ func TestQuickhullSupport(t *testing.T) {
 		hull.Vertices[hull.bestSupport[1]].Position,
 		hull.Vertices[hull.bestSupport[2]].Position)
 
-	const sep = 16
+	const sep = 7
 	for n := 0; n < sep; n++ {
 		dir := glm.Vec2{math.Cos(float32(n) * 2.0 * math.Pi / float32(sep)), math.Sin(float32(n) * 2.0 * math.Pi / float32(sep))}
 		s := hull.Support(&dir)
-		_ = s
-		//ss := hull.SupportSlow(&dir)
-		//if !s.ApproxEqualThreshold(&ss, 1e-4) {
-		//	t.Errorf("[%d] dir %+v, s %+v, ss %+v", n, dir, s, ss)
-		//}
+		t.Logf("[%d] %s %d", n, dir.String(), s)
 	}
 }

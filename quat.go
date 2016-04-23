@@ -5,7 +5,7 @@ import (
 	math64 "math"
 )
 
-// RotationOrder  is the order in which
+// RotationOrder is the order in which
 // rotations will be transformed for the purposes of AnglesToQuat
 type RotationOrder int
 
@@ -25,10 +25,10 @@ const (
 	ZXY
 )
 
-// Quat is a Quaternion. A Quaternion is an extension of the imaginary numbers; there's all sorts of
-// interesting theory behind it. In 3D graphics we mostly use it as a cheap way of
-// representing rotation since quaternions are cheaper to multiply by, and easier to
-// interpolate than matrices.
+// Quat is a Quaternion. A Quaternion is an extension of the imaginary numbers;
+// there's all sorts of interesting theory behind it. In 3D graphics we mostly
+// use it as a cheap way of representing rotation since quaternions are cheaper
+// to multiply by, and easier to interpolate than matrices.
 //
 // A Quaternion has two parts: W, the so-called scalar component,
 // and "V", the vector component. The vector component is considered to
@@ -41,10 +41,10 @@ type Quat struct {
 // QuatIdent return the identity quaternion.
 // The quaternion identity: W=1; V=(0,0,0).
 //
-// As with all identities, multiplying any quaternion by this will yield the same
-// quaternion you started with.
+// As with all identities, multiplying any quaternion by this will yield the
+// same quaternion you started with.
 func QuatIdent() Quat {
-	return Quat{1., Vec3{0, 0, 0}}
+	return Quat{1, Vec3{0, 0, 0}}
 }
 
 // QuatRotate creates an angle from an axis and an angle relative to that axis.
@@ -76,8 +76,8 @@ func (q1 Quat) Z() float32 {
 	return q1.V[2]
 }
 
-// Add adds two quaternions. It's no more complicated than
-// adding their W and V components.
+// Add adds two quaternions. It's no more complicated than adding their W and V
+// components.
 func (q1 *Quat) Add(q2 *Quat) Quat {
 	return Quat{q1.W + q2.W, q1.V.Add(&q2.V)}
 }
@@ -88,16 +88,16 @@ func (q1 *Quat) AddOf(q2, q3 *Quat) {
 	q1.V.AddOf(&q2.V, &q3.V)
 }
 
-// AddWith is a memory friendly version of Add.
-// In quaternion cases you COULD use AddOf with q1 twice: q1.AddOf(&q1,&q2).
-// This is here just for API consistency.
+// AddWith is a memory friendly version of Add. In quaternion cases you COULD
+// use AddOf with q1 twice: q1.AddOf(&q1,&q2). This is here just for API
+// consistency.
 func (q1 *Quat) AddWith(q2 *Quat) {
 	q1.W += q2.W
 	q1.V.AddWith(&q2.V)
 }
 
-// Sub subtracts two quaternions. It's no more complicated than
-// subtracting their W and V components.
+// Sub subtracts two quaternions. It's no more complicated than subtracting
+// their W and V components.
 func (q1 *Quat) Sub(q2 *Quat) Quat {
 	return Quat{q1.W - q2.W, q1.V.Sub(&q2.V)}
 }
@@ -108,9 +108,9 @@ func (q1 *Quat) SubOf(q2, q3 *Quat) {
 	q1.V.SubOf(&q2.V, &q3.V)
 }
 
-// SubWith is a memory friendly version of Sub.
-// In quaternion cases you COULD use SubOf with q1 twice: q1.SubOf(&q1,&q2).
-// This is here just for API consistency.
+// SubWith is a memory friendly version of Sub. In quaternion cases you COULD
+// use SubOf with q1 twice: q1.SubOf(&q1,&q2). This is here just for API
+// consistency.
 func (q1 *Quat) SubWith(q2 *Quat) {
 	q1.W -= q2.W
 	q1.V.SubWith(&q2.V)
@@ -141,8 +141,8 @@ func (q1 *Quat) MulOf(q2, q3 *Quat) {
 	q1.V.AddScaledVec(q3.W, &q2.V)
 }
 
-// MulWith is a memory friendly version of Mul.
-// Use this when you want q1 both as dest and arg.
+// MulWith is a memory friendly version of Mul. Use this when you want q1 both
+// as dest and arg.
 func (q1 *Quat) MulWith(q2 *Quat) {
 	w := q1.W
 	v := q1.V
@@ -187,8 +187,8 @@ func (q1 *Quat) Conjugate() {
 	q1.V.MulWith(-1)
 }
 
-// Len returns the Length of the quaternion, also known as its Norm. This is the same thing as
-// the Len of a Vec4
+// Len returns the Length of the quaternion, also known as its Norm. This is the
+// same thing as the Len of a Vec4.
 func (q1 *Quat) Len() float32 {
 	return math.Sqrt(q1.W*q1.W + q1.V[0]*q1.V[0] + q1.V[1]*q1.V[1] + q1.V[2]*q1.V[2])
 }
@@ -219,7 +219,8 @@ func (q1 *Quat) Normalized() Quat {
 	return Quat{q1.W * il, q1.V.Mul(il)}
 }
 
-// SetNormalizedOf Normalizes the quaternion, returning its versor (unit quaternion).
+// SetNormalizedOf Normalizes the quaternion, returning its versor (unit
+// quaternion).
 //
 // This is the same as normalizing it as a Vec4.
 func (q1 *Quat) SetNormalizedOf(q2 *Quat) {
@@ -269,12 +270,12 @@ func (q1 *Quat) Normalize() {
 	q1.V.MulWith(il)
 }
 
-// Inverse returns the inverse of a quaternion. The inverse is equivalent
-// to the conjugate divided by the square of the length.
+// Inverse returns the inverse of a quaternion. The inverse is equivalent to the
+// conjugate divided by the square of the length.
 //
-// This method computes the square norm by directly adding the sum
-// of the squares of all terms instead of actually squaring q1.Len(),
-// both for performance and percision.
+// This method computes the square norm by directly adding the sum of the
+// squares of all terms instead of actually squaring q1.Len(), both for
+// performance and precision.
 func (q1 *Quat) Inverse() Quat {
 	c := q1.Conjugated()
 	return c.Scale(1 / q1.Dot(q1))
@@ -292,15 +293,14 @@ func (q1 *Quat) Invert() {
 	q1.ScaleWith(1.0 / q1.Dot(q1))
 }
 
-// Rotate rotates a vector by the rotation this quaternion represents.
-// This will result in a 3D vector. Strictly speaking, this is
-// equivalent to q1.v.q* where the "."" is quaternion multiplication and v is interpreted
-// as a quaternion with W 0 and V v. In code:
-// q1.Mul(Quat{0,v}).Mul(q1.Conjugate()), and
-// then retrieving the imaginary (vector) part.
+// Rotate rotates a vector by the rotation this quaternion represents. This will
+// result in a 3D vector. Strictly speaking, this is equivalent to q1.v.q* where
+// the "."" is quaternion multiplication and v is interpreted as a quaternion
+// with W 0 and V v. In code: q1.Mul(Quat{0,v}).Mul(q1.Conjugate()), and then
+// retrieving the imaginary (vector) part.
 //
-// In practice, we hand-compute this in the general case and simplify
-// to save a few operations.
+// In practice, we hand-compute this in the general case and simplify to save a
+// few operations.
 func (q1 *Quat) Rotate(v *Vec3) Vec3 {
 	var cross Vec3
 	cross.CrossOf(&q1.V, v)
@@ -343,8 +343,8 @@ func (q1 *Quat) AddScaledVec(f float32, v1 *Vec3) {
 	q1.V[2] += q2.V[2] * 0.5
 }
 
-// Mat4 returns the homogeneous 3D rotation matrix corresponding to the quaternion.
-// with last row and last column as [0 0 0 1]
+// Mat4 returns the homogeneous 3D rotation matrix corresponding to the
+// quaternion. with last row and last column as [0 0 0 1]
 func (q1 *Quat) Mat4() Mat4 {
 	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
 	return Mat4{
@@ -355,7 +355,8 @@ func (q1 *Quat) Mat4() Mat4 {
 	}
 }
 
-// Mat3 returns the homogeneous 3D rotation matrix corresponding to the quaternion.
+// Mat3 returns the homogeneous 3D rotation matrix corresponding to the
+// quaternion.
 func (q1 *Quat) Mat3() Mat3 {
 	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
 	return Mat3{
@@ -365,38 +366,44 @@ func (q1 *Quat) Mat3() Mat3 {
 	}
 }
 
-// Dot returns the dot product between two quaternions, equivalent to if this was a Vec4
+// Dot returns the dot product between two quaternions, equivalent to if this
+// was a Vec4.
 func (q1 *Quat) Dot(q2 *Quat) float32 {
 	return q1.W*q2.W + q1.V[0]*q2.V[0] + q1.V[1]*q2.V[1] + q1.V[2]*q2.V[2]
 }
 
 // ApproxEqual returns whether the quaternions are approximately equal, as if
-// FloatEqual was called on each matching element
+// FloatEqual was called on each matching element.
 func (q1 *Quat) ApproxEqual(q2 *Quat) bool {
 	return FloatEqual(q1.W, q2.W) && q1.V.ApproxEqual(&q2.V)
 }
 
-// ApproxEqualThreshold returns whether the quaternions are approximately equal with a given tolerence, as if
-// FloatEqualThreshold was called on each matching element with the given epsilon
+// ApproxEqualThreshold returns whether the quaternions are approximately equal
+// with a given tolerence, as if FloatEqualThreshold was called on each matching
+// element with the given epsilon.
 func (q1 *Quat) ApproxEqualThreshold(q2 *Quat, epsilon float32) bool {
 	return FloatEqualThreshold(q1.W, q2.W, epsilon) && q1.V.ApproxEqualThreshold(&q2.V, epsilon)
 }
 
-// ApproxEqualFunc returns whether the quaternions are approximately equal using the given comparison function, as if
-// the function had been called on each individual element
+// ApproxEqualFunc returns whether the quaternions are approximately equal using
+// the given comparison function, as if the function had been called on each
+// individual element.
 func (q1 *Quat) ApproxEqualFunc(q2 *Quat, f func(float32, float32) bool) bool {
 	return f(q1.W, q2.W) && q1.V.ApproxFuncEqual(&q2.V, f)
 }
 
-// OrientationEqual returns whether the quaternions represents the same orientation
+// OrientationEqual returns whether the quaternions represents the same
+// orientation.
 //
-// Different values can represent the same orientation (q == -q) because quaternions avoid singularities
-// and discontinuities involved with rotation in 3 dimensions by adding extra dimensions
+// Different values can represent the same orientation (q == -q) because
+// quaternions avoid singularities and discontinuities involved with rotation in
+// 3 dimensions by adding extra dimensions.
 func (q1 *Quat) OrientationEqual(q2 *Quat) bool {
 	return q1.OrientationEqualThreshold(q2, Epsilon)
 }
 
-// OrientationEqualThreshold returns whether the quaternions represents the same orientation with a given tolerence
+// OrientationEqualThreshold returns whether the quaternions represents the same
+// orientation with a given tolerence.
 func (q1 *Quat) OrientationEqualThreshold(q2 *Quat, epsilon float32) bool {
 	n1 := q1.Normalized()
 	n2 := q2.Normalized()
@@ -404,20 +411,24 @@ func (q1 *Quat) OrientationEqualThreshold(q2 *Quat, epsilon float32) bool {
 }
 
 // QuatSlerp is *S*pherical *L*inear Int*erp*olation, a method of interpolating
-// between two quaternions. This always takes the straightest path on the sphere between
-// the two quaternions, and maintains constant velocity.
+// between two quaternions. This always takes the straightest path on the sphere
+// between the two quaternions, and maintains constant velocity.
 //
-// However, it's expensive and QuatSlerp(q1,q2) is not the same as QuatSlerp(q2,q1)
+// However, it's expensive and QuatSlerp(q1,q2) is not the same as
+// QuatSlerp(q2,q1)
 func QuatSlerp(q1, q2 *Quat, amount float32) Quat {
 	n1, n2 := q1.Normalized(), q2.Normalized()
 	dot := n1.Dot(&n2)
 
-	// If the inputs are too close for comfort, linearly interpolate and normalize the result.
+	// If the inputs are too close for comfort, linearly interpolate and
+	// normalize the result.
 	if dot > 0.9995 {
 		return QuatNlerp(&n1, &n2, amount)
 	}
 
-	// This is here for precision errors, I'm perfectly aware the *technically* the dot is bound [-1,1], but since Acos will freak out if it's not (even if it's just a liiiiitle bit over due to normal error) we need to clamp it
+	// This is here for precision errors, I'm perfectly aware that *technically*
+	// the dot is bound [-1,1], but since Acos will freak out if it's not (even
+	// if it's just a little bit over due to normal error) we need to clamp it.
 	dot = Clamp(dot, -1, 1)
 
 	theta := math.Acos(dot) * amount
@@ -429,30 +440,10 @@ func QuatSlerp(q1, q2 *Quat, amount float32) Quat {
 	rel = rel.Scale(s)
 	n1c := n1.Scale(c)
 	return n1c.Add(&rel)
-
-	/*
-		n1, n2 = n1.Normalize(), n2.Normalize()
-		dot := n1.Dot(n2)
-
-		// If the inputs are too close for comfort, linearly interpolate and normalize the result.
-		if dot > 0.9995 {
-			return QuatNlerp(n1, n2, amount)
-		}
-
-		// This is here for precision errors, I'm perfectly aware the *technically* the dot is bound [-1,1], but since Acos will freak out if it's not (even if it's just a liiiiitle bit over due to normal error) we need to clamp it
-		dot = Clamp(dot, -1, 1)
-
-		theta := math.Acos(dot) * amount
-		c, s := math.Cos(theta), math.Sin(theta)
-		rel := n2.Sub(n1.Scale(dot)).Normalize()
-
-		return n1.Scale(c).Add(rel.Scale(s))
-	*/
 }
 
-// QuatLerp is *L*inear Int*erp*olation between two Quaternions, cheap and simple.
-//
-// Not excessively useful, but uses can be found.
+// QuatLerp is *L*inear Int*erp*olation between two Quaternions, cheap and
+// simple.
 func QuatLerp(q1, q2 *Quat, amount float32) Quat {
 	//q1.Add(                        )
 	//       q2.Sub(  )
@@ -462,12 +453,13 @@ func QuatLerp(q1, q2 *Quat, amount float32) Quat {
 	return q1.Add(&var2)
 }
 
-// QuatNlerp is *N*ormalized *L*inear Int*erp*olation between two Quaternions. Cheaper than Slerp
-// and usually just as good. This is literally Lerp with Normalize() called on it.
+// QuatNlerp is *N*ormalized *L*inear Int*erp*olation between two Quaternions.
+// Cheaper than Slerp and usually just as good. This is literally Lerp with
+// Normalize() called on it.
 //
 // Unlike Slerp, constant velocity isn't maintained, but it's much faster and
-// Nlerp(q1,q2) and Nlerp(q2,q1) return the same path. You should probably
-// use this more often unless you're suffering from choppiness due to the
+// Nlerp(q1,q2) and Nlerp(q2,q1) return the same path. You should probably use
+// this more often unless you're suffering from choppiness due to the
 // non-constant velocity problem.
 func QuatNlerp(q1, q2 *Quat, amount float32) Quat {
 	l := QuatLerp(q1, q2, amount)
@@ -475,17 +467,17 @@ func QuatNlerp(q1, q2 *Quat, amount float32) Quat {
 }
 
 // AnglesToQuat performs a rotation in the specified order. If the order is not
-// a valid RotationOrder, this function will panic
+// a valid RotationOrder, this function will panic.
 //
 // The rotation "order" is more of an axis descriptor. For instance XZX would
-// tell the function to interpret angle1 as a rotation about the X axis, angle2 about
-// the Z axis, and angle3 about the X axis again.
+// tell the function to interpret angle1 as a rotation about the X axis, angle2
+// about the Z axis, and angle3 about the X axis again.
 //
-// Based off the code for the Matlab function "angle2quat", though this implementation
-// only supports 3 single angles as opposed to multiple angles.
+// Based off the code for the Matlab function "angle2quat", though this
+// implementation only supports 3 single angles as opposed to multiple angles.
 func AnglesToQuat(angle1, angle2, angle3 float32, order RotationOrder) Quat {
-	s := [3]float64{}
-	c := [3]float64{}
+	var s [3]float64
+	var c [3]float64
 
 	s[0], c[0] = math64.Sincos(float64(angle1 / 2))
 	s[1], c[1] = math64.Sincos(float64(angle2 / 2))
@@ -655,13 +647,13 @@ func QuatLookAtV(eye, center, up *Vec3) Quat {
 
 // QuatBetweenVectors calculates the rotation between two vectors
 func QuatBetweenVectors(start, dest *Vec3) Quat {
+	const epsilon = 0.001
 	// http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/#I_need_an_equivalent_of_gluLookAt__How_do_I_orient_an_object_towards_a_point__
 	// https://github.com/g-truc/glm/blob/0.9.5/glm/gtx/quaternion.inl#L225
 	// https://bitbucket.org/sinbad/ogre/src/d2ef494c4a2f5d6e2f0f17d3bfb9fd936d5423bb/OgreMain/include/OgreVector3.h?at=default#cl-654
 
 	sn := start.Normalized()
 	dn := dest.Normalized()
-	epsilon := float32(0.001)
 
 	cosTheta := sn.Dot(&dn)
 	if cosTheta < -1.0+epsilon {

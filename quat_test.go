@@ -1,6 +1,7 @@
 package glm
 
 import (
+	math32 "github.com/luxengine/math"
 	"math"
 	"math/rand"
 	"testing"
@@ -531,7 +532,7 @@ func TestQuatMatConversion(t *testing.T) {
 		q1 := Mat4ToQuat(&m1)
 		q2 := QuatRotate(c.Angle, c.Axis)
 
-		if !FloatEqualThreshold(Abs(q1.Dot(&q2)), 1, 1e-4) {
+		if !FloatEqualThreshold(math32.Abs(q1.Dot(&q2)), 1, 1e-4) {
 			t.Errorf("Quaternions for %v %v do not match:\n%v\n%v", RadToDeg(c.Angle), c.Axis, q1, q2)
 		}
 	}

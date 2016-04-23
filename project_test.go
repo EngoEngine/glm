@@ -5,6 +5,17 @@ import (
 	"testing"
 )
 
+func TestASDF(t *testing.T) {
+	var m Mat4
+	x := Translate3D(3, 4, 5)
+	v := Vec3{0, 1, 0}
+	y := HomogRotate3D(math.Pi*5/6, &v)
+	z := Scale3D(10, 0.1, 1)
+	m.Mul4Of(&x, &y)
+	m.Mul4With(&z)
+	t.Log(m.String())
+}
+
 func TestProject(t *testing.T) {
 	//t.Parallel()
 

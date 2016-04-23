@@ -138,3 +138,11 @@ func Z(a float64) bool {
 	}
 	return -a <= epsilon
 }
+
+// Nz returns true if a is not roughly equal to zero.
+func Nz(a float64) bool {
+	if a > 0 {
+		return a >= epsilon
+	}
+	return -a >= epsilon
+}

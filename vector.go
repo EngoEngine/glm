@@ -9,21 +9,51 @@ import (
 type Vec2 [2]float32
 
 func (v1 *Vec2) String() string {
-	return fmt.Sprintf("{%.6f, %.6f}", v1[0], v1[1])
+	ret := "{"
+	for n := 0; n < len(v1); n++ {
+		if v1[n] >= 0 {
+			ret += " "
+		}
+		ret += fmt.Sprintf("%.6f", v1[n])
+		if n < len(v1)-1 {
+			ret += ", "
+		}
+	}
+	return ret + "}"
 }
 
 // Vec3 is the representation of a vector with 3 components.
 type Vec3 [3]float32
 
 func (v1 *Vec3) String() string {
-	return fmt.Sprintf("{%.6f, %.6f, %.6f}", v1[0], v1[1], v1[2])
+	ret := "{"
+	for n := 0; n < len(v1); n++ {
+		if v1[n] >= 0 {
+			ret += " "
+		}
+		ret += fmt.Sprintf("%.6f", v1[n])
+		if n < len(v1)-1 {
+			ret += ", "
+		}
+	}
+	return ret + "}"
 }
 
 // Vec4 is the representation of a vector with 4 components.
 type Vec4 [4]float32
 
 func (v1 *Vec4) String() string {
-	return fmt.Sprintf("{%.6f, %.6f, %.6f, %.6f}", v1[0], v1[1], v1[2], v1[2])
+	ret := "{"
+	for n := 0; n < len(v1); n++ {
+		if v1[n] >= 0 {
+			ret += " "
+		}
+		ret += fmt.Sprintf("%.6f", v1[n])
+		if n < len(v1)-1 {
+			ret += ", "
+		}
+	}
+	return ret + "}"
 }
 
 // Vec3 return a Vec3 from this Vec2 with {z}.

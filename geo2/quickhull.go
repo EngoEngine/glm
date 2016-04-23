@@ -30,7 +30,7 @@ type ConvexHull struct {
 }
 
 // Support returns the support of this convex hull in the given direction.
-func (c *ConvexHull) Support(dir *glm.Vec2) glm.Vec2 {
+func (c *ConvexHull) Support(dir *glm.Vec2) int {
 	// TODO(hydroflame): finish implementation
 
 	// find the index of the support we should start using at first. We could
@@ -58,8 +58,8 @@ func (c *ConvexHull) Support(dir *glm.Vec2) glm.Vec2 {
 			i = 2
 		}
 	}
-	_ = i
-	return glm.Vec2{}
+
+	return i
 
 	/*dot := c.Vertices[i].Position.Dot(dir)
 
@@ -86,10 +86,10 @@ func (c *ConvexHull) Support(dir *glm.Vec2) glm.Vec2 {
 	}*/
 }
 
-// convexHullSupportSlow is like Support but the implementation is much simpler
+// SupportSlow is like Support but the implementation is much simpler
 // and probably correct, however it's kinda slow. this is used as a reference
 // when testing the fast support.
-func convexHullSupportSlow(c *ConvexHull, dir *glm.Vec2) glm.Vec2 {
+func (c *ConvexHull) SupportSlow(dir *glm.Vec2) glm.Vec2 {
 	var bestDot float32
 	var bestIndex int
 	for n := range c.Vertices {
@@ -231,9 +231,3 @@ func convexHull2FromPoints(points []glm.Vec2) ConvexHull {
 
 	return hull
 }
-
-/*
-// Quickhull3 returns a 3D Convex hull of the given points.
-func Quickhull3(points []glm.Vec3) {
-
-}*/

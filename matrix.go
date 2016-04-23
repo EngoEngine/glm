@@ -7,13 +7,13 @@ import (
 	"text/tabwriter"
 )
 
-// Mat2 represents a 2x2 matrix
+// Mat2 represents a 2x2 matrix.
 type Mat2 [4]float32
 
-// Mat3 represents a 3x3 matrix
+// Mat3 represents a 3x3 matrix.
 type Mat3 [9]float32
 
-// Mat4 represents a 4x4 matrix
+// Mat4 represents a 4x4 matrix.
 type Mat4 [16]float32
 
 // Mat3 returns
@@ -152,16 +152,15 @@ func Ident2() Mat2 {
 }
 
 // Diag2 creates a diagonal matrix from the entries of the input vector.
-// That is, for each pointer for row==col, vector[row] is the entry. Otherwise it's 0.
-//
-// Another way to think about it is that the identity is this function where the every vector element is 1.
+// That is, for each pointer for row==col, vector[row] is the entry. Otherwise
+// it's 0.
 func Diag2(v *Vec2) Mat2 {
 	return Mat2{v[0], 0, 0, v[1]}
 }
 
-// Mat2FromRows builds a new matrix from row vectors.
-// The resulting matrix will still be in column major order, but this can be
-// good for hand-building matrices.
+// Mat2FromRows builds a new matrix from row vectors. The resulting matrix will
+// still be in column major order, but this can be good for hand-building
+// matrices.
 func Mat2FromRows(row0, row1 *Vec2) Mat2 {
 	return Mat2{row0[0], row1[0], row0[1], row1[1]}
 }
@@ -171,8 +170,8 @@ func Mat2FromCols(col0, col1 *Vec2) Mat2 {
 	return Mat2{col0[0], col0[1], col1[0], col1[1]}
 }
 
-// Add performs an element-wise addition of two matrices, this is
-// equivalent to iterating over every element of m1 and adding the corresponding value of m2.
+// Add performs an element-wise addition of two matrices, this is equivalent to
+// iterating over every element of m1 and adding the corresponding value of m2.
 func (m1 *Mat2) Add(m2 *Mat2) Mat2 {
 	return Mat2{m1[0] + m2[0], m1[1] + m2[1], m1[2] + m2[2], m1[3] + m2[3]}
 }
@@ -193,8 +192,9 @@ func (m1 *Mat2) AddWith(m2 *Mat2) {
 	m1[3] += m2[3]
 }
 
-// Sub performs an element-wise subtraction of two matrices, this is
-// equivalent to iterating over every element of m1 and subtracting the corresponding value of m2.
+// Sub performs an element-wise subtraction of two matrices, this is equivalent
+// to iterating over every element of m1 and subtracting the corresponding value
+// of m2.
 func (m1 *Mat2) Sub(m2 *Mat2) Mat2 {
 	return Mat2{m1[0] - m2[0], m1[1] - m2[1], m1[2] - m2[2], m1[3] - m2[3]}
 }
@@ -215,8 +215,8 @@ func (m1 *Mat2) SubWith(m2 *Mat2) {
 	m1[3] -= m2[3]
 }
 
-// Mul performs a scalar multiplcation of the matrix. This is equivalent to iterating
-// over every element of the matrix and multiply it by c.
+// Mul performs a scalar multiplcation of the matrix. This is equivalent to
+// iterating over every element of the matrix and multiply it by c.
 func (m1 *Mat2) Mul(c float32) Mat2 {
 	return Mat2{m1[0] * c, m1[1] * c, m1[2] * c, m1[3] * c}
 }
@@ -237,10 +237,10 @@ func (m1 *Mat2) MulWith(c float32) {
 	m1[3] *= c
 }
 
-// Mul2x1 performs a "matrix product" between this matrix
-// and another of the given dimension. For any two matrices of dimensionality
-// MxN and NxO, the result will be MxO. For instance, Mat4 multiplied using
-// Mul4x2 will result in a Mat4x2.
+// Mul2x1 performs a "matrix product" between this matrix and another of the
+// given dimension. For any two matrices of dimensionality MxN and NxO, the
+// result will be MxO. For instance, Mat4 multiplied using Mul4x2 will result
+// in a Mat4x2.
 func (m1 *Mat2) Mul2x1(m2 *Vec2) Vec2 {
 	return Vec2{
 		m1[0]*m2[0] + m1[2]*m2[1],
@@ -248,10 +248,10 @@ func (m1 *Mat2) Mul2x1(m2 *Vec2) Vec2 {
 	}
 }
 
-// Mul2 performs a "matrix product" between this matrix
-// and another of the given dimension. For any two matrices of dimensionality
-// MxN and NxO, the result will be MxO. For instance, Mat4 multiplied using
-// Mul4x2 will result in a Mat4x2.
+// Mul2 performs a "matrix product" between this matrix and another of the given
+// dimension. For any two matrices of dimensionality MxN and NxO, the result
+// will be MxO. For instance, Mat4 multiplied using Mul4x2 will result in a
+// Mat4x2.
 func (m1 *Mat2) Mul2(m2 *Mat2) Mat2 {
 	return Mat2{
 		m1[0]*m2[0] + m1[2]*m2[1],
@@ -281,10 +281,9 @@ func (m1 *Mat2) Mul2With(m2 *Mat2) {
 	m1[3] = v1*m2[2] + v3*m2[3]
 }
 
-// Transposed produces the transpose of this matrix. For any MxN matrix
-// the transpose is an NxM matrix with the rows swapped with the columns. For instance
-// the transpose of the Mat3x2 is a Mat2x3 like so:
-//
+// Transposed produces the transpose of this matrix. For any MxN matrix the
+// transpose is an NxM matrix with the rows swapped with the columns. For
+// instance the transpose of the Mat3x2 is a Mat2x3 like so:
 //    [[a b]]    [[a c e]]
 //    [[c d]] =  [[b d f]]
 //    [[e f]]
@@ -292,10 +291,9 @@ func (m1 *Mat2) Transposed() Mat2 {
 	return Mat2{m1[0], m1[2], m1[1], m1[3]}
 }
 
-// Transpose transpose this matrix with itself as destination. For any MxN matrix
-// the transpose is an NxM matrix with the rows swapped with the columns. For instance
-// the transpose of the Mat3x2 is a Mat2x3 like so:
-//
+// Transpose transpose this matrix with itself as destination. For any MxN
+// matrix the transpose is an NxM matrix with the rows swapped with the columns.
+// For instance the transpose of the Mat3x2 is a Mat2x3 like so:
 //    [[a b]]    [[a c e]]
 //    [[c d]] =  [[b d f]]
 //    [[e f]]
@@ -310,29 +308,21 @@ func (m1 *Mat2) TransposeOf(m2 *Mat2) {
 	m1[0], m1[1], m1[2], m1[3] = m2[0], m2[2], m2[1], m2[3]
 }
 
-// Det returns the determinant of a matrix. The determinant is a measure of a square matrix's
-// singularity and invertability, among other things. In this library, the
-// determinant is hard coded based on pre-computed cofactor expansion, and uses
-// no loops. Of course, the addition and multiplication must still be done.
+// Det returns the determinant of a matrix. The determinant is a measure of a
+// square matrix's singularity and invertability, among other things. In this
+// library, the determinant is hard coded based on pre-computed cofactor
+// expansion, and uses no loops. Of course, the addition and multiplication must
+// still be done.
 func (m1 *Mat2) Det() float32 {
 	return m1[0]*m1[2] - m1[1]*m1[3]
 }
 
-// Inverse computes the inverse of a square matrix. An inverse is a square matrix such that when multiplied by the
-// original, yields the identity.
-//
-// M_inv * M = M * M_inv = I
-//
-// In this library, the math is precomputed, and uses no loops, though the multiplications, additions, determinant calculation, and scaling
-// are still done. This can still be (relatively) expensive for a 4x4.
-//
-// This function checks the determinant to see if the matrix is invertible.
-// If the determinant is 0.0, this function returns the zero matrix. However, due to floating point errors, it is
-// entirely plausible to get a false positive or negative.
-// In the future, an alternate function may be written which takes in a pre-computed determinant.
+// Inverse computes the inverse of a square matrix. An inverse is a square
+// matrix such that when multiplied by the original, yields the identity. Return
+// the zero matrix if the determinant is zero.
 func (m1 *Mat2) Inverse() Mat2 {
 	det := m1.Det()
-	if FloatEqual(det, float32(0.0)) {
+	if FloatEqual(det, 0) {
 		return Mat2{}
 	}
 
@@ -341,69 +331,69 @@ func (m1 *Mat2) Inverse() Mat2 {
 	return retMat.Mul(1 / det)
 }
 
-// ApproxEqual performs an element-wise approximate equality test between two matrices,
-// as if FloatEqual had been used.
+// ApproxEqual performs an element-wise approximate equality test between two
+// matrices, as if FloatEqual had been used.
 func (m1 *Mat2) ApproxEqual(m2 *Mat2) bool {
-	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3])
+	return FloatEqual(m1[0], m2[0]) &&
+		FloatEqual(m1[1], m2[1]) &&
+		FloatEqual(m1[2], m2[2]) &&
+		FloatEqual(m1[3], m2[3])
 }
 
-// ApproxEqualThreshold performs an element-wise approximate equality test between two matrices
-// with a given epsilon threshold, as if FloatEqualThreshold had been used.
+// ApproxEqualThreshold performs an element-wise approximate equality test
+// between two matrices with a given epsilon threshold, as if
+// FloatEqualThreshold had been used.
 func (m1 *Mat2) ApproxEqualThreshold(m2 *Mat2, threshold float32) bool {
-	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold)
+	return FloatEqualThreshold(m1[0], m2[0], threshold) &&
+		FloatEqualThreshold(m1[1], m2[1], threshold) &&
+		FloatEqualThreshold(m1[2], m2[2], threshold) &&
+		FloatEqualThreshold(m1[3], m2[3], threshold)
 }
 
-// ApproxFuncEqual performs an element-wise approximate equality test between two matrices
-// with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
-// function may be used in practice.
+// ApproxFuncEqual performs an element-wise approximate equality test between
+// two matrices with a given equality functions, intended to be used with
+// FloatEqualFunc; although and comparison function may be used in practice.
 func (m1 *Mat2) ApproxFuncEqual(m2 *Mat2, eq func(float32, float32) bool) bool {
-	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3])
+	return eq(m1[0], m2[0]) &&
+		eq(m1[1], m2[1]) &&
+		eq(m1[2], m2[2]) &&
+		eq(m1[3], m2[3])
 }
 
 // At returns the matrix element at the given row and column.
 // This is equivalent to mat[col * numRow + row] where numRow is constant
-// (E.G. for a Mat3x2 it's equal to 3)
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// At(5,0) will work just like At(1,1). Or it may panic if it's out of bounds.
+// (E.G. for a Mat3x2 it's equal to 3).
 func (m1 *Mat2) At(row, col int) float32 {
 	return m1[col*2+row]
 }
 
 // Set sets the corresponding matrix element at the given row and column.
 // This has a pointer receiver because it mutates the matrix.
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// Set(5,0,val) will work just like Set(1,1,val). Or it may panic if it's out of bounds.
 func (m1 *Mat2) Set(row, col int, value float32) {
 	m1[col*2+row] = value
 }
 
 // Index returns the index of the given row and column, to be used with direct
 // access. E.G. Index(0,0) = 0.
-//
-// This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
-// (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
-// a panic if you try to access the array with it if it's truly out of bounds.
 func (Mat2) Index(row, col int) int {
 	return col*2 + row
 }
 
 // Row returns a vector representing the corresponding row (starting at row 0).
-// This package makes no distinction between row and column vectors, so it
-// will be a normal VecM for a MxN matrix.
+// This package makes no distinction between row and column vectors, so it will
+// be a normal VecM for a MxN matrix.
 func (m1 *Mat2) Row(row int) Vec2 {
 	return Vec2{m1[row+0], m1[row+2]}
 }
 
-// Rows decomposes a matrix into its corresponding row vectors.
-// This is equivalent to calling mat.Row for each row.
+// Rows decomposes a matrix into its corresponding row vectors. This is
+// equivalent to calling mat.Row for each row.
 func (m1 *Mat2) Rows() (row0, row1 Vec2) {
 	return m1.Row(0), m1.Row(1)
 }
 
-// Col returns a vector representing the corresponding column (starting at col 0).
-// This package makes no distinction between row and column vectors, so it
+// Col returns a vector representing the corresponding column (starting at col
+// 0). This package makes no distinction between row and column vectors, so it
 // will be a normal VecN for a MxN matrix.
 func (m1 *Mat2) Col(col int) Vec2 {
 	return Vec2{m1[col*2+0], m1[col*2+1]}
@@ -415,33 +405,53 @@ func (m1 *Mat2) Cols() (col0, col1 Vec2) {
 	return m1.Col(0), m1.Col(1)
 }
 
-// Trace is a basic operation on a square matrix that simply
-// sums up all elements on the main diagonal (meaning all elements such that row==col).
+// Trace is a basic operation on a square matrix that simply sums up all
+// elements on the main diagonal (meaning all elements such that row == col).
 func (m1 *Mat2) Trace() float32 {
 	return m1[0] + m1[3]
 }
 
 // Abs returns the element-wise absolute value of this matrix
 func (m1 *Mat2) Abs() Mat2 {
-	return Mat2{Abs(m1[0]), Abs(m1[1]), Abs(m1[2]), Abs(m1[3])}
+	return Mat2{math.Abs(m1[0]), math.Abs(m1[1]), math.Abs(m1[2]), math.Abs(m1[3])}
 }
 
 // AbsSelf is a memory friendly version of Abs.
 func (m1 *Mat2) AbsSelf() {
-	m1[0], m1[1], m1[2], m1[3] = math.Abs(m1[0]), math.Abs(m1[1]), math.Abs(m1[2]), math.Abs(m1[3])
+	if m1[0] < 0 {
+		m1[0] = -m1[0]
+	}
+	if m1[1] < 0 {
+		m1[1] = -m1[1]
+	}
+	if m1[2] < 0 {
+		m1[2] = -m1[2]
+	}
+	if m1[3] < 0 {
+		m1[3] = -m1[3]
+	}
 }
 
 // AbsOf is a memory friendly version of Abs.
 func (m1 *Mat2) AbsOf(m2 *Mat2) {
-	m1[0], m1[1], m1[2], m1[3] = math.Abs(m2[0]), math.Abs(m2[1]), math.Abs(m2[2]), math.Abs(m2[3])
+	*m1 = *m2
+	if m1[0] < 0 {
+		m1[0] = -m1[0]
+	}
+	if m1[1] < 0 {
+		m1[1] = -m1[1]
+	}
+	if m1[2] < 0 {
+		m1[2] = -m1[2]
+	}
+	if m1[3] < 0 {
+		m1[3] = -m1[3]
+	}
 }
 
 // Iden sets this matrix to the identity matrix.
 func (m1 *Mat2) Iden() {
-	m1[0] = 1
-	m1[1] = 0
-	m1[2] = 0
-	m1[3] = 1
+	*m1 = Mat2{1, 0, 0, 1}
 }
 
 // String pretty prints the matrix
@@ -728,18 +738,9 @@ func (m1 *Mat3) Det() float32 {
 	return m1[0]*m1[4]*m1[8] + m1[3]*m1[7]*m1[2] + m1[6]*m1[1]*m1[5] - m1[6]*m1[4]*m1[2] - m1[3]*m1[1]*m1[8] - m1[0]*m1[7]*m1[5]
 }
 
-// Inverse computes the inverse of a square matrix. An inverse is a square matrix such that when multiplied by the
-// original, yields the identity.
-//
-// M_inv * M = M * M_inv = I
-//
-// In this library, the math is precomputed, and uses no loops, though the multiplications, additions, determinant calculation, and scaling
-// are still done. This can still be (relatively) expensive for a 4x4.
-//
-// This function checks the determinant to see if the matrix is invertible.
-// If the determinant is 0.0, this function returns the zero matrix. However, due to floating point errors, it is
-// entirely plausible to get a false positive or negative.
-// In the future, an alternate function may be written which takes in a pre-computed determinant.
+// Inverse computes the inverse of a square matrix. An inverse is a square
+// matrix such that when multiplied by the original, yields the identity. Return
+// the zero matrix if the determinant is zero.
 func (m1 *Mat3) Inverse() Mat3 {
 	det := m1.Det()
 	if FloatEqual(det, float32(0.0)) {
@@ -1336,18 +1337,9 @@ func (m1 *Mat4) Det() float32 {
 	return m1[0]*m1[5]*m1[10]*m1[15] - m1[0]*m1[5]*m1[11]*m1[14] - m1[0]*m1[6]*m1[9]*m1[15] + m1[0]*m1[6]*m1[11]*m1[13] + m1[0]*m1[7]*m1[9]*m1[14] - m1[0]*m1[7]*m1[10]*m1[13] - m1[1]*m1[4]*m1[10]*m1[15] + m1[1]*m1[4]*m1[11]*m1[14] + m1[1]*m1[6]*m1[8]*m1[15] - m1[1]*m1[6]*m1[11]*m1[12] - m1[1]*m1[7]*m1[8]*m1[14] + m1[1]*m1[7]*m1[10]*m1[12] + m1[2]*m1[4]*m1[9]*m1[15] - m1[2]*m1[4]*m1[11]*m1[13] - m1[2]*m1[5]*m1[8]*m1[15] + m1[2]*m1[5]*m1[11]*m1[12] + m1[2]*m1[7]*m1[8]*m1[13] - m1[2]*m1[7]*m1[9]*m1[12] - m1[3]*m1[4]*m1[9]*m1[14] + m1[3]*m1[4]*m1[10]*m1[13] + m1[3]*m1[5]*m1[8]*m1[14] - m1[3]*m1[5]*m1[10]*m1[12] - m1[3]*m1[6]*m1[8]*m1[13] + m1[3]*m1[6]*m1[9]*m1[12]
 }
 
-// Inverse computes the inverse of a square matrix. An inverse is a square matrix such that when multiplied by the
-// original, yields the identity.
-//
-// M_inv * M = M * M_inv = I
-//
-// In this library, the math is precomputed, and uses no loops, though the multiplications, additions, determinant calculation, and scaling
-// are still done. This can still be (relatively) expensive for a 4x4.
-//
-// This function checks the determinant to see if the matrix is invertible.
-// If the determinant is 0.0, this function returns the zero matrix. However, due to floating point errors, it is
-// entirely plausible to get a false positive or negative.
-// In the future, an alternate function may be written which takes in a pre-computed determinant.
+// Inverse computes the inverse of a square matrix. An inverse is a square
+// matrix such that when multiplied by the original, yields the identity. Return
+// the zero matrix if the determinant is zero.
 func (m1 *Mat4) Inverse() Mat4 {
 	det := m1.Det()
 	if FloatEqual(det, float32(0.0)) {

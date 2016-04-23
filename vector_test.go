@@ -6,22 +6,22 @@ import (
 
 func TestVec2_String(t *testing.T) {
 	v := Vec2{1, 1}
-	if s := v.String(); s != "{1.000000, 1.000000}" {
-		t.Errorf("(%v).String() = %s, want {1.000000, 1.000000}", v, s)
+	if s := v.String(); s != "{ 1.000000,  1.000000}" {
+		t.Errorf("(%v).String() = %s, want { 1.000000,  1.000000}", v, s)
 	}
 }
 
 func TestVec3_String(t *testing.T) {
 	v := Vec3{1, 1, 1}
-	if s := v.String(); s != "{1.000000, 1.000000, 1.000000}" {
-		t.Errorf("(%v).String() = %s, want {1.000000, 1.000000, 1.000000}", v, s)
+	if s := v.String(); s != "{ 1.000000,  1.000000,  1.000000}" {
+		t.Errorf("(%v).String() = %s, want { 1.000000,  1.000000,  1.000000}", v, s)
 	}
 }
 
 func TestVec4_String(t *testing.T) {
 	v := Vec4{1, 1, 1, 1}
-	if s := v.String(); s != "{1.000000, 1.000000, 1.000000, 1.000000}" {
-		t.Errorf("(%v).String() = %s, want {1.000000, 1.000000, 1.000000, 1.000000}", v, s)
+	if s := v.String(); s != "{ 1.000000,  1.000000,  1.000000,  1.000000}" {
+		t.Errorf("(%v).String() = %s, want { 1.000000,  1.000000,  1.000000,  1.000000}", v, s)
 	}
 }
 
