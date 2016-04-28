@@ -11,7 +11,7 @@ type Rect struct {
 	// the orientation of the rectangle in space.
 	Orientation [2]glm.Vec3
 	// the half extends of the rectangle.
-	Radius glm.Vec2
+	HalfExtend glm.Vec2
 }
 
 // ClosestPointRectPoint returns the point on the rectangle closest to p
@@ -28,10 +28,10 @@ func ClosestPointRectPoint(r *Rect, p *glm.Vec3) glm.Vec3 {
 		dist := d.Dot(&r.Orientation[i])
 
 		// If distance farther than the box extents, clamp to the box
-		if dist > r.Radius[i] {
-			dist = r.Radius[i]
-		} else if dist < -r.Radius[i] {
-			dist = -r.Radius[i]
+		if dist > r.HalfExtend[i] {
+			dist = r.HalfExtend[i]
+		} else if dist < -r.HalfExtend[i] {
+			dist = -r.HalfExtend[i]
 		}
 
 		closestPoint.AddScaledVec(dist, &r.Orientation[i])
@@ -52,10 +52,10 @@ func SqDistRectPoint(r *Rect, p *glm.Vec3) float32 {
 		var excess float32
 		d := v.Dot(&r.Orientation[i])
 
-		if d < -r.Radius[i] {
-			excess = d + r.Radius[i]
-		} else if d > r.Radius[i] {
-			excess = d - r.Radius[i]
+		if d < -r.HalfExtend[i] {
+			excess = d + r.HalfExtend[i]
+		} else if d > r.HalfExtend[i] {
+			excess = d - r.HalfExtend[i]
 		}
 		sqDist += excess * excess
 	}

@@ -71,8 +71,8 @@ func TestSphere_AABB(t *testing.T) {
 				Radius2: 1,
 			},
 			b: AABB{
-				Center: glm.Vec2{3, 4},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{3, 4},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 		},
 		{
@@ -82,8 +82,8 @@ func TestSphere_AABB(t *testing.T) {
 				Radius2: 1,
 			},
 			b: AABB{
-				Center: glm.Vec2{-4, 2.3},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{-4, 2.3},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 		},
 
@@ -94,8 +94,8 @@ func TestSphere_AABB(t *testing.T) {
 				Radius2: 1,
 			},
 			b: AABB{
-				Center: glm.Vec2{1, 4},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{1, 4},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 		},
 	}
@@ -103,7 +103,7 @@ func TestSphere_AABB(t *testing.T) {
 	for i, test := range tests {
 		aabb := AABBFromSphere(&test.a)
 		if !aabb.Center.ApproxEqualThreshold(&test.b.Center, 1e-4) ||
-			!aabb.Radius.ApproxEqualThreshold(&test.b.Radius, 1e-4) {
+			!aabb.HalfExtend.ApproxEqualThreshold(&test.b.HalfExtend, 1e-4) {
 			t.Errorf("[%d] %v.AABB = %v, want %v", i, test.a, aabb, test.b)
 		}
 	}

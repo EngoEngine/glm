@@ -600,9 +600,9 @@ func TestSphereHalfspace(s *Sphere, p *Plane) bool {
 // TestOBBPlane returns true if b and p intersect.
 func TestOBBPlane(b *OBB, p *Plane) bool {
 	// Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-	r := b.Radius[0]*math.Abs(p.N.Dot(&b.Orientation[0])) +
-		b.Radius[1]*math.Abs(p.N.Dot(&b.Orientation[1])) +
-		b.Radius[2]*math.Abs(p.N.Dot(&b.Orientation[2]))
+	r := b.HalfExtend[0]*math.Abs(p.N.Dot(&b.Orientation[0])) +
+		b.HalfExtend[1]*math.Abs(p.N.Dot(&b.Orientation[1])) +
+		b.HalfExtend[2]*math.Abs(p.N.Dot(&b.Orientation[2]))
 	// Compute distance of box center from plane
 	//float s = Dot(p.n, b.c) - p.d
 	c := b.Center.Sub(&p.P)
@@ -615,9 +615,9 @@ func TestOBBPlane(b *OBB, p *Plane) bool {
 func TestAABBPlane(b *AABB, p *Plane) bool {
 	// These two lines not necessary with a (center, extents) AABB representation
 	// Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-	r := b.Radius[0]*math.Abs(p.N[0]) +
-		b.Radius[1]*math.Abs(p.N[1]) +
-		b.Radius[2]*math.Abs(p.N[2])
+	r := b.HalfExtend[0]*math.Abs(p.N[0]) +
+		b.HalfExtend[1]*math.Abs(p.N[1]) +
+		b.HalfExtend[2]*math.Abs(p.N[2])
 	// Compute distance of box center from plane
 	c := b.Center.Sub(&p.P)
 	s := c.Dot(&p.N)
@@ -670,7 +670,7 @@ func TestTriangleAABB(v0, v1, v2 *glm.Vec3, b *AABB) bool {
 	// Test axis a00
 	p0 = u0[2]*u1[1] - u0[1]*u1[2]
 	p2 = u2[2]*(u1[1]-u0[1]) - u2[2]*(u1[2]-u0[2])
-	r = b.Radius[1]*math.Abs(f0[2]) + b.Radius[2]*math.Abs(f0[1])
+	r = b.HalfExtend[1]*math.Abs(f0[2]) + b.HalfExtend[2]*math.Abs(f0[1])
 	if math.Max(-math.Max(p0, p2), math.Min(p0, p2)) > r {
 		return false // Axis is a separating axis
 	}
@@ -678,19 +678,19 @@ func TestTriangleAABB(v0, v1, v2 *glm.Vec3, b *AABB) bool {
 	//...
 	// Test the three axes corresponding to the face normals of AABB b (category 1).
 	// Exit if...
-	// ... [-b.Radius[0], b.Radius[0]] and [min(u0[0],u1[0],u2[0]), max(u0[0],u1[0],u2[0])] do not overlap
-	if math.Max(u0[0], math.Max(u1[0], u2[0])) < -b.Radius[0] ||
-		math.Min(u0[0], math.Min(u1[0], u2[0])) > b.Radius[0] {
+	// ... [-b.HalfExtend[0], b.HalfExtend[0]] and [min(u0[0],u1[0],u2[0]), max(u0[0],u1[0],u2[0])] do not overlap
+	if math.Max(u0[0], math.Max(u1[0], u2[0])) < -b.HalfExtend[0] ||
+		math.Min(u0[0], math.Min(u1[0], u2[0])) > b.HalfExtend[0] {
 		return false
 	}
-	// ... [-b.Radius[1], b.Radius[1]] and [min(u0[1],u1[1],u2[1]), max(u0[1],u1[1],u2[1])] do not overlap
-	if math.Max(u0[1], math.Max(u1[1], u2[1])) < -b.Radius[1] ||
-		math.Min(u0[1], math.Min(u1[1], u2[1])) > b.Radius[1] {
+	// ... [-b.HalfExtend[1], b.HalfExtend[1]] and [min(u0[1],u1[1],u2[1]), max(u0[1],u1[1],u2[1])] do not overlap
+	if math.Max(u0[1], math.Max(u1[1], u2[1])) < -b.HalfExtend[1] ||
+		math.Min(u0[1], math.Min(u1[1], u2[1])) > b.HalfExtend[1] {
 		return false
 	}
-	// ... [-b.Radius[2], b.Radius[2]] and [min(u0[2],u1[2],u2[2]), max(u0[2],u1[2],u2[2])] do not overlap
-	if math.Max(u0[2], math.Max(u1[2], u2[2])) < -b.Radius[2] ||
-		math.Min(u0[2], math.Min(u1[2], u2[2])) > b.Radius[2] {
+	// ... [-b.HalfExtend[2], b.HalfExtend[2]] and [min(u0[2],u1[2],u2[2]), max(u0[2],u1[2],u2[2])] do not overlap
+	if math.Max(u0[2], math.Max(u1[2], u2[2])) < -b.HalfExtend[2] ||
+		math.Min(u0[2], math.Min(u1[2], u2[2])) > b.HalfExtend[2] {
 		return false
 	}
 	// Test separating axis corresponding to triangle face normal (category 2)
@@ -778,14 +778,14 @@ func IntersectRayAABB(p, d *glm.Vec3, a *AABB) (t float32, q glm.Vec3, overlap b
 	for i := 0; i < 3; i++ {
 		if math.Abs(d[i]) < epsilon {
 			// Ray is parallel to slab. No hit if origin not within slab
-			if p[i] < a.Center[i]-a.Radius[i] || p[i] > a.Center[i]+a.Radius[i] {
+			if p[i] < a.Center[i]-a.HalfExtend[i] || p[i] > a.Center[i]+a.HalfExtend[i] {
 				return
 			}
 		} else {
 			// Compute intersection t value of ray with near and far plane of slab
 			ood := 1.0 / d[i]
-			t1 := (a.Center[i] - a.Radius[i] - p[i]) * ood
-			t2 := (a.Center[i] + a.Radius[i] - p[i]) * ood
+			t1 := (a.Center[i] - a.HalfExtend[i] - p[i]) * ood
+			t2 := (a.Center[i] + a.HalfExtend[i] - p[i]) * ood
 			// Make t1 be intersection with near plane, t2 with far plane
 			if t1 > t2 {
 				t1, t2 = t2, t1
@@ -824,15 +824,15 @@ func TestSegmentAABB(p0, p1 *glm.Vec3, b *AABB) bool {
 
 	// Try world coordinate axes as separating axes
 	adx := math.Abs(d[0])
-	if flops.Gt(math.Abs(m[0]), b.Radius[0]+adx) {
+	if flops.Gt(math.Abs(m[0]), b.HalfExtend[0]+adx) {
 		return false
 	}
 	ady := math.Abs(d[1])
-	if flops.Gt(math.Abs(m[1]), b.Radius[1]+ady) {
+	if flops.Gt(math.Abs(m[1]), b.HalfExtend[1]+ady) {
 		return false
 	}
 	adz := math.Abs(d[2])
-	if flops.Gt(math.Abs(m[2]), b.Radius[2]+adz) {
+	if flops.Gt(math.Abs(m[2]), b.HalfExtend[2]+adz) {
 		return false
 	}
 	// Add in an epsilon term to counteract arithmetic errors when segment is
@@ -841,9 +841,9 @@ func TestSegmentAABB(p0, p1 *glm.Vec3, b *AABB) bool {
 	ady += epsilon
 	adz += epsilon
 	// Try cross products of segment direction vector with coordinate axes
-	if flops.Gt(math.Abs(m[1]*d[2]-m[2]*d[1]), b.Radius[1]*adz+b.Radius[2]*ady) ||
-		flops.Gt(math.Abs(m[2]*d[0]-m[0]*d[2]), b.Radius[0]*adz+b.Radius[2]*adx) ||
-		flops.Gt(math.Abs(m[0]*d[1]-m[1]*d[0]), b.Radius[0]*ady+b.Radius[1]*adx) {
+	if flops.Gt(math.Abs(m[1]*d[2]-m[2]*d[1]), b.HalfExtend[1]*adz+b.HalfExtend[2]*ady) ||
+		flops.Gt(math.Abs(m[2]*d[0]-m[0]*d[2]), b.HalfExtend[0]*adz+b.HalfExtend[2]*adx) ||
+		flops.Gt(math.Abs(m[0]*d[1]-m[1]*d[0]), b.HalfExtend[0]*ady+b.HalfExtend[1]*adx) {
 		return false
 	}
 	// No separating axis found; segment must be overlapping AABB
@@ -985,7 +985,6 @@ func IntersectSegmentTriangle2(p, q, a, b, c *glm.Vec3) (u, v, w, t float32, ove
 // cylinder specified by p, q and r
 func IntersectSegmentCylinder(sa, sb, p, q *glm.Vec3, r float32) (float32, bool) {
 	const Epsilon = 0.00001
-	var t float32
 	d := q.Sub(p)
 	m := sa.Sub(p)
 	n := sb.Sub(sa)
@@ -1008,10 +1007,11 @@ func IntersectSegmentCylinder(sa, sb, p, q *glm.Vec3, r float32) (float32, bool)
 	if math.Abs(a) < Epsilon {
 		// Segment runs parallel to cylinder axis
 		if c > 0 {
-			return t, false
+			return 0, false
 		}
 		// ’a’ and thus the segment lie outside cylinder
 		// Now known that segment intersects cylinder; figure out how it intersects
+		var t float32
 		if md < 0 {
 			t = -mn / nn // Intersect segment against ’p’ endcap
 		} else if md > dd {
@@ -1026,7 +1026,7 @@ func IntersectSegmentCylinder(sa, sb, p, q *glm.Vec3, r float32) (float32, bool)
 	if discr < 0 {
 		return 0, false // No real roots; no intersection
 	}
-	t = (-b - math.Sqrt(discr)) / a
+	t := (-b - math.Sqrt(discr)) / a
 	if t < 0 || t > 1 {
 		return 0, false // Intersection lies outside segment
 	}

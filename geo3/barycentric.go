@@ -68,7 +68,3 @@ func IsPointInTriangle(p, a, b, c *glm.Vec3) bool {
 	_, v, w := Barycentric(a, b, c, p)
 	return v >= 0 && w >= 0 && (v+w) <= 1
 }
-
-func triArea2D(x1, y1, x2, y2, x3, y3 float32) float32 {
-	return (x1-x2)*(y2-y3) - (x2-x3)*(y1-y2)
-}

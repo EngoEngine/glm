@@ -12,7 +12,7 @@ type OBB struct {
 	// The orientation of the OBB, these need to be orthonormal.
 	Orientation [3]glm.Vec3
 	// The half extends of the OBB.
-	Radius glm.Vec3
+	HalfExtend glm.Vec3
 }
 
 // ClosestPointOBBPoint returns the point in or on the OBB closest to p
@@ -24,16 +24,16 @@ func ClosestPointOBBPoint(o *OBB, p *glm.Vec3) glm.Vec3 {
 	// Start result at center of box; make steps from there
 
 	// For each OBB axis...
-	for i := 0; i < len(o.Radius); i++ {
+	for i := 0; i < len(o.HalfExtend); i++ {
 		// ...project d onto that axis and get the distance along the axis of d
 		// from the box center
 		dist := d.Dot(&o.Orientation[i])
 
 		// If distance farther than the box extents, clamp to the box
-		if dist > o.Radius[i] {
-			dist = o.Radius[i]
-		} else if dist < -o.Radius[i] {
-			dist = -o.Radius[i]
+		if dist > o.HalfExtend[i] {
+			dist = o.HalfExtend[i]
+		} else if dist < -o.HalfExtend[i] {
+			dist = -o.HalfExtend[i]
 		}
 
 		closestPoint.AddScaledVec(dist, &o.Orientation[i])
@@ -54,10 +54,10 @@ func SqDistOBBPoint(o *OBB, p *glm.Vec3) float32 {
 		var excess float32
 		d := v.Dot(&o.Orientation[i])
 
-		if d < -o.Radius[i] {
-			excess = d + o.Radius[i]
-		} else if d > o.Radius[i] {
-			excess = d - o.Radius[i]
+		if d < -o.HalfExtend[i] {
+			excess = d + o.HalfExtend[i]
+		} else if d > o.HalfExtend[i] {
+			excess = d - o.HalfExtend[i]
 		}
 		sqDist += excess * excess
 	}
@@ -98,8 +98,8 @@ func TestOBBOBB(a, b *OBB) bool {
 	var ra, rb float32
 	// Test axes L = A0, L = A1, L = A2
 	for i := 0; i < 3; i++ {
-		ra = a.Radius[i]
-		rb = b.Radius[0]*AbsR[0*3+i] + b.Radius[1]*AbsR[1*3+i] + b.Radius[2]*AbsR[2*3+i]
+		ra = a.HalfExtend[i]
+		rb = b.HalfExtend[0]*AbsR[0*3+i] + b.HalfExtend[1]*AbsR[1*3+i] + b.HalfExtend[2]*AbsR[2*3+i]
 		if math.Abs(t[i]) > ra+rb {
 			return false
 		}
@@ -107,72 +107,72 @@ func TestOBBOBB(a, b *OBB) bool {
 
 	// Test axes L = B0, L = B1, L = B2
 	for i := 0; i < 3; i++ {
-		ra = a.Radius[0]*AbsR[i*3+0] + a.Radius[1]*AbsR[i*3+1] + a.Radius[2]*AbsR[i*3+2]
-		rb = b.Radius[i]
+		ra = a.HalfExtend[0]*AbsR[i*3+0] + a.HalfExtend[1]*AbsR[i*3+1] + a.HalfExtend[2]*AbsR[i*3+2]
+		rb = b.HalfExtend[i]
 		if math.Abs(t[0]*R[i*3+0]+t[1]*R[i*3+1]+t[2]*R[i*3+2]) > ra+rb {
 			return false
 		}
 	}
 
 	// Test axis L = A0 x B0
-	ra = a.Radius[1]*AbsR[2] + a.Radius[2]*AbsR[1]
-	rb = b.Radius[1]*AbsR[6] + b.Radius[2]*AbsR[3]
+	ra = a.HalfExtend[1]*AbsR[2] + a.HalfExtend[2]*AbsR[1]
+	rb = b.HalfExtend[1]*AbsR[6] + b.HalfExtend[2]*AbsR[3]
 	if math.Abs(t[2]*R[1]-t[1]*R[2]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A0 x B1
-	ra = a.Radius[1]*AbsR[5] + a.Radius[2]*AbsR[4]
-	rb = b.Radius[0]*AbsR[6] + b.Radius[2]*AbsR[0]
+	ra = a.HalfExtend[1]*AbsR[5] + a.HalfExtend[2]*AbsR[4]
+	rb = b.HalfExtend[0]*AbsR[6] + b.HalfExtend[2]*AbsR[0]
 	if math.Abs(t[2]*R[4]-t[1]*R[5]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A0 x B2
-	ra = a.Radius[1]*AbsR[8] + a.Radius[2]*AbsR[7]
-	rb = b.Radius[0]*AbsR[3] + b.Radius[1]*AbsR[0]
+	ra = a.HalfExtend[1]*AbsR[8] + a.HalfExtend[2]*AbsR[7]
+	rb = b.HalfExtend[0]*AbsR[3] + b.HalfExtend[1]*AbsR[0]
 	if math.Abs(t[2]*R[7]-t[1]*R[8]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A1 x B0
-	ra = a.Radius[0]*AbsR[2] + a.Radius[2]*AbsR[0]
-	rb = b.Radius[1]*AbsR[7] + b.Radius[2]*AbsR[4]
+	ra = a.HalfExtend[0]*AbsR[2] + a.HalfExtend[2]*AbsR[0]
+	rb = b.HalfExtend[1]*AbsR[7] + b.HalfExtend[2]*AbsR[4]
 	if math.Abs(t[0]*R[2]-t[2]*R[0]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A1 x B1
-	ra = a.Radius[0]*AbsR[5] + a.Radius[2]*AbsR[3]
-	rb = b.Radius[0]*AbsR[7] + b.Radius[2]*AbsR[1]
+	ra = a.HalfExtend[0]*AbsR[5] + a.HalfExtend[2]*AbsR[3]
+	rb = b.HalfExtend[0]*AbsR[7] + b.HalfExtend[2]*AbsR[1]
 	if math.Abs(t[0]*R[5]-t[2]*R[3]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A1 x B2
-	ra = a.Radius[0]*AbsR[8] + a.Radius[2]*AbsR[6]
-	rb = b.Radius[0]*AbsR[4] + b.Radius[1]*AbsR[1]
+	ra = a.HalfExtend[0]*AbsR[8] + a.HalfExtend[2]*AbsR[6]
+	rb = b.HalfExtend[0]*AbsR[4] + b.HalfExtend[1]*AbsR[1]
 	if math.Abs(t[0]*R[8]-t[2]*R[6]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A2 x B0
-	ra = a.Radius[0]*AbsR[1] + a.Radius[1]*AbsR[0]
-	rb = b.Radius[1]*AbsR[8] + b.Radius[2]*AbsR[5]
+	ra = a.HalfExtend[0]*AbsR[1] + a.HalfExtend[1]*AbsR[0]
+	rb = b.HalfExtend[1]*AbsR[8] + b.HalfExtend[2]*AbsR[5]
 	if math.Abs(t[1]*R[0]-t[0]*R[1]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A2 x B1
-	ra = a.Radius[0]*AbsR[4] + a.Radius[1]*AbsR[3]
-	rb = b.Radius[0]*AbsR[8] + b.Radius[2]*AbsR[2]
+	ra = a.HalfExtend[0]*AbsR[4] + a.HalfExtend[1]*AbsR[3]
+	rb = b.HalfExtend[0]*AbsR[8] + b.HalfExtend[2]*AbsR[2]
 	if math.Abs(t[1]*R[3]-t[0]*R[4]) > ra+rb {
 		return false
 	}
 
 	// Test axis L = A2 x B2
-	ra = a.Radius[0]*AbsR[7] + a.Radius[1]*AbsR[6]
-	rb = b.Radius[0]*AbsR[5] + b.Radius[1]*AbsR[2]
+	ra = a.HalfExtend[0]*AbsR[7] + a.HalfExtend[1]*AbsR[6]
+	rb = b.HalfExtend[0]*AbsR[5] + b.HalfExtend[1]*AbsR[2]
 	if math.Abs(t[1]*R[6]-t[0]*R[7]) > ra+rb {
 		return false
 	}

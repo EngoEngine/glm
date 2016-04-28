@@ -26,8 +26,8 @@ func TestSphereSphere(a, b *Sphere) bool {
 // underlying object better.
 func AABBFromSphere(s *Sphere) AABB {
 	return AABB{
-		Center: s.Center,
-		Radius: glm.Vec2{s.Radius, s.Radius},
+		Center:     s.Center,
+		HalfExtend: glm.Vec2{s.Radius, s.Radius},
 	}
 }
 

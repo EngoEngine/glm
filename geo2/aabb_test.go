@@ -12,67 +12,67 @@ func TestTestAABBAABB(t *testing.T) {
 	}{
 		{ // 0
 			a: AABB{
-				Center: glm.Vec2{0, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			b: AABB{
-				Center: glm.Vec2{0.5, 0.5},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0.5, 0.5},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			intersects: true,
 		},
 		{ // 1
 			a: AABB{
-				Center: glm.Vec2{0, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			b: AABB{
-				Center: glm.Vec2{5, 5},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{5, 5},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			intersects: false,
 		},
 		{ // 2
 			a: AABB{
-				Center: glm.Vec2{5, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{5, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			b: AABB{
-				Center: glm.Vec2{7, 0},
-				Radius: glm.Vec2{1, 0},
+				Center:     glm.Vec2{7, 0},
+				HalfExtend: glm.Vec2{1, 0},
 			},
 			intersects: true,
 		},
 		{ // 3
 			a: AABB{
-				Center: glm.Vec2{0, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			b: AABB{
-				Center: glm.Vec2{0, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			intersects: true,
 		},
 		{ // 4
 			a: AABB{
-				Center: glm.Vec2{0, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			b: AABB{
-				Center: glm.Vec2{2, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{2, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			intersects: true,
 		},
 		{ // 5
 			a: AABB{
-				Center: glm.Vec2{0, 0},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			b: AABB{
-				Center: glm.Vec2{0, 6},
-				Radius: glm.Vec2{1, 1},
+				Center:     glm.Vec2{0, 6},
+				HalfExtend: glm.Vec2{1, 1},
 			},
 			intersects: false,
 		},
@@ -87,12 +87,12 @@ func TestTestAABBAABB(t *testing.T) {
 
 func BenchmarkTestAABBAABB(tb *testing.B) {
 	a := AABB{
-		Center: glm.Vec2{0, 0},
-		Radius: glm.Vec2{1, 1},
+		Center:     glm.Vec2{0, 0},
+		HalfExtend: glm.Vec2{1, 1},
 	}
 	b := AABB{
-		Center: glm.Vec2{0, 0},
-		Radius: glm.Vec2{1, 1},
+		Center:     glm.Vec2{0, 0},
+		HalfExtend: glm.Vec2{1, 1},
 	}
 	for n := 0; n < tb.N; n++ {
 		TestAABBAABB(&a, &b)
