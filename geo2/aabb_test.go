@@ -109,3 +109,49 @@ func BenchmarkTestAABBAABB(tb *testing.B) {
 		TestAABBAABB(&a, &b)
 	}
 }
+
+func TestUpdateAABB(t *testing.T) {
+	tests := []struct {
+		base AABB
+		t    glm.Mat2x3
+		fill AABB
+	}{
+		{ //0
+			base: AABB{
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
+			},
+			t: glm.Mat2x3{
+				1, 2,
+				3, 4,
+				5, 6,
+			},
+			fill: AABB{
+				Center:     glm.Vec2{10, 130},
+				HalfExtend: glm.Vec2{3, 30},
+			},
+		},
+	}
+
+	for i, test := range tests {
+		UpdateAABB(&test.base, &test.base, &test.t)
+		if test.fill != test.base {
+			t.Errorf("[%d] Update expected %v got %v", i, test.fill, test.base)
+		}
+	}
+}
+
+func BenchmarkUpdateAABB(tb *testing.B) {
+	a := AABB{
+		Center:     glm.Vec2{0, 0},
+		HalfExtend: glm.Vec2{1, 1},
+	}
+	t := glm.Mat2x3{
+		1, 2,
+		3, 4,
+		5, 6,
+	}
+	for n := 0; n < tb.N; n++ {
+		UpdateAABB(&a, &a, &t)
+	}
+}
