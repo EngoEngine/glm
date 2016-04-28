@@ -76,6 +76,17 @@ func TestTestAABBAABB(t *testing.T) {
 			},
 			intersects: false,
 		},
+		{ // 6
+			a: AABB{
+				Center:     glm.Vec2{0, 0},
+				HalfExtend: glm.Vec2{1, 1},
+			},
+			b: AABB{
+				Center:     glm.Vec2{2, 2},
+				HalfExtend: glm.Vec2{1, 1},
+			},
+			intersects: true,
+		},
 	}
 
 	for i, test := range tests {
