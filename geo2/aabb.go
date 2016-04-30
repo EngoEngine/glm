@@ -28,14 +28,26 @@ func TestAABBAABB(a *AABB, b *AABB) bool {
 // result in fill.
 func UpdateAABB(base, fill *AABB, t *glm.Mat2x3) {
 	for i := 0; i < 2; i++ {
-		fill.Center[i] = t[i+4]
+		fill.Center[i] = t.At(i, 2)
 		fill.HalfExtend[i] = 0
 		for j := 0; j < 2; j++ {
-			fill.Center[i] += t[j*2+i] * base.Center[j]
-			fill.HalfExtend[i] += math.Abs(t[j*2+i]) * base.HalfExtend[j]
+			fill.Center[i] += t.At(i, j) * base.Center[j]
+			fill.HalfExtend[i] += math.Abs(t.At(i, j)) * base.HalfExtend[j]
 		}
 	}
 }
+
+/*
+void UpdateAABB(AABB a, float m[3][3], float t[3], AABB &b) {
+      for (int i = 0; i < 3; i++) {
+          b.c[i] = t[i];
+          b.r[i] = 0.0f;
+          for (int j = 0; j < 3; j++) {
+              b.c[i] += m[i][j] * a.c[j];
+              b.r[i] += Abs(m[i][j]) * a.r[j];
+          }
+} }
+*/
 
 // ClosestPointAABBPoint returns the point in or on the AABB closest to 'p'
 func ClosestPointAABBPoint(a *AABB, p *glm.Vec2) glm.Vec2 {

@@ -112,31 +112,62 @@ func BenchmarkTestAABBAABB(tb *testing.B) {
 
 func TestUpdateAABB(t *testing.T) {
 	tests := []struct {
-		base AABB
-		t    glm.Mat2x3
-		fill AABB
+		base   AABB
+		t      glm.Mat2x3
+		expect AABB
 	}{
-		{ //0
+		{ // 0
 			base: AABB{
-				Center:     glm.Vec2{0, 0},
-				HalfExtend: glm.Vec2{1, 1},
+				Center:     glm.Vec2{5, 4},
+				HalfExtend: glm.Vec2{1, 3},
 			},
 			t: glm.Mat2x3{
-				1, 2,
-				3, 4,
-				5, 6,
+				1, 0,
+				0, 1,
+				0, 0,
 			},
-			fill: AABB{
-				Center:     glm.Vec2{10, 130},
-				HalfExtend: glm.Vec2{3, 30},
+			expect: AABB{
+				Center:     glm.Vec2{5, 4},
+				HalfExtend: glm.Vec2{1, 3},
+			},
+		},
+		{ // 1
+			base: AABB{
+				Center:     glm.Vec2{5, 4},
+				HalfExtend: glm.Vec2{1, 3},
+			},
+			t: glm.Mat2x3{
+				1, 0,
+				0, 1,
+				4, 4,
+			},
+			expect: AABB{
+				Center:     glm.Vec2{9, 8},
+				HalfExtend: glm.Vec2{1, 3},
+			},
+		},
+		{ // 2
+			base: AABB{
+				Center:     glm.Vec2{5, 4},
+				HalfExtend: glm.Vec2{1, 3},
+			},
+			t: glm.Mat2x3{
+				0, 1,
+				1, 0,
+				0, 0,
+			},
+			expect: AABB{
+				Center:     glm.Vec2{4, 5},
+				HalfExtend: glm.Vec2{3, 1},
 			},
 		},
 	}
 
 	for i, test := range tests {
-		UpdateAABB(&test.base, &test.base, &test.t)
-		if test.fill != test.base {
-			t.Errorf("[%d] Update expected %v got %v", i, test.fill, test.base)
+		var aabb AABB
+		UpdateAABB(&test.base, &aabb, &test.t)
+		if !test.expect.Center.ApproxEqual(&aabb.Center) || !test.expect.HalfExtend.ApproxEqual(&aabb.HalfExtend) {
+			t.Errorf("[%d] UpdateAABB expected %v got %v", i, test.expect, aabb)
 		}
 	}
 }
