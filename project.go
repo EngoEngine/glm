@@ -28,9 +28,9 @@ func Perspective(fovy, aspect, near, far float32) Mat4 {
 
 	return Mat4{
 		f / aspect, 0, 0, 0,
-		0, f, 0, 0, 0,
-		0, (near + far) / nmf, -1, 0,
-		0, (2. * far * near) / nmf, 0,
+		0, f, 0, 0,
+		0, 0, (near + far) / nmf, -1,
+		0, 0, (2. * far * near) / nmf, 0,
 	}
 }
 
