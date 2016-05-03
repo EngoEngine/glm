@@ -9,6 +9,7 @@ import (
 /* Only floats are tested because the double versions are simply a find->replace on floats */
 
 func Test2DVecAdd(t *testing.T) {
+	t.Parallel()
 	v1 := &Vec2{1.0, 2.5}
 	v2 := &Vec2{0.0, 1.0}
 
@@ -27,6 +28,7 @@ func Test2DVecAdd(t *testing.T) {
 }
 
 func Test3DVecAdd(t *testing.T) {
+	t.Parallel()
 	v1 := &Vec3{1.0, 2.5, 1.1}
 	v2 := &Vec3{0.0, 1.0, 9.9}
 
@@ -45,6 +47,7 @@ func Test3DVecAdd(t *testing.T) {
 }
 
 func Test4DVecAdd(t *testing.T) {
+	t.Parallel()
 	v1 := &Vec4{1.0, 2.5, 1.1, 2.0}
 	v2 := &Vec4{0.0, 1.0, 9.9, 100.0}
 
@@ -63,6 +66,7 @@ func Test4DVecAdd(t *testing.T) {
 }
 
 func Test2DVecSub(t *testing.T) {
+	t.Parallel()
 	v1 := &Vec2{1.0, 2.5}
 	v2 := &Vec2{0.0, 1.0}
 
@@ -75,6 +79,7 @@ func Test2DVecSub(t *testing.T) {
 }
 
 func Test3DVecSub(t *testing.T) {
+	t.Parallel()
 	v1 := &Vec3{1.0, 2.5, 1.1}
 	v2 := &Vec3{0.0, 1.0, 9.9}
 
@@ -88,6 +93,7 @@ func Test3DVecSub(t *testing.T) {
 }
 
 func Test4DVecSub(t *testing.T) {
+	t.Parallel()
 	v1 := &Vec4{1.0, 2.5, 1.1, 2.0}
 	v2 := &Vec4{0.0, 1.0, 9.9, 100.0}
 
@@ -101,6 +107,7 @@ func Test4DVecSub(t *testing.T) {
 }
 
 func TestVecMul(t *testing.T) {
+	t.Parallel()
 	v := Vec2{1.0, 0.0}
 	v = v.Mul(15.0)
 
@@ -124,6 +131,7 @@ func TestVecMul(t *testing.T) {
 }
 
 func TestVecCrossProduct(t *testing.T) {
+	t.Parallel()
 	v1 := Vec3{1, 2, 3}
 	v2 := Vec3{10, 11, 12}
 	expected := Vec3{-9, 18, -9}
@@ -136,6 +144,7 @@ func TestVecCrossProduct(t *testing.T) {
 }
 
 func TestVecCrossOfProduct(t *testing.T) {
+	t.Parallel()
 	v1 := Vec3{1, 2, 3}
 	v2 := Vec3{10, 11, 12}
 	expected := v1.Cross(&v2)
@@ -149,6 +158,7 @@ func TestVecCrossOfProduct(t *testing.T) {
 }
 
 func TestVecCrossWithProduct(t *testing.T) {
+	t.Parallel()
 	v1 := Vec3{1, 2, 3}
 	v2 := Vec3{10, 11, 12}
 	expected := v1.Cross(&v2)
@@ -162,6 +172,7 @@ func TestVecCrossWithProduct(t *testing.T) {
 }
 
 func TestVecDotProduct(t *testing.T) {
+	t.Parallel()
 	mustEqual := func(result float32, expected float32, name string) {
 		if !FloatEqual(result, expected) {
 			t.Errorf("%v.Dot(%v) failed. Got: %v. Expected %v.",
@@ -175,6 +186,7 @@ func TestVecDotProduct(t *testing.T) {
 }
 
 func TestVecLen(t *testing.T) {
+	t.Parallel()
 	mustEqual := func(result float32, expected float32, name string) {
 		if !FloatEqual(result, expected) {
 			t.Errorf("%v failed. Got: %v. Expected %v.",
@@ -192,6 +204,7 @@ func TestVecLen(t *testing.T) {
 }
 
 func Test2DVecNormalize(t *testing.T) {
+	t.Parallel()
 	v := Vec2{3, 4}
 	norm := v.Normalized()
 	expected := &Vec2{0.6, 0.8}
@@ -202,6 +215,7 @@ func Test2DVecNormalize(t *testing.T) {
 }
 
 func TestVecElemAccessors(t *testing.T) {
+	t.Parallel()
 	mustEqual := func(desc string, expected float32, results ...float32) {
 		for _, r := range results {
 			if !FloatEqual(expected, r) {
@@ -231,6 +245,7 @@ func TestVecElemAccessors(t *testing.T) {
 }
 
 func TestVecEqual(t *testing.T) {
+	t.Parallel()
 	assert := func(res bool, desc string) {
 		if !res {
 			t.Errorf("%v failed.", desc)
@@ -270,6 +285,7 @@ func TestVecEqual(t *testing.T) {
 }
 
 func TestOuterProd2(t *testing.T) {
+	t.Parallel()
 	v1 := Vec2{1, -1}
 	v2 := Vec2{2, 3}
 	m := v1.OuterProd2(&v2)
@@ -280,6 +296,7 @@ func TestOuterProd2(t *testing.T) {
 }
 
 func TestOuterProd3(t *testing.T) {
+	t.Parallel()
 	v1 := Vec3{1, 2, 3}
 	v2 := Vec3{3, 2, 1}
 	m := v1.OuterProd3(&v2)
@@ -290,6 +307,7 @@ func TestOuterProd3(t *testing.T) {
 }
 
 func TestVec4Normalize(t *testing.T) {
+	t.Parallel()
 	v := Vec4{1, 2, 3, 4}
 	v.Normalize()
 	if !FloatEqual(v.Len(), 1) {

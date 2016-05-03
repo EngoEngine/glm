@@ -6,6 +6,7 @@ import (
 )
 
 func TestMat4_Mat3x4(t *testing.T) {
+	t.Parallel()
 	m4 := Mat4{rand.Float32() * 10, rand.Float32() * 10, rand.Float32() * 10, 0,
 		rand.Float32() * 10, rand.Float32() * 10, rand.Float32() * 10, 0,
 		rand.Float32() * 10, rand.Float32() * 10, rand.Float32() * 10, 0,
@@ -19,6 +20,7 @@ func TestMat4_Mat3x4(t *testing.T) {
 }
 
 func TestMat3x4_Det(t *testing.T) {
+	t.Parallel()
 	m4 := Mat4{rand.Float32() * 10, rand.Float32() * 10, rand.Float32() * 10, 0,
 		rand.Float32() * 10, rand.Float32() * 10, rand.Float32() * 10, 0,
 		rand.Float32() * 10, rand.Float32() * 10, rand.Float32() * 10, 0,
@@ -30,6 +32,7 @@ func TestMat3x4_Det(t *testing.T) {
 }
 
 func TestMat3x4_Inv(t *testing.T) {
+	t.Parallel()
 	m4 := Mat4{-1.793091, 5.359944, -5.777826, 0,
 		0.408224, -1.586935, 1.855001, 0,
 		2.300430, -3.715716, 3.871170, 0,
@@ -39,7 +42,7 @@ func TestMat3x4_Inv(t *testing.T) {
 	i3 := m3x4.Inverse()
 	i3_4 := i3.Mat4()
 	if !i3_4.ApproxEqualThreshold(&i4, 1e-4) {
-		t.Errorf("m.Inv() =\n%s, want\n%s", i3_4.String(), i4.String())
+		t.Errorf("Inv(m) =\n%s, want\n%s", i3_4.String(), i4.String())
 		return
 	}
 }

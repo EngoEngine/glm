@@ -7,7 +7,7 @@ import (
 )
 
 func TestEqual(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	var a float32 = 1.5
 	var b float32 = 1.0 + .5
@@ -40,7 +40,7 @@ func TestEqual(t *testing.T) {
 }
 
 func TestEqualThreshold(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	// |1.0 - 1.01| < .1
 	if !FloatEqualThreshold(1.0, 1.01, 1e-1) {
@@ -54,6 +54,7 @@ func TestEqualThreshold(t *testing.T) {
 }
 
 func TestEqualThresholdTable(t *testing.T) {
+	t.Parallel()
 	// http://floating-point-gui.de/errors/NearlyEqualsTest.java
 
 	tests := []struct {
@@ -163,7 +164,7 @@ func TestEqualThresholdTable(t *testing.T) {
 }
 
 func TestEqual32(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	a := float32(1.5)
 	b := float32(1.0 + .5)
@@ -192,7 +193,7 @@ func TestEqual32(t *testing.T) {
 }
 
 func TestClampf(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	if !FloatEqual(Clamp(-1.0, 0.0, 1.0), 0.0) {
 		t.Errorf("Clamp returns incorrect value for below threshold")
@@ -212,7 +213,7 @@ func TestClampf(t *testing.T) {
 }
 
 func TestIsClamped(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	if IsClamped(-1.0, 0.0, 1.0) {
 		t.Errorf("Test below min is considered clamped")
@@ -271,6 +272,7 @@ func BenchmarkClampf(b *testing.B) {
 }
 
 func TestRound(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Value     float32
 		Precision int
@@ -291,6 +293,7 @@ func TestRound(t *testing.T) {
 }
 
 func TestClampFunc(t *testing.T) {
+	t.Parallel()
 	clamp := ClampFunc(0, 1)
 	if clamp(-1) != 0 {
 		t.Errorf("clamp func failed to turn -1 into a 0")
@@ -304,6 +307,7 @@ func TestClampFunc(t *testing.T) {
 }
 
 func TestSetMax(t *testing.T) {
+	t.Parallel()
 	a, b := float32(0), float32(5)
 	SetMax(&a, &b)
 	if a != 5 {
@@ -317,6 +321,7 @@ func TestSetMax(t *testing.T) {
 }
 
 func TestSetMin(t *testing.T) {
+	t.Parallel()
 	a, b := float32(0), float32(5)
 	SetMin(&a, &b)
 	if a != 0 {

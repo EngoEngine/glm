@@ -8,7 +8,8 @@ import (
 )
 
 func TestMulIdent(t *testing.T) {
-	i1 := [...]float32{
+	t.Parallel()
+	i1 := Mat4{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
@@ -25,6 +26,7 @@ func TestMulIdent(t *testing.T) {
 }
 
 func TestMatRowsSquare(t *testing.T) {
+	t.Parallel()
 	v0 := Vec4{1, 2, 3, 4}
 	v1 := Vec4{5, 6, 7, 8}
 	v2 := Vec4{9, 10, 11, 12}
@@ -55,89 +57,38 @@ func TestMatRowsSquare(t *testing.T) {
 }
 
 func TestMatColsSquare(t *testing.T) {
-	//t.Skip()
-
-	v0 := Vec4{1, 2, 3, 4}
-	v1 := Vec4{5, 6, 7, 8}
-	v2 := Vec4{9, 10, 11, 12}
-	v3 := Vec4{13, 14, 15, 16}
-	cols := [4]Vec4{v0, v1, v2, v3}
-	m1 := Mat4FromCols(&v0, &v1, &v2, &v3)
+	t.Parallel()
+	cols := [4]Vec4{Vec4{1, 2, 3, 4},
+		Vec4{5, 6, 7, 8},
+		Vec4{9, 10, 11, 12},
+		Vec4{13, 14, 15, 16},
+	}
+	m1 := Mat4FromCols(&cols[0], &cols[1], &cols[2], &cols[3])
 
 	t.Logf("4x4 matrix as built from cols: %v", m1)
-	if !FloatEqualThreshold(m1.At(0, 0), cols[0][0], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 0, 0, m1.At(0, 0), cols[0][0])
-	}
-	if !FloatEqualThreshold(m1.At(0, 1), cols[1][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 0, 1, m1.At(0, 1), cols[1][2])
-	}
-	if !FloatEqualThreshold(m1.At(0, 2), cols[2][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 0, 2, m1.At(0, 2), cols[2][2])
-	}
-	if !FloatEqualThreshold(m1.At(0, 3), cols[3][3], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 0, 3, m1.At(0, 3), cols[3][3])
+	for r := 0; r < 4; r++ {
+		for c := 0; c < 4; c++ {
+			if m1.At(r, c) != cols[c][r] {
+				t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", r, c, m1.At(r, c), cols[c][r])
+			}
+		}
 	}
 
-	if !FloatEqualThreshold(m1.At(1, 0), cols[0][0], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 1, 0, m1.At(1, 0), cols[0][0])
-	}
-	if !FloatEqualThreshold(m1.At(1, 1), cols[1][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 1, 1, m1.At(1, 1), cols[1][2])
-	}
-	if !FloatEqualThreshold(m1.At(1, 2), cols[2][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 1, 2, m1.At(1, 2), cols[2][2])
-	}
-	if !FloatEqualThreshold(m1.At(1, 3), cols[3][3], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 1, 3, m1.At(1, 3), cols[3][3])
-	}
-
-	if !FloatEqualThreshold(m1.At(2, 0), cols[0][0], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 2, 0, m1.At(2, 0), cols[0][0])
-	}
-	if !FloatEqualThreshold(m1.At(2, 1), cols[1][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 2, 1, m1.At(2, 1), cols[1][2])
-	}
-	if !FloatEqualThreshold(m1.At(2, 2), cols[2][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 2, 2, m1.At(2, 2), cols[2][2])
-	}
-	if !FloatEqualThreshold(m1.At(2, 3), cols[3][3], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 2, 3, m1.At(2, 3), cols[3][3])
-	}
-
-	if !FloatEqualThreshold(m1.At(3, 0), cols[0][0], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 3, 0, m1.At(3, 0), cols[0][0])
-	}
-	if !FloatEqualThreshold(m1.At(3, 1), cols[1][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 3, 1, m1.At(3, 1), cols[1][2])
-	}
-	if !FloatEqualThreshold(m1.At(3, 2), cols[2][2], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 3, 2, m1.At(3, 2), cols[2][2])
-	}
-	if !FloatEqualThreshold(m1.At(3, 3), cols[3][3], 1e-5) {
-		t.Errorf("Matrix element at (%d,%d) wrong when built from rows. Got: %f, Expected: %f", 3, 3, m1.At(3, 3), cols[3][3])
-	}
-
-	v0, v1, v2, v3 = m1.Cols()
+	v0, v1, v2, v3 := m1.Cols()
 	r2 := [4]Vec4{v0, v1, v2, v3}
 
 	t.Logf("4x4 matrix returned cols: %v", r2)
 	for r := 0; r < 4; r++ {
-		if !FloatEqualThreshold(r2[0][0], cols[0][0], 1e-5) {
-			t.Errorf("Matrix element at (%d,%d) wrong when rows are gotten. Got: %f, Expected: %f", r, 0, r2[0][0], cols[0][0])
-		}
-		if !FloatEqualThreshold(r2[1][2], cols[1][2], 1e-5) {
-			t.Errorf("Matrix element at (%d,%d) wrong when rows are gotten. Got: %f, Expected: %f", r, 1, r2[1][2], cols[1][2])
-		}
-		if !FloatEqualThreshold(r2[2][2], cols[2][2], 1e-5) {
-			t.Errorf("Matrix element at (%d,%d) wrong when rows are gotten. Got: %f, Expected: %f", r, 2, r2[2][2], cols[2][2])
-		}
-		if !FloatEqualThreshold(r2[3][3], cols[3][3], 1e-5) {
-			t.Errorf("Matrix element at (%d,%d) wrong when rows are gotten. Got: %f, Expected: %f", r, 3, r2[3][3], cols[3][3])
+		for c := 0; c < 4; c++ {
+			if r2[c][r] != cols[c][r] {
+				t.Errorf("Matrix element at (%d,%d) wrong when rows are gotten. Got: %f, Expected: %f", r, c, r2[c][r], cols[c][r])
+			}
 		}
 	}
 }
 
 func TestTransposeSquare(t *testing.T) {
+	t.Parallel()
 	v := [4]Vec4{
 		{1, 2, 3, 4},
 		{5, 6, 7, 8},
@@ -150,12 +101,13 @@ func TestTransposeSquare(t *testing.T) {
 
 	correct := Mat4FromRows(&v[0], &v[1], &v[2], &v[3])
 
-	if !correct.ApproxEqualThreshold(&transpose, 1e-4) {
+	if correct != transpose {
 		t.Errorf("Transpose not correct. Got: %v, expected: %v", transpose, correct)
 	}
 }
 
 func TestAtSet(t *testing.T) {
+	t.Parallel()
 	m := Mat3{
 		1, 2, 3,
 		4, 5, 6,
@@ -184,6 +136,7 @@ func TestAtSet(t *testing.T) {
 }
 
 func TestDiagTrace(t *testing.T) {
+	t.Parallel()
 	m := Diag4(&Vec4{1, 2, 3, 4})
 
 	tr := m.Trace()
@@ -194,6 +147,7 @@ func TestDiagTrace(t *testing.T) {
 }
 
 func TestMatAbs(t *testing.T) {
+	t.Parallel()
 	m := Mat4{1, -3, 4, 5, -6, 8, -9, 10, 0, 1, 6, 2, 357, 3, 436}
 	result := Mat4{1, 3, 4, 5, 6, 8, 9, 10, 0, 1, 6, 2, 357, 3, 436}
 
@@ -205,6 +159,7 @@ func TestMatAbs(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
+	t.Parallel()
 	m := Ident4()
 
 	str := fmt.Sprintf(` %[2]f %[1]f %[1]f %[1]f
@@ -219,6 +174,7 @@ func TestString(t *testing.T) {
 }
 
 func TestMat2Conv(t *testing.T) {
+	t.Parallel()
 	m2 := Mat2{
 		1, 0,
 		0, 1,
@@ -234,6 +190,7 @@ func TestMat2Conv(t *testing.T) {
 }
 
 func TestMat3Conv(t *testing.T) {
+	t.Parallel()
 	m3 := Mat3{
 		1, 0, 0,
 		0, 1, 0,
@@ -250,6 +207,7 @@ func TestMat3Conv(t *testing.T) {
 }
 
 func TestMat4Conv(t *testing.T) {
+	t.Parallel()
 	m4 := Mat4{
 		1, 0, 0, 0,
 		0, 1, 0, 0,
@@ -266,6 +224,7 @@ func TestMat4Conv(t *testing.T) {
 	}
 }
 func TestMat2SetCol(t *testing.T) {
+	t.Parallel()
 	m2 := Ident2()
 	m2.SetCol(0, &Vec2{2, 2})
 	expected := Mat2{2, 2, 0, 1}
@@ -275,6 +234,7 @@ func TestMat2SetCol(t *testing.T) {
 }
 
 func TestMat3SetCol(t *testing.T) {
+	t.Parallel()
 	m3 := Ident3()
 	m3.SetCol(0, &Vec3{2, 2, 2})
 	expected := Mat3{2, 2, 2, 0, 1, 0, 0, 0, 1}
@@ -284,6 +244,7 @@ func TestMat3SetCol(t *testing.T) {
 }
 
 func TestMat4SetCol(t *testing.T) {
+	t.Parallel()
 	m4 := Ident4()
 	m4.SetCol(0, &Vec4{2, 2, 2, 2})
 	expected := Mat4{2, 2, 2, 2, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
@@ -293,6 +254,7 @@ func TestMat4SetCol(t *testing.T) {
 }
 
 func TestMat2SetRow(t *testing.T) {
+	t.Parallel()
 	m2 := Ident2()
 	m2.SetRow(0, &Vec2{2, 2})
 	expected := Mat2{2, 0, 2, 1}
@@ -302,6 +264,7 @@ func TestMat2SetRow(t *testing.T) {
 }
 
 func TestMat3SetRow(t *testing.T) {
+	t.Parallel()
 	m3 := Ident3()
 	m3.SetRow(0, &Vec3{2, 2, 2})
 	expected := Mat3{2, 0, 0, 2, 1, 0, 2, 0, 1}
@@ -311,6 +274,7 @@ func TestMat3SetRow(t *testing.T) {
 }
 
 func TestMat4SetRow(t *testing.T) {
+	t.Parallel()
 	m4 := Ident4()
 	m4.SetRow(0, &Vec4{2, 2, 2, 2})
 	expected := Mat4{2, 0, 0, 0, 2, 1, 0, 0, 2, 0, 1, 0, 2, 0, 0, 1}
@@ -319,6 +283,7 @@ func TestMat4SetRow(t *testing.T) {
 	}
 }
 func TestMat2Diag2(t *testing.T) {
+	t.Parallel()
 	m := Ident2()
 	diag := m.Diag()
 	expected := Vec2{1, 1}
@@ -327,6 +292,7 @@ func TestMat2Diag2(t *testing.T) {
 	}
 }
 func TestMat3Diag3(t *testing.T) {
+	t.Parallel()
 	m := Ident3()
 	diag := m.Diag()
 	expected := Vec3{1, 1, 1}
@@ -335,6 +301,7 @@ func TestMat3Diag3(t *testing.T) {
 	}
 }
 func TestMat4Diag4(t *testing.T) {
+	t.Parallel()
 	m := Ident4()
 	diag := m.Diag()
 	expected := Vec4{1, 1, 1, 1}
@@ -343,6 +310,7 @@ func TestMat4Diag4(t *testing.T) {
 	}
 }
 func TestMat2Ident(t *testing.T) {
+	t.Parallel()
 	expected := Mat2{1, 0, 0, 1}
 	iden := Ident2()
 	if expected != iden {
@@ -350,6 +318,7 @@ func TestMat2Ident(t *testing.T) {
 	}
 }
 func TestMat3Ident(t *testing.T) {
+	t.Parallel()
 	expected := Mat3{1, 0, 0, 0, 1, 0, 0, 0, 1}
 	iden := Ident3()
 	if expected != iden {
@@ -357,6 +326,7 @@ func TestMat3Ident(t *testing.T) {
 	}
 }
 func TestMat4Ident(t *testing.T) {
+	t.Parallel()
 	expected := Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
 	iden := Ident4()
 	if expected != iden {
@@ -365,6 +335,7 @@ func TestMat4Ident(t *testing.T) {
 }
 
 func TestDiag2(t *testing.T) {
+	t.Parallel()
 	vec := &Vec2{1, 1}
 	m := Diag2(vec)
 	if Ident2() != m {
@@ -372,6 +343,7 @@ func TestDiag2(t *testing.T) {
 	}
 }
 func TestDiag3(t *testing.T) {
+	t.Parallel()
 	vec := &Vec3{1, 1, 1}
 	m := Diag3(vec)
 	if Ident3() != m {
@@ -379,6 +351,7 @@ func TestDiag3(t *testing.T) {
 	}
 }
 func TestDiag4(t *testing.T) {
+	t.Parallel()
 	vec := &Vec4{1, 1, 1, 1}
 	m := Diag4(vec)
 	if Ident4() != m {
@@ -387,6 +360,7 @@ func TestDiag4(t *testing.T) {
 }
 
 func TestMat2FromRow(t *testing.T) {
+	t.Parallel()
 	m := Mat2FromRows(&Vec2{1, 0}, &Vec2{0, 1})
 	if m != Ident2() {
 		t.Errorf("Unexpected result from Mat2FromRow %+v", m)

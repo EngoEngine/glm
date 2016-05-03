@@ -6,6 +6,7 @@ import (
 )
 
 func TestProject(t *testing.T) {
+	t.Parallel()
 	obj := &Vec3{1002, 960, 0}
 	modelview := &Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 203, 1, 0, 1}
 	projection := &Mat4{0.0013020833721384406, 0, 0, 0, -0, -0.0020833334419876337, -0, -0, -0, -0, -1, -0, -1, 1, 0, 1}
@@ -29,6 +30,7 @@ func TestProject(t *testing.T) {
 }
 
 func TestUnprojectSingular(t *testing.T) {
+	t.Parallel()
 	if _, err := UnProject(&Vec3{}, &Mat4{}, &Mat4{}, 0, 0, 2048, 1152); err == nil {
 		t.Errorf("Did not get error from UnProject on singular matrix")
 	} else {
@@ -37,6 +39,7 @@ func TestUnprojectSingular(t *testing.T) {
 }
 
 func TestLookAtV(t *testing.T) {
+	t.Parallel()
 	// http://www.euclideanspace.com/maths/algebra/matrix/transforms/examples/index.htm
 	iden := Ident4()
 	tests := []struct {
@@ -114,6 +117,7 @@ func TestLookAtV(t *testing.T) {
 }
 
 func TestOrtho(t *testing.T) {
+	t.Parallel()
 	iden := Ident4()
 	tests := []struct {
 		Left, Right,
@@ -141,6 +145,7 @@ func TestOrtho(t *testing.T) {
 }
 
 func TestOrtho2D(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Left, Right,
 		Bottom, Top float32
@@ -166,6 +171,7 @@ func TestOrtho2D(t *testing.T) {
 }
 
 func TestPerspective(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Fovy, Aspect,
 		Near, Far float32
@@ -191,6 +197,7 @@ func TestPerspective(t *testing.T) {
 }
 
 func TestFrustum(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Left, Right,
 		Bottom, Top,

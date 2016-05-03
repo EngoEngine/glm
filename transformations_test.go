@@ -6,6 +6,7 @@ import (
 )
 
 func TestHomogRotate3D(t *testing.T) {
+	t.Parallel()
 	iden := Ident4()
 	tests := []struct {
 		Description string
@@ -69,6 +70,7 @@ func TestHomogRotate3D(t *testing.T) {
 }
 
 func TestExtract3DScale(t *testing.T) {
+	t.Parallel()
 
 	t1 := Translate3D(10, 12, -5)
 	h := HomogRotate3D(math.Pi/2, &Vec3{1, 0, 0})
@@ -102,6 +104,7 @@ func TestExtract3DScale(t *testing.T) {
 }
 
 func TestExtractMaxScale(t *testing.T) {
+	t.Parallel()
 	t1 := Translate3D(10, 12, -5)
 	h := HomogRotate3D(math.Pi/2, &Vec3{1, 0, 0})
 	s := Scale3D(2, 3, 4)
@@ -134,6 +137,7 @@ func TestExtractMaxScale(t *testing.T) {
 }
 
 func TestTransformCoordinate(t *testing.T) {
+	t.Parallel()
 
 	t1 := Translate3D(0, 1, 1)
 	s := Scale3D(2, 2, 2)
@@ -158,6 +162,7 @@ func TestTransformCoordinate(t *testing.T) {
 }
 
 func TestTransformNormal(t *testing.T) {
+	t.Parallel()
 	t1 := Translate3D(0, 1, 1)
 	s := Scale3D(2, 2, 2)
 	t3 := t1.Mul4(&s)
@@ -181,6 +186,7 @@ func TestTransformNormal(t *testing.T) {
 }
 
 func TestRotate2D(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		angle      float32
 		start, end Vec2
@@ -211,6 +217,7 @@ func TestRotate2D(t *testing.T) {
 }
 
 func TestRotate3D(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		angle                      float32
 		start, endRX, endRY, endRZ Vec3

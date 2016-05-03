@@ -2470,7 +2470,6 @@ func (m1 *Mat2x3) String() string {
 		for _, col := range m1.Row(i) {
 			fmt.Fprintf(w, "%f\t", col)
 		}
-
 		fmt.Fprintln(w, "")
 	}
 	w.Flush()

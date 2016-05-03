@@ -9,7 +9,7 @@ import (
 )
 
 func TestQuatMulIdentity(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	i1 := &Quat{1.0, Vec3{0, 0, 0}}
 	i2 := QuatIdent()
@@ -33,7 +33,7 @@ func TestQuatMulIdentity(t *testing.T) {
 }
 
 func TestQuatRotateOnAxis(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	var angleDegrees float32 = 30.0
 	axis := Vec3{1, 0, 0}
@@ -54,7 +54,7 @@ func TestQuatRotateOnAxis(t *testing.T) {
 }
 
 func TestQuatRotateOffAxis(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	angleRads := DegToRad(30.0)
 	axis := Vec3{1, 0, 0}
@@ -79,7 +79,7 @@ func TestQuatRotateOffAxis(t *testing.T) {
 }
 
 func TestQuatIdentityToMatrix(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	quat := QuatIdent()
 	matrix := quat.Mat4()
@@ -91,7 +91,7 @@ func TestQuatIdentityToMatrix(t *testing.T) {
 }
 
 func TestQuatRotationToMatrix(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	angle := DegToRad(45.0)
 
@@ -108,7 +108,7 @@ func TestQuatRotationToMatrix(t *testing.T) {
 
 // Taken from the Matlab AnglesToQuat documentation example
 func TestAnglesToQuatZYX(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	q := AnglesToQuat(.7854, 0.1, 0, ZYX)
 
@@ -124,7 +124,7 @@ func TestAnglesToQuatZYX(t *testing.T) {
 }
 
 func TestQuatMatRotateY(t *testing.T) {
-	//t.Parallel()
+	t.Parallel()
 
 	q := QuatRotate(float32(math.Pi), &Vec3{0, 1, 0})
 	q.Normalize()
@@ -214,6 +214,7 @@ func BenchmarkQuatFuncElementAccess(b *testing.B) {
 }
 
 func TestMat4ToQuat(t *testing.T) {
+	t.Parallel()
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/examples/index.htm
 
 	iden := Ident4()
@@ -279,6 +280,7 @@ func TestMat4ToQuat(t *testing.T) {
 }
 
 func TestQuatRotate(t *testing.T) {
+	t.Parallel()
 	qiden := QuatIdent()
 	tests := []struct {
 		Description string
@@ -322,6 +324,7 @@ func TestQuatRotate(t *testing.T) {
 }
 
 func TestQuatLookAtV(t *testing.T) {
+	t.Parallel()
 	// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/transforms/examples/index.htm
 	qiden := QuatIdent()
 	tests := []struct {
@@ -375,6 +378,7 @@ func TestQuatLookAtV(t *testing.T) {
 }
 
 func TestCompareLookAt(t *testing.T) {
+	t.Parallel()
 	type OrigExp [2]*Vec3
 
 	tests := []struct {
@@ -510,6 +514,7 @@ func TestCompareLookAt(t *testing.T) {
 }
 
 func TestQuatMatConversion(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Angle float32
 		Axis  *Vec3
@@ -539,6 +544,7 @@ func TestQuatMatConversion(t *testing.T) {
 }
 
 func TestQuatGetter(t *testing.T) {
+	t.Parallel()
 	tests := []*Quat{
 		&Quat{0, Vec3{0, 0, 0}},
 		&Quat{1, Vec3{2, 3, 4}},
@@ -561,6 +567,7 @@ func TestQuatGetter(t *testing.T) {
 }
 
 func TestQuatEqual(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     *Quat
 		Expected bool
@@ -581,6 +588,7 @@ func TestQuatEqual(t *testing.T) {
 }
 
 func TestQuatOrientationEqual(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     *Quat
 		Expected bool
@@ -599,6 +607,7 @@ func TestQuatOrientationEqual(t *testing.T) {
 }
 
 func TestQuatAdd(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     *Quat
 		Expected *Quat
@@ -616,6 +625,7 @@ func TestQuatAdd(t *testing.T) {
 }
 
 func TestQuatSub(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     *Quat
 		Expected *Quat
@@ -633,6 +643,7 @@ func TestQuatSub(t *testing.T) {
 }
 
 func TestQuatScale(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Rotation *Quat
 		Scalar   float32
@@ -651,6 +662,7 @@ func TestQuatScale(t *testing.T) {
 }
 
 func TestQuatLen(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Rotation Quat
 		Expected float32
@@ -674,6 +686,7 @@ func TestQuatLen(t *testing.T) {
 }
 
 func TestQuatNormalize(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Rotation *Quat
 		Expected *Quat
@@ -694,6 +707,7 @@ func TestQuatNormalize(t *testing.T) {
 }
 
 func TestQuatInverse(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		Rotation *Quat
 		Expected *Quat
@@ -711,6 +725,7 @@ func TestQuatInverse(t *testing.T) {
 }
 
 func TestQuatSlerp(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     *Quat
 		Scalar   float32
@@ -734,6 +749,7 @@ func TestQuatSlerp(t *testing.T) {
 }
 
 func TestQuatDot(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     *Quat
 		Expected float32
@@ -751,6 +767,7 @@ func TestQuatDot(t *testing.T) {
 }
 
 func TestApproxEqual(t *testing.T) {
+	t.Parallel()
 	q1 := Quat{1, Vec3{2, 3, 4}}
 	q2 := Quat{1, Vec3{2, 3, 4}}
 	if !q1.ApproxEqual(&q2) {
@@ -763,12 +780,14 @@ func TestApproxEqual(t *testing.T) {
 }
 
 func TestQuatBetweenVector3(t *testing.T) {
+	t.Parallel()
 	v1 := Vec3{1, 0, 0}
 	v2 := Vec3{-1, 0, 0}
 	QuatBetweenVectors(&v1, &v2)
 }
 
 func TestQuatLerp(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     Quat
 		Amount   float32
@@ -787,6 +806,7 @@ func TestQuatLerp(t *testing.T) {
 }
 
 func TestQuatBetweenVectors(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		A, B     Vec3
 		Expected Quat
@@ -804,6 +824,7 @@ func TestQuatBetweenVectors(t *testing.T) {
 }
 
 func TestQuat_Ident(t *testing.T) {
+	t.Parallel()
 	ident := Quat{W: 1, V: Vec3{0, 0, 0}}
 	if ident != QuatIdent() {
 		t.Errorf("QuatIdent = %v, want %v", QuatIdent(), ident)
@@ -860,6 +881,7 @@ var quatTests = []struct {
 }
 
 func TestQuat_AddOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.AddOf(&test.q1, &test.q2)
@@ -870,6 +892,7 @@ func TestQuat_AddOf(t *testing.T) {
 }
 
 func TestQuat_AddWith(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.AddWith(&test.q2)
@@ -880,6 +903,7 @@ func TestQuat_AddWith(t *testing.T) {
 }
 
 func TestQuat_SubOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.SubOf(&test.q1, &test.q2)
@@ -890,6 +914,7 @@ func TestQuat_SubOf(t *testing.T) {
 }
 
 func TestQuat_SubWith(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.SubWith(&test.q2)
@@ -900,6 +925,7 @@ func TestQuat_SubWith(t *testing.T) {
 }
 
 func TestQuat_Mul(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Mul(&test.q2)
 		if !q.ApproxEqualThreshold(&test.mul, 1e-4) {
@@ -909,6 +935,7 @@ func TestQuat_Mul(t *testing.T) {
 }
 
 func TestQuat_MulOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.MulOf(&test.q1, &test.q2)
@@ -919,6 +946,7 @@ func TestQuat_MulOf(t *testing.T) {
 }
 
 func TestQuat_MulWith(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.MulWith(&test.q2)
@@ -929,6 +957,7 @@ func TestQuat_MulWith(t *testing.T) {
 }
 
 func TestQuat_Scale(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Scale(test.f)
 		if !q.ApproxEqualThreshold(&test.scale, 1e-4) {
@@ -938,6 +967,7 @@ func TestQuat_Scale(t *testing.T) {
 }
 
 func TestQuat_ScaleOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.ScaleOf(test.f, &test.q1)
@@ -948,6 +978,7 @@ func TestQuat_ScaleOf(t *testing.T) {
 }
 
 func TestQuat_ScaleWith(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.ScaleWith(test.f)
@@ -958,6 +989,7 @@ func TestQuat_ScaleWith(t *testing.T) {
 }
 
 func TestQuat_Conjugated(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Conjugated()
 		if !q.ApproxEqualThreshold(&test.conj, 1e-4) {
@@ -967,6 +999,7 @@ func TestQuat_Conjugated(t *testing.T) {
 }
 
 func TestQuat_Conjugate(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.Conjugate()
@@ -977,6 +1010,7 @@ func TestQuat_Conjugate(t *testing.T) {
 }
 
 func TestQuat_ConjugateOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.ConjugateOf(&test.q1)
@@ -987,6 +1021,7 @@ func TestQuat_ConjugateOf(t *testing.T) {
 }
 
 func TestQuat_Normalized(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Normalized()
 		if !q.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -996,6 +1031,7 @@ func TestQuat_Normalized(t *testing.T) {
 }
 
 func TestQuat_Normalize(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.Normalize()
@@ -1006,6 +1042,7 @@ func TestQuat_Normalize(t *testing.T) {
 }
 
 func TestQuat_SetNormalizeOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.SetNormalizedOf(&test.q1)
@@ -1016,6 +1053,7 @@ func TestQuat_SetNormalizeOf(t *testing.T) {
 }
 
 func TestQuat_Inverse(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Inverse()
 		if !q.ApproxEqualThreshold(&test.inv, 1e-4) {
@@ -1025,6 +1063,7 @@ func TestQuat_Inverse(t *testing.T) {
 }
 
 func TestQuat_Invert(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.Invert()
@@ -1035,6 +1074,7 @@ func TestQuat_Invert(t *testing.T) {
 }
 
 func TestQuat_InverseOf(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		var q Quat
 		q.InverseOf(&test.q1)
@@ -1045,6 +1085,7 @@ func TestQuat_InverseOf(t *testing.T) {
 }
 
 func TestQuat_AddScaledVec(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.AddScaledVec(test.f, &test.v1)
@@ -1055,6 +1096,7 @@ func TestQuat_AddScaledVec(t *testing.T) {
 }
 
 func TestQuat_Mat3(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.Normalize()
@@ -1066,6 +1108,7 @@ func TestQuat_Mat3(t *testing.T) {
 }
 
 func TestQuat_Mat4(t *testing.T) {
+	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1
 		q.Normalize()

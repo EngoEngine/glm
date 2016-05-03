@@ -5,6 +5,7 @@ import (
 )
 
 func TestVec2_String(t *testing.T) {
+	t.Parallel()
 	v := Vec2{1, 1}
 	if s := v.String(); s != "{ 1.000000,  1.000000}" {
 		t.Errorf("(%v).String() = %s, want { 1.000000,  1.000000}", v, s)
@@ -12,6 +13,7 @@ func TestVec2_String(t *testing.T) {
 }
 
 func TestVec3_String(t *testing.T) {
+	t.Parallel()
 	v := Vec3{1, 1, 1}
 	if s := v.String(); s != "{ 1.000000,  1.000000,  1.000000}" {
 		t.Errorf("(%v).String() = %s, want { 1.000000,  1.000000,  1.000000}", v, s)
@@ -19,6 +21,7 @@ func TestVec3_String(t *testing.T) {
 }
 
 func TestVec4_String(t *testing.T) {
+	t.Parallel()
 	v := Vec4{1, 1, 1, 1}
 	if s := v.String(); s != "{ 1.000000,  1.000000,  1.000000,  1.000000}" {
 		t.Errorf("(%v).String() = %s, want { 1.000000,  1.000000,  1.000000,  1.000000}", v, s)
@@ -26,6 +29,7 @@ func TestVec4_String(t *testing.T) {
 }
 
 func TestVec2_Vec3(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec2 Vec2
 		arg  float32
@@ -43,6 +47,7 @@ func TestVec2_Vec3(t *testing.T) {
 }
 
 func TestVec2_Vec4(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec2 Vec2
 		args [2]float32
@@ -60,6 +65,7 @@ func TestVec2_Vec4(t *testing.T) {
 }
 
 func TestVec3_Vec2(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec3 Vec3
 		vec2 Vec2
@@ -76,6 +82,7 @@ func TestVec3_Vec2(t *testing.T) {
 }
 
 func TestVec3_Vec4(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec3 Vec3
 		arg  float32
@@ -93,6 +100,7 @@ func TestVec3_Vec4(t *testing.T) {
 }
 
 func TestVec4_Vec3(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec4 Vec4
 		vec3 Vec3
@@ -109,6 +117,7 @@ func TestVec4_Vec3(t *testing.T) {
 }
 
 func TestVec4_Vec2(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec4 Vec4
 		vec2 Vec2
@@ -125,6 +134,7 @@ func TestVec4_Vec2(t *testing.T) {
 }
 
 func TestVec2_Elem(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec2 Vec2
 		x, y float32
@@ -141,6 +151,7 @@ func TestVec2_Elem(t *testing.T) {
 }
 
 func TestVec3_Elem(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec3    Vec3
 		x, y, z float32
@@ -157,6 +168,7 @@ func TestVec3_Elem(t *testing.T) {
 }
 
 func TestVec4_Elem(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		vec4       Vec4
 		x, y, z, w float32
@@ -183,6 +195,7 @@ var crossTests = []struct {
 }
 
 func TestVec3_Cross(t *testing.T) {
+	t.Parallel()
 	for _, test := range crossTests {
 		if c := test.v1.Cross(&test.v2); !c.ApproxEqual(&test.v3) {
 			t.Errorf("%v X %v = %v, want %v", test.v1, test.v2, c, test.v3)
@@ -191,6 +204,7 @@ func TestVec3_Cross(t *testing.T) {
 }
 
 func TestVec3_CrossOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range crossTests {
 		var c Vec3
 		c.CrossOf(&test.v1, &test.v2)
@@ -201,6 +215,7 @@ func TestVec3_CrossOf(t *testing.T) {
 }
 
 func TestVec3_CrossWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range crossTests {
 		c := test.v1
 		c.CrossWith(&test.v2)
@@ -385,6 +400,7 @@ var vec4Tests = []struct {
 }
 
 func TestVec2_Add(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Add(&test.v2)
 		if !c.ApproxEqualThreshold(&test.add, 1e-4) {
@@ -394,6 +410,7 @@ func TestVec2_Add(t *testing.T) {
 }
 
 func TestVec2_AddOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		var c Vec2
 		c.AddOf(&test.v1, &test.v2)
@@ -404,6 +421,7 @@ func TestVec2_AddOf(t *testing.T) {
 }
 
 func TestVec2_AddWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.AddWith(&test.v2)
@@ -414,6 +432,7 @@ func TestVec2_AddWith(t *testing.T) {
 }
 
 func TestVec3_Add(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Add(&test.v2)
 		if !c.ApproxEqualThreshold(&test.add, 1e-4) {
@@ -423,6 +442,7 @@ func TestVec3_Add(t *testing.T) {
 }
 
 func TestVec3_AddOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		var c Vec3
 		c.AddOf(&test.v1, &test.v2)
@@ -433,6 +453,7 @@ func TestVec3_AddOf(t *testing.T) {
 }
 
 func TestVec3_AddWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.AddWith(&test.v2)
@@ -443,6 +464,7 @@ func TestVec3_AddWith(t *testing.T) {
 }
 
 func TestVec4_Add(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Add(&test.v2)
 		if !c.ApproxEqualThreshold(&test.add, 1e-4) {
@@ -452,6 +474,7 @@ func TestVec4_Add(t *testing.T) {
 }
 
 func TestVec4_AddOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		var c Vec4
 		c.AddOf(&test.v1, &test.v2)
@@ -462,6 +485,7 @@ func TestVec4_AddOf(t *testing.T) {
 }
 
 func TestVec4_AddWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.AddWith(&test.v2)
@@ -472,6 +496,7 @@ func TestVec4_AddWith(t *testing.T) {
 }
 
 func TestVec2_Sub(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Sub(&test.v2)
 		if !c.ApproxEqualThreshold(&test.sub, 1e-4) {
@@ -481,6 +506,7 @@ func TestVec2_Sub(t *testing.T) {
 }
 
 func TestVec2_SubOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		var c Vec2
 		c.SubOf(&test.v1, &test.v2)
@@ -491,6 +517,7 @@ func TestVec2_SubOf(t *testing.T) {
 }
 
 func TestVec2_SubWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.SubWith(&test.v2)
@@ -501,6 +528,7 @@ func TestVec2_SubWith(t *testing.T) {
 }
 
 func TestVec3_Sub(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Sub(&test.v2)
 		if !c.ApproxEqualThreshold(&test.sub, 1e-4) {
@@ -510,6 +538,7 @@ func TestVec3_Sub(t *testing.T) {
 }
 
 func TestVec3_SubOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		var c Vec3
 		c.SubOf(&test.v1, &test.v2)
@@ -520,6 +549,7 @@ func TestVec3_SubOf(t *testing.T) {
 }
 
 func TestVec3_SubWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.SubWith(&test.v2)
@@ -530,6 +560,7 @@ func TestVec3_SubWith(t *testing.T) {
 }
 
 func TestVec4_Sub(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Sub(&test.v2)
 		if !c.ApproxEqualThreshold(&test.sub, 1e-4) {
@@ -539,6 +570,7 @@ func TestVec4_Sub(t *testing.T) {
 }
 
 func TestVec4_SubOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		var c Vec4
 		c.SubOf(&test.v1, &test.v2)
@@ -549,6 +581,7 @@ func TestVec4_SubOf(t *testing.T) {
 }
 
 func TestVec4_SubWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.SubWith(&test.v2)
@@ -559,6 +592,7 @@ func TestVec4_SubWith(t *testing.T) {
 }
 
 func TestVec2_Mul(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Mul(test.f)
 		if !c.ApproxEqualThreshold(&test.mul, 1e-4) {
@@ -568,6 +602,7 @@ func TestVec2_Mul(t *testing.T) {
 }
 
 func TestVec2_MulOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		var c Vec2
 		c.MulOf(test.f, &test.v1)
@@ -578,6 +613,7 @@ func TestVec2_MulOf(t *testing.T) {
 }
 
 func TestVec2_MulWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.MulWith(test.f)
@@ -588,6 +624,7 @@ func TestVec2_MulWith(t *testing.T) {
 }
 
 func TestVec3_Mul(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Mul(test.f)
 		if !c.ApproxEqualThreshold(&test.mul, 1e-4) {
@@ -597,6 +634,7 @@ func TestVec3_Mul(t *testing.T) {
 }
 
 func TestVec3_MulOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		var c Vec3
 		c.MulOf(test.f, &test.v1)
@@ -607,6 +645,7 @@ func TestVec3_MulOf(t *testing.T) {
 }
 
 func TestVec3_MulWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.MulWith(test.f)
@@ -617,6 +656,7 @@ func TestVec3_MulWith(t *testing.T) {
 }
 
 func TestVec4_Mul(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Mul(test.f)
 		if !c.ApproxEqualThreshold(&test.mul, 1e-4) {
@@ -626,6 +666,7 @@ func TestVec4_Mul(t *testing.T) {
 }
 
 func TestVec4_MulOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		var c Vec4
 		c.MulOf(test.f, &test.v1)
@@ -636,6 +677,7 @@ func TestVec4_MulOf(t *testing.T) {
 }
 
 func TestVec4_MulWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.MulWith(test.f)
@@ -646,6 +688,7 @@ func TestVec4_MulWith(t *testing.T) {
 }
 
 func TestVec2_ComponentProduct(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.ComponentProduct(&test.v2)
 		if !c.ApproxEqualThreshold(&test.component, 1e-4) {
@@ -655,6 +698,7 @@ func TestVec2_ComponentProduct(t *testing.T) {
 }
 
 func TestVec2_ComponentProductOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		var c Vec2
 		c.ComponentProductOf(&test.v1, &test.v2)
@@ -665,6 +709,7 @@ func TestVec2_ComponentProductOf(t *testing.T) {
 }
 
 func TestVec2_ComponentProductWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.ComponentProductWith(&test.v2)
@@ -675,6 +720,7 @@ func TestVec2_ComponentProductWith(t *testing.T) {
 }
 
 func TestVec3_ComponentProduct(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.ComponentProduct(&test.v2)
 		if !c.ApproxEqualThreshold(&test.component, 1e-4) {
@@ -684,6 +730,7 @@ func TestVec3_ComponentProduct(t *testing.T) {
 }
 
 func TestVec3_ComponentProductOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		var c Vec3
 		c.ComponentProductOf(&test.v1, &test.v2)
@@ -694,6 +741,7 @@ func TestVec3_ComponentProductOf(t *testing.T) {
 }
 
 func TestVec3_ComponentProductWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.ComponentProductWith(&test.v2)
@@ -704,6 +752,7 @@ func TestVec3_ComponentProductWith(t *testing.T) {
 }
 
 func TestVec4_ComponentProduct(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.ComponentProduct(&test.v2)
 		if !c.ApproxEqualThreshold(&test.component, 1e-4) {
@@ -713,6 +762,7 @@ func TestVec4_ComponentProduct(t *testing.T) {
 }
 
 func TestVec4_ComponentProductOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		var c Vec4
 		c.ComponentProductOf(&test.v1, &test.v2)
@@ -723,6 +773,7 @@ func TestVec4_ComponentProductOf(t *testing.T) {
 }
 
 func TestVec4_ComponentProductWith(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.ComponentProductWith(&test.v2)
@@ -735,6 +786,7 @@ func TestVec4_ComponentProductWith(t *testing.T) {
 ////////////////////////////////////////////////////////////////////////////////////
 
 func TestVec2_Dot(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Dot(&test.v2)
 		if !FloatEqualThreshold(c, test.dot, 1e-4) {
@@ -744,6 +796,7 @@ func TestVec2_Dot(t *testing.T) {
 }
 
 func TestVec3_Dot(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Dot(&test.v2)
 		if !FloatEqualThreshold(c, test.dot, 1e-4) {
@@ -753,6 +806,7 @@ func TestVec3_Dot(t *testing.T) {
 }
 
 func TestVec4_Dot(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Dot(&test.v2)
 		if !FloatEqualThreshold(c, test.dot, 1e-4) {
@@ -762,6 +816,7 @@ func TestVec4_Dot(t *testing.T) {
 }
 
 func TestVec2_Dotf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Dotf(test.v2[0], test.v2[1])
 		if !FloatEqualThreshold(c, test.dot, 1e-4) {
@@ -771,6 +826,7 @@ func TestVec2_Dotf(t *testing.T) {
 }
 
 func TestVec3_Dotf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Dotf(test.v2[0], test.v2[1], test.v2[2])
 		if !FloatEqualThreshold(c, test.dot, 1e-4) {
@@ -780,6 +836,7 @@ func TestVec3_Dotf(t *testing.T) {
 }
 
 func TestVec4_Dotf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Dotf(test.v2[0], test.v2[1], test.v2[2], test.v2[3])
 		if !FloatEqualThreshold(c, test.dot, 1e-4) {
@@ -789,6 +846,7 @@ func TestVec4_Dotf(t *testing.T) {
 }
 
 func TestVec2_Len(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Len()
 		if !FloatEqualThreshold(c, test.len, 1e-4) {
@@ -798,6 +856,7 @@ func TestVec2_Len(t *testing.T) {
 }
 
 func TestVec3_Len(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Len()
 		if !FloatEqualThreshold(c, test.len, 1e-4) {
@@ -807,6 +866,7 @@ func TestVec3_Len(t *testing.T) {
 }
 
 func TestVec4_Len(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Len()
 		if !FloatEqualThreshold(c, test.len, 1e-4) {
@@ -816,6 +876,7 @@ func TestVec4_Len(t *testing.T) {
 }
 
 func TestVec2_Len2(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Len2()
 		if !FloatEqualThreshold(c, test.len*test.len, 1e-4) {
@@ -825,6 +886,7 @@ func TestVec2_Len2(t *testing.T) {
 }
 
 func TestVec3_Len2(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Len2()
 		if !FloatEqualThreshold(c, test.len*test.len, 1e-4) {
@@ -834,6 +896,7 @@ func TestVec3_Len2(t *testing.T) {
 }
 
 func TestVec4_Len2(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Len2()
 		if !FloatEqualThreshold(c, test.len*test.len, 1e-4) {
@@ -843,6 +906,7 @@ func TestVec4_Len2(t *testing.T) {
 }
 
 func TestVec2_Inverse(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Inverse()
 		if !c.ApproxEqualThreshold(&test.invert, 1e-4) {
@@ -852,6 +916,7 @@ func TestVec2_Inverse(t *testing.T) {
 }
 
 func TestVec3_Inverse(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Inverse()
 		if !c.ApproxEqualThreshold(&test.invert, 1e-4) {
@@ -861,6 +926,7 @@ func TestVec3_Inverse(t *testing.T) {
 }
 
 func TestVec4_Inverse(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Inverse()
 		if !c.ApproxEqualThreshold(&test.invert, 1e-4) {
@@ -870,6 +936,7 @@ func TestVec4_Inverse(t *testing.T) {
 }
 
 func TestVec2_Invert(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.Invert()
@@ -880,6 +947,7 @@ func TestVec2_Invert(t *testing.T) {
 }
 
 func TestVec3_Invert(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.Invert()
@@ -890,6 +958,7 @@ func TestVec3_Invert(t *testing.T) {
 }
 
 func TestVec4_Invert(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.Invert()
@@ -900,6 +969,7 @@ func TestVec4_Invert(t *testing.T) {
 }
 
 func TestVec2_Zero(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.Zero()
@@ -910,6 +980,7 @@ func TestVec2_Zero(t *testing.T) {
 }
 
 func TestVec3_Zero(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.Zero()
@@ -920,6 +991,7 @@ func TestVec3_Zero(t *testing.T) {
 }
 
 func TestVec4_Zero(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.Zero()
@@ -930,6 +1002,7 @@ func TestVec4_Zero(t *testing.T) {
 }
 
 func TestVec2_Normalized(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1.Normalized()
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -939,6 +1012,7 @@ func TestVec2_Normalized(t *testing.T) {
 }
 
 func TestVec2_Normalize(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := test.v1
 		c.Normalize()
@@ -949,6 +1023,7 @@ func TestVec2_Normalize(t *testing.T) {
 }
 
 func TestVec3_Normalized(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1.Normalized()
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -958,6 +1033,7 @@ func TestVec3_Normalized(t *testing.T) {
 }
 
 func TestVec3_Normalize(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := test.v1
 		c.Normalize()
@@ -968,6 +1044,7 @@ func TestVec3_Normalize(t *testing.T) {
 }
 
 func TestVec4_Normalized(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1.Normalized()
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -977,6 +1054,7 @@ func TestVec4_Normalized(t *testing.T) {
 }
 
 func TestVec4_Normalize(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := test.v1
 		c.Normalize()
@@ -987,6 +1065,7 @@ func TestVec4_Normalize(t *testing.T) {
 }
 
 func TestVec2_AddScaled(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		tmp := test.v2.Mul(test.f)
 		tmp.AddWith(&test.v1)
@@ -999,6 +1078,7 @@ func TestVec2_AddScaled(t *testing.T) {
 }
 
 func TestVec3_AddScaled(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		tmp := test.v2.Mul(test.f)
 		tmp.AddWith(&test.v1)
@@ -1011,6 +1091,7 @@ func TestVec3_AddScaled(t *testing.T) {
 }
 
 func TestVec4_AddScaled(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		tmp := test.v2.Mul(test.f)
 		tmp.AddWith(&test.v1)
@@ -1023,6 +1104,7 @@ func TestVec4_AddScaled(t *testing.T) {
 }
 
 func TestNormalizeVec2(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		c := NormalizeVec2(test.v1)
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -1032,6 +1114,7 @@ func TestNormalizeVec2(t *testing.T) {
 }
 
 func TestNormalizeVec3(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		c := NormalizeVec3(test.v1)
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -1041,6 +1124,7 @@ func TestNormalizeVec3(t *testing.T) {
 }
 
 func TestNormalizeVec4(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		c := NormalizeVec4(test.v1)
 		if !c.ApproxEqualThreshold(&test.normal, 1e-4) {
@@ -1050,6 +1134,7 @@ func TestNormalizeVec4(t *testing.T) {
 }
 
 func TestVec2_SetNormalizeOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec2Tests {
 		var c Vec2
 		c.SetNormalizeOf(&test.v1)
@@ -1060,6 +1145,7 @@ func TestVec2_SetNormalizeOf(t *testing.T) {
 }
 
 func TestVec3_SetNormalizeOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec3Tests {
 		var c Vec3
 		c.SetNormalizeOf(&test.v1)
@@ -1070,6 +1156,7 @@ func TestVec3_SetNormalizeOf(t *testing.T) {
 }
 
 func TestVec4_SetNormalizeOf(t *testing.T) {
+	t.Parallel()
 	for _, test := range vec4Tests {
 		var c Vec4
 		c.SetNormalizeOf(&test.v1)

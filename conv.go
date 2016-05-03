@@ -28,7 +28,7 @@ func SphericalToCartesian(r, theta, phi float32) Vec3 {
 	st, ct := math.Sincos(theta)
 	sp, cp := math.Sincos(phi)
 
-	return Vec3{r * float32(st*cp), r * float32(st*sp), r * float32(ct)}
+	return Vec3{r * st * cp, r * st * sp, r * ct}
 }
 
 // SphericalToCylindrical converts spherical coordinates with radius r,
