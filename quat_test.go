@@ -1,8 +1,7 @@
 package glm
 
 import (
-	math32 "github.com/luxengine/math"
-	"math"
+	"github.com/luxengine/math"
 	"math/rand"
 	"testing"
 	"time"
@@ -64,8 +63,8 @@ func TestQuatRotateOffAxis(t *testing.T) {
 	vector := Vec3{0, 1, 0}
 	rotatedVector := i1.Rotate(&vector)
 
-	s, c := math.Sincos(float64(angleRads))
-	answer := Vec3{0, float32(c), float32(s)}
+	s, c := math.Sincos(angleRads)
+	answer := Vec3{0, c, s}
 
 	if !FloatEqualThreshold(rotatedVector[0], answer[0], 1e-4) {
 		t.Errorf("Rotation of vector does not yield answer")
@@ -126,13 +125,13 @@ func TestAnglesToQuatZYX(t *testing.T) {
 func TestQuatMatRotateY(t *testing.T) {
 	t.Parallel()
 
-	q := QuatRotate(float32(math.Pi), &Vec3{0, 1, 0})
+	q := QuatRotate(math.Pi, &Vec3{0, 1, 0})
 	q.Normalize()
 	v := Vec3{1, 0, 0}
 
 	result := q.Rotate(&v)
 
-	r := Rotate3DY(float32(math.Pi))
+	r := Rotate3DY(math.Pi)
 	expected := r.Mul3x1(&v)
 	t.Logf("Computed from rotation matrix: %v", expected)
 	if !result.ApproxEqualThreshold(&expected, 1e-4) {
@@ -271,7 +270,7 @@ func TestMat4ToQuat(t *testing.T) {
 		},
 	}
 
-	threshold := float32(math.Pow(10, -2))
+	threshold := math.Pow(10, -2)
 	for _, c := range tests {
 		if r := Mat4ToQuat(c.Rotation); !r.ApproxEqualThreshold(c.Expected, threshold) {
 			t.Errorf("%v failed: Mat4ToQuat(%v) != %v (got %v)", c.Description, c.Rotation, c.Expected, r)
@@ -315,7 +314,7 @@ func TestQuatRotate(t *testing.T) {
 		},
 	}
 
-	threshold := float32(math.Pow(10, -2))
+	threshold := math.Pow(10, -2)
 	for _, c := range tests {
 		if r := QuatRotate(c.Angle, c.Axis); !r.OrientationEqualThreshold(c.Expected, threshold) {
 			t.Errorf("%v failed: QuatRotate(%v, %v) != %v (got %v)", c.Description, c.Angle, c.Axis, c.Expected, r)
@@ -369,7 +368,7 @@ func TestQuatLookAtV(t *testing.T) {
 		},
 	}
 
-	threshold := float32(math.Pow(10, -2))
+	threshold := math.Pow(10, -2)
 	for _, c := range tests {
 		if r := QuatLookAtV(c.Eye, c.Center, c.Up); !r.OrientationEqualThreshold(c.Expected, threshold) {
 			t.Errorf("%v failed: QuatLookAtV(%v, %v, %v) != %v (got %v)", c.Description, c.Eye, c.Center, c.Up, c.Expected, r)
@@ -485,7 +484,7 @@ func TestCompareLookAt(t *testing.T) {
 		},
 	}
 
-	threshold := float32(math.Pow(10, -2))
+	threshold := math.Pow(10, -2)
 	for _, c := range tests {
 		m := LookAtV(c.Eye, c.Center, c.Up)
 		q := QuatLookAtV(c.Eye, c.Center, c.Up)
@@ -537,7 +536,7 @@ func TestQuatMatConversion(t *testing.T) {
 		q1 := Mat4ToQuat(&m1)
 		q2 := QuatRotate(c.Angle, c.Axis)
 
-		if !FloatEqualThreshold(math32.Abs(q1.Dot(&q2)), 1, 1e-4) {
+		if !FloatEqualThreshold(math.Abs(q1.Dot(&q2)), 1, 1e-4) {
 			t.Errorf("Quaternions for %v %v do not match:\n%v\n%v", RadToDeg(c.Angle), c.Axis, q1, q2)
 		}
 	}
@@ -670,8 +669,8 @@ func TestQuatLen(t *testing.T) {
 		{Quat{0, Vec3{1, 0, 0}}, 1},
 		{Quat{0, Vec3{0.0000000000001, 0, 0}}, 0},
 		{Quat{0, Vec3{MaxValue, 1, 0}}, InfPos},
-		{Quat{4, Vec3{1, 2, 3}}, float32(math.Sqrt(1*1 + 2*2 + 3*3 + 4*4))},
-		{Quat{0, Vec3{3.1, 4.2, 1.3}}, float32(math.Sqrt(3.1*3.1 + 4.2*4.2 + 1.3*1.3))},
+		{Quat{4, Vec3{1, 2, 3}}, math.Sqrt(1*1 + 2*2 + 3*3 + 4*4)},
+		{Quat{0, Vec3{3.1, 4.2, 1.3}}, math.Sqrt(3.1*3.1 + 4.2*4.2 + 1.3*1.3)},
 	}
 
 	for _, c := range tests {
@@ -852,7 +851,7 @@ var quatTests = []struct {
 		mul:    Quat{W: -28, V: Vec3{4, 6, 8}},
 		scale:  Quat{W: 2, V: Vec3{4, 6, 8}},
 		conj:   Quat{W: 1, V: Vec3{-2, -3, -4}},
-		normal: Quat{W: float32(1.0 / math.Sqrt(30.0)), V: Vec3{float32(math.Sqrt(2.0 / 15.0)), float32(math.Sqrt(3.0 / 10.0)), float32(2.0 * math.Sqrt(2.0/15.0))}},
+		normal: Quat{W: 1.0 / math.Sqrt(30.0), V: Vec3{math.Sqrt(2.0 / 15.0), math.Sqrt(3.0 / 10.0), float32(2.0 * math.Sqrt(2.0/15.0))}},
 		inv:    Quat{W: 1.0 / 30.0, V: Vec3{-1.0 / 15.0, -1.0 / 10.0, -2.0 / 15.0}},
 		svec:   Quat{W: -15, V: Vec3{10, -5, 10}},
 		v1:     Vec3{3, 2, 1},

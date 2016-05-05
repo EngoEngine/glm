@@ -2,7 +2,6 @@ package glm
 
 import (
 	"github.com/luxengine/math"
-	math64 "math"
 )
 
 // RotationOrder is the order in which
@@ -476,12 +475,12 @@ func QuatNlerp(q1, q2 *Quat, amount float32) Quat {
 // Based off the code for the Matlab function "angle2quat", though this
 // implementation only supports 3 single angles as opposed to multiple angles.
 func AnglesToQuat(angle1, angle2, angle3 float32, order RotationOrder) Quat {
-	var s [3]float64
-	var c [3]float64
+	var s [3]float32
+	var c [3]float32
 
-	s[0], c[0] = math64.Sincos(float64(angle1 / 2))
-	s[1], c[1] = math64.Sincos(float64(angle2 / 2))
-	s[2], c[2] = math64.Sincos(float64(angle3 / 2))
+	s[0], c[0] = math.Sincos(angle1 / 2)
+	s[1], c[1] = math.Sincos(angle2 / 2)
+	s[2], c[2] = math.Sincos(angle3 / 2)
 
 	ret := Quat{}
 	switch order {

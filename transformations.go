@@ -37,7 +37,7 @@ func Rotate3DX(angle float32) Mat3 {
 // Where c is cos(angle) and s is sin(angle)
 //    [c 0 s]
 //    [0 1 0]
-//    [s 0 c ]
+//    [s 0 c]
 func Rotate3DY(angle float32) Mat3 {
 	sin, cos := math.Sincos(angle)
 	return Mat3{
@@ -250,11 +250,7 @@ func ExtractMaxScale(m *Mat4) float32 {
 func Mat4Normal(m *Mat4) Mat3 {
 	n := m.Inverse()
 	n.Transpose()
-	return Mat3{
-		n[0], n[1], n[2],
-		n[4], n[5], n[6],
-		n[8], n[9], n[10],
-	}
+	return n.Mat3()
 }
 
 // TransformCoordinate multiplies a 3D vector by a transformation given by the

@@ -1,8 +1,7 @@
 package glm
 
 import (
-	math32 "github.com/luxengine/math"
-	"math"
+	"github.com/luxengine/math"
 )
 
 // Epsilon is some tiny value that determines how precisely equal we want our
@@ -59,13 +58,13 @@ func FloatEqualThreshold(a, b, epsilon float32) bool {
 		return true
 	}
 
-	diff := math32.Abs(a - b)
+	diff := math.Abs(a - b)
 	if a*b == 0 || diff < MinNormal { // If a or b are 0 or both are extremely close to it
 		return diff < epsilon*epsilon
 	}
 
 	// Else compare difference
-	return diff/(math32.Abs(a)+math32.Abs(b)) < epsilon
+	return diff/(math.Abs(a)+math.Abs(b)) < epsilon
 }
 
 // Clamp takes in a value and two thresholds. If the value is smaller than the
@@ -117,9 +116,9 @@ func SetMax(a, b *float32) {
 // values (23.5) are always rounded up (24).
 func Round(v float32, precision int) float32 {
 	p := float32(precision)
-	t := v * math32.Pow(10, p)
+	t := v * math.Pow(10, p)
 	if t > 0 {
-		return math32.Floor(t+0.5) / math32.Pow(10, p)
+		return math.Floor(t+0.5) / math.Pow(10, p)
 	}
-	return math32.Ceil(t-0.5) / math32.Pow(10, p)
+	return math.Ceil(t-0.5) / math.Pow(10, p)
 }
