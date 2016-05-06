@@ -1165,3 +1165,110 @@ func TestVec4_SetNormalizeOf(t *testing.T) {
 		}
 	}
 }
+
+func TestScalarTripleProduct(t *testing.T) {
+	tests := []struct {
+		v0, v1, v2 Vec3
+		out        float32
+	}{
+		{
+			v0:  Vec3{-2, 3, 1},
+			v1:  Vec3{0, 4, 0},
+			v2:  Vec3{-1, 3, 3},
+			out: -20,
+		},
+	}
+	for i, test := range tests {
+		if stp := ScalarTripleProduct(&test.v0, &test.v1, &test.v2); !FloatEqual(stp, test.out) {
+			t.Errorf("[%d] stp(%s, %s, %s) = %f, want %f", i, test.v0.String(), test.v1.String(), test.v2.String(), stp, test.out)
+		}
+	}
+}
+
+var perpcases = []struct {
+	in, out Vec2
+}{
+	{
+		in:  Vec2{0, 1},
+		out: Vec2{-1, 0},
+	},
+	{
+		in:  Vec2{3, 4},
+		out: Vec2{-4, 3},
+	},
+
+	{
+		in:  Vec2{3, -4},
+		out: Vec2{4, 3},
+	},
+	{
+		in:  Vec2{-3, -4},
+		out: Vec2{4, -3},
+	},
+	{
+		in:  Vec2{-3, 4},
+		out: Vec2{-4, -3},
+	},
+}
+
+func TestPerp(t *testing.T) {
+	for i, test := range perpcases {
+		if perp := test.in.Perp(); !perp.ApproxEqual(&test.out) {
+			t.Errorf("[%d] Perp(%s) = %s, want %s", i, test.in.String(), perp.String(), test.out.String())
+		}
+	}
+}
+
+func TestSetPerp(t *testing.T) {
+	for i, test := range perpcases {
+		perp := test.in
+		perp.SetPerp()
+		if !perp.ApproxEqual(&test.out) {
+			t.Errorf("[%d] (%s).SetPerp() = %s, want %s", i, test.in.String(), perp.String(), test.out.String())
+		}
+	}
+}
+
+func TestPseudoCross(t *testing.T) {
+	tests := []struct {
+		v0, v1 Vec2
+		out    float32
+	}{
+		{ // https://www.wolframalpha.com/input/?i=%7B1,0%7D+cross+%7B0,0%7D
+			v0:  Vec2{1, 0},
+			v1:  Vec2{0, 0},
+			out: 0,
+		},
+		{ // https://www.wolframalpha.com/input/?i=%7B1,0.5%7D+cross+%7B0.5,1%7D
+			v0:  Vec2{1, 0.5},
+			v1:  Vec2{0.5, 1},
+			out: 0.75,
+		},
+		{ // https://www.wolframalpha.com/input/?i=%7B10,0.5%7D+cross+%7B0.5,0.1%7D
+			v0:  Vec2{10, 0.5},
+			v1:  Vec2{0.5, 0.1},
+			out: 0.75,
+		},
+		{ // https://www.wolframalpha.com/input/?i=%7B13,0.3%7D+cross+%7B0.6,0.07%7D
+			v0:  Vec2{13, 0.3},
+			v1:  Vec2{0.6, 0.07},
+			out: 0.73,
+		},
+		{ // https://www.wolframalpha.com/input/?i=%7B-13,0.3%7D+cross+%7B0.6,0.07%7D
+			v0:  Vec2{-13, 0.3},
+			v1:  Vec2{0.6, 0.07},
+			out: -1.09,
+		},
+		{ // https://www.wolframalpha.com/input/?i=%7B-13,0.3%7D+cross+%7B-0.6,0.07%7D
+			v0:  Vec2{-13, 0.3},
+			v1:  Vec2{-0.6, 0.07},
+			out: -0.73,
+		},
+	}
+
+	for i, test := range tests {
+		if c := test.v0.Cross(&test.v1); !FloatEqual(c, test.out) {
+			t.Errorf("[%d] Cross(%s, %s) = %f, want %f", i, test.v0.String(), test.v1.String(), c, test.out)
+		}
+	}
+}

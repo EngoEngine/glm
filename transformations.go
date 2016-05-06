@@ -141,10 +141,12 @@ func HomogRotate3DZ(angle float32) Mat4 {
 }
 
 // Scale3D creates a homogeneous 3D scaling matrix.
-// [[ scaleX, 0     , 0     , 0 ]]
-// [[ 0     , scaleY, 0     , 0 ]]
-// [[ 0     , 0     , scaleZ, 0 ]]
-// [[ 0     , 0     , 0     , 1 ]]
+// [scaleX 0      0      0]
+// [0      scaleY 0      0]
+// [0      0      scaleZ 0]
+// [0      0      0      1]
+//
+// https://en.wikipedia.org/wiki/Scaling_(geometry)
 func Scale3D(scaleX, scaleY, scaleZ float32) Mat4 {
 	return Mat4{
 		scaleX, 0, 0, 0,
@@ -155,60 +157,16 @@ func Scale3D(scaleX, scaleY, scaleZ float32) Mat4 {
 }
 
 // Scale2D creates a homogeneous 2D scaling matrix.
-// [[ scaleX, 0     , 0 ]]
-// [[ 0     , scaleY, 0 ]]
-// [[ 0     , 0     , 1 ]]
+// [scaleX 0      0]
+// [0      scaleY 0]
+// [0      0      1]
+//
+// https://en.wikipedia.org/wiki/Scaling_(geometry)
 func Scale2D(scaleX, scaleY float32) Mat3 {
 	return Mat3{
 		scaleX, 0, 0,
 		0, scaleY, 0,
 		0, 0, 1,
-	}
-}
-
-// ShearX2D creates a homogeneous 2D shear matrix along the X-axis.
-func ShearX2D(shear float32) Mat3 {
-	return Mat3{1, 0, 0,
-		shear, 1, 0,
-		0, 0, 1,
-	}
-}
-
-// ShearY2D creates a homogeneous 2D shear matrix along the Y-axis.
-func ShearY2D(shear float32) Mat3 {
-	return Mat3{
-		1, shear, 0,
-		0, 1, 0,
-		0, 0, 1,
-	}
-}
-
-// ShearX3D creates a homogeneous 3D shear matrix along the X-axis.
-func ShearX3D(shearY, shearZ float32) Mat4 {
-	return Mat4{1, shearY, shearZ, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	}
-}
-
-// ShearY3D creates a homogeneous 3D shear matrix along the Y-axis
-func ShearY3D(shearX, shearZ float32) Mat4 {
-	return Mat4{
-		1, 0, 0, 0,
-		shearX, 1, shearZ, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	}
-}
-
-// ShearZ3D creates a homogeneous 3D shear matrix along the Z-axis
-func ShearZ3D(shearX, shearY float32) Mat4 {
-	return Mat4{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		shearX, shearY, 1, 0,
-		0, 0, 0, 1,
 	}
 }
 

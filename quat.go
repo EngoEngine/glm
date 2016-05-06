@@ -24,10 +24,10 @@ const (
 	ZXY
 )
 
-// Quat is a Quaternion. A Quaternion is an extension of the imaginary numbers;
-// there's all sorts of interesting theory behind it. In 3D graphics we mostly
-// use it as a cheap way of representing rotation since quaternions are cheaper
-// to multiply by, and easier to interpolate than matrices.
+// Quat is a Quaternion. A Quaternion is an extension of the imaginary numbers.
+// In 3D graphics we mostly use it as a cheap way of representing rotation since
+// quaternions are cheaper to multiply by, and easier to interpolate than
+// matrices.
 //
 // A Quaternion has two parts: W, the so-called scalar component,
 // and "V", the vector component. The vector component is considered to
@@ -50,7 +50,7 @@ func QuatIdent() Quat {
 //
 // This is cheaper than HomogRotate3D.
 func QuatRotate(angle float32, axis *Vec3) Quat {
-	s, c := math.Sin(angle/2), math.Cos(angle/2)
+	s, c := math.Sin(angle*0.5), math.Cos(angle*0.5)
 	return Quat{c, axis.Mul(s)}
 }
 
@@ -61,17 +61,17 @@ func (q1 *Quat) Iden() {
 }
 
 // X is a convenient alias for q.V[0]
-func (q1 Quat) X() float32 {
+func (q1 *Quat) X() float32 {
 	return q1.V[0]
 }
 
 // Y is a convenient alias for q.V[1]
-func (q1 Quat) Y() float32 {
+func (q1 *Quat) Y() float32 {
 	return q1.V[1]
 }
 
 // Z is a convenient alias for q.V[2]
-func (q1 Quat) Z() float32 {
+func (q1 *Quat) Z() float32 {
 	return q1.V[2]
 }
 
@@ -198,8 +198,6 @@ func (q1 *Quat) Norm() float32 {
 }
 
 // Normalized Normalizes the quaternion, returning its versor (unit quaternion).
-//
-// This is the same as normalizing it as a Vec4.
 func (q1 *Quat) Normalized() Quat {
 	length := q1.Len()
 
@@ -220,8 +218,6 @@ func (q1 *Quat) Normalized() Quat {
 
 // SetNormalizedOf Normalizes the quaternion, returning its versor (unit
 // quaternion).
-//
-// This is the same as normalizing it as a Vec4.
 func (q1 *Quat) SetNormalizedOf(q2 *Quat) {
 	length := q2.Len()
 
@@ -246,8 +242,6 @@ func (q1 *Quat) SetNormalizedOf(q2 *Quat) {
 }
 
 // Normalize Normalizes the quaternion in place.
-//
-// This is the same as normalizing it as a Vec4.
 func (q1 *Quat) Normalize() {
 	length := q1.Len()
 
@@ -332,7 +326,7 @@ func (q1 *Quat) Rotate(v *Vec3) Vec3 {
 //}
 
 // AddScaledVec takes an input vector and scaled it by f then adds that rotation
-// to q1. Mostly used by tornago.
+// to q1.
 func (q1 *Quat) AddScaledVec(f float32, v1 *Vec3) {
 	q2 := Quat{0, Vec3{v1[0] * f, v1[1] * f, v1[2] * f}}
 	q2.MulWith(q1)
@@ -365,8 +359,7 @@ func (q1 *Quat) Mat3() Mat3 {
 	}
 }
 
-// Dot returns the dot product between two quaternions, equivalent to if this
-// was a Vec4.
+// Dot returns the dot product between two quaternions.
 func (q1 *Quat) Dot(q2 *Quat) float32 {
 	return q1.W*q2.W + q1.V[0]*q2.V[0] + q1.V[1]*q2.V[1] + q1.V[2]*q2.V[2]
 }
@@ -416,18 +409,17 @@ func (q1 *Quat) OrientationEqualThreshold(q2 *Quat, epsilon float32) bool {
 // However, it's expensive and QuatSlerp(q1,q2) is not the same as
 // QuatSlerp(q2,q1)
 func QuatSlerp(q1, q2 *Quat, amount float32) Quat {
+	const epsilon = 0.9995
 	n1, n2 := q1.Normalized(), q2.Normalized()
 	dot := n1.Dot(&n2)
 
 	// If the inputs are too close for comfort, linearly interpolate and
 	// normalize the result.
-	if dot > 0.9995 {
+	if dot > epsilon {
 		return QuatNlerp(&n1, &n2, amount)
 	}
 
-	// This is here for precision errors, I'm perfectly aware that *technically*
-	// the dot is bound [-1,1], but since Acos will freak out if it's not (even
-	// if it's just a little bit over due to normal error) we need to clamp it.
+	// This is here for precision errors.
 	dot = Clamp(dot, -1, 1)
 
 	theta := math.Acos(dot) * amount
@@ -441,8 +433,7 @@ func QuatSlerp(q1, q2 *Quat, amount float32) Quat {
 	return n1c.Add(&rel)
 }
 
-// QuatLerp is *L*inear Int*erp*olation between two Quaternions, cheap and
-// simple.
+// QuatLerp is *L*inear Int*erp*olation between two Quaternions.
 func QuatLerp(q1, q2 *Quat, amount float32) Quat {
 	//q1.Add(                        )
 	//       q2.Sub(  )
@@ -471,10 +462,10 @@ func QuatNlerp(q1, q2 *Quat, amount float32) Quat {
 // The rotation "order" is more of an axis descriptor. For instance XZX would
 // tell the function to interpret angle1 as a rotation about the X axis, angle2
 // about the Z axis, and angle3 about the X axis again.
-//
-// Based off the code for the Matlab function "angle2quat", though this
-// implementation only supports 3 single angles as opposed to multiple angles.
 func AnglesToQuat(angle1, angle2, angle3 float32, order RotationOrder) Quat {
+	// Based off the code for the Matlab function "angle2quat", though this
+	// implementation only supports 3 single angles as opposed to multiple
+	// angles.
 	var s [3]float32
 	var c [3]float32
 
@@ -482,79 +473,79 @@ func AnglesToQuat(angle1, angle2, angle3 float32, order RotationOrder) Quat {
 	s[1], c[1] = math.Sincos(angle2 / 2)
 	s[2], c[2] = math.Sincos(angle3 / 2)
 
-	ret := Quat{}
+	var ret Quat
 	switch order {
 	case ZYX:
-		ret.W = float32(c[0]*c[1]*c[2] + s[0]*s[1]*s[2])
-		ret.V = Vec3{float32(c[0]*c[1]*s[2] - s[0]*s[1]*c[2]),
-			float32(c[0]*s[1]*c[2] + s[0]*c[1]*s[2]),
-			float32(s[0]*c[1]*c[2] - c[0]*s[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] + s[0]*s[1]*s[2]
+		ret.V = Vec3{c[0]*c[1]*s[2] - s[0]*s[1]*c[2],
+			c[0]*s[1]*c[2] + s[0]*c[1]*s[2],
+			s[0]*c[1]*c[2] - c[0]*s[1]*s[2],
 		}
 	case ZYZ:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*c[1]*s[2])
-		ret.V = Vec3{float32(c[0]*s[1]*s[2] - s[0]*s[1]*c[2]),
-			float32(c[0]*s[1]*c[2] + s[0]*s[1]*s[2]),
-			float32(s[0]*c[1]*c[2] + c[0]*c[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*c[1]*s[2]
+		ret.V = Vec3{c[0]*s[1]*s[2] - s[0]*s[1]*c[2],
+			c[0]*s[1]*c[2] + s[0]*s[1]*s[2],
+			s[0]*c[1]*c[2] + c[0]*c[1]*s[2],
 		}
 	case ZXY:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*s[1]*s[2])
-		ret.V = Vec3{float32(c[0]*s[1]*c[2] - s[0]*c[1]*s[2]),
-			float32(c[0]*c[1]*s[2] + s[0]*s[1]*c[2]),
-			float32(c[0]*s[1]*s[2] + s[0]*c[1]*c[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*s[1]*s[2]
+		ret.V = Vec3{c[0]*s[1]*c[2] - s[0]*c[1]*s[2],
+			c[0]*c[1]*s[2] + s[0]*s[1]*c[2],
+			c[0]*s[1]*s[2] + s[0]*c[1]*c[2],
 		}
 	case ZXZ:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*c[1]*s[2])
-		ret.V = Vec3{float32(c[0]*s[1]*c[2] + s[0]*s[1]*s[2]),
-			float32(s[0]*s[1]*c[2] - c[0]*s[1]*s[2]),
-			float32(c[0]*c[1]*s[2] + s[0]*c[1]*c[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*c[1]*s[2]
+		ret.V = Vec3{c[0]*s[1]*c[2] + s[0]*s[1]*s[2],
+			s[0]*s[1]*c[2] - c[0]*s[1]*s[2],
+			c[0]*c[1]*s[2] + s[0]*c[1]*c[2],
 		}
 	case YXZ:
-		ret.W = float32(c[0]*c[1]*c[2] + s[0]*s[1]*s[2])
-		ret.V = Vec3{float32(c[0]*s[1]*c[2] + s[0]*c[1]*s[2]),
-			float32(s[0]*c[1]*c[2] - c[0]*s[1]*s[2]),
-			float32(c[0]*c[1]*s[2] - s[0]*s[1]*c[2]),
+		ret.W = c[0]*c[1]*c[2] + s[0]*s[1]*s[2]
+		ret.V = Vec3{c[0]*s[1]*c[2] + s[0]*c[1]*s[2],
+			s[0]*c[1]*c[2] - c[0]*s[1]*s[2],
+			c[0]*c[1]*s[2] - s[0]*s[1]*c[2],
 		}
 	case YXY:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*c[1]*s[2])
-		ret.V = Vec3{float32(c[0]*s[1]*c[2] + s[0]*s[1]*s[2]),
-			float32(s[0]*c[1]*c[2] + c[0]*c[1]*s[2]),
-			float32(c[0]*s[1]*s[2] - s[0]*s[1]*c[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*c[1]*s[2]
+		ret.V = Vec3{c[0]*s[1]*c[2] + s[0]*s[1]*s[2],
+			s[0]*c[1]*c[2] + c[0]*c[1]*s[2],
+			c[0]*s[1]*s[2] - s[0]*s[1]*c[2],
 		}
 	case YZX:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*s[1]*s[2])
-		ret.V = Vec3{float32(c[0]*c[1]*s[2] + s[0]*s[1]*c[2]),
-			float32(c[0]*s[1]*s[2] + s[0]*c[1]*c[2]),
-			float32(c[0]*s[1]*c[2] - s[0]*c[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*s[1]*s[2]
+		ret.V = Vec3{c[0]*c[1]*s[2] + s[0]*s[1]*c[2],
+			c[0]*s[1]*s[2] + s[0]*c[1]*c[2],
+			c[0]*s[1]*c[2] - s[0]*c[1]*s[2],
 		}
 	case YZY:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*c[1]*s[2])
-		ret.V = Vec3{float32(s[0]*s[1]*c[2] - c[0]*s[1]*s[2]),
-			float32(c[0]*c[1]*s[2] + s[0]*c[1]*c[2]),
-			float32(c[0]*s[1]*c[2] + s[0]*s[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*c[1]*s[2]
+		ret.V = Vec3{s[0]*s[1]*c[2] - c[0]*s[1]*s[2],
+			c[0]*c[1]*s[2] + s[0]*c[1]*c[2],
+			c[0]*s[1]*c[2] + s[0]*s[1]*s[2],
 		}
 	case XYZ:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*s[1]*s[2])
-		ret.V = Vec3{float32(c[0]*s[1]*s[2] + s[0]*c[1]*c[2]),
-			float32(c[0]*s[1]*c[2] - s[0]*c[1]*s[2]),
-			float32(c[0]*c[1]*s[2] + s[0]*s[1]*c[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*s[1]*s[2]
+		ret.V = Vec3{c[0]*s[1]*s[2] + s[0]*c[1]*c[2],
+			c[0]*s[1]*c[2] - s[0]*c[1]*s[2],
+			c[0]*c[1]*s[2] + s[0]*s[1]*c[2],
 		}
 	case XYX:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*c[1]*s[2])
-		ret.V = Vec3{float32(c[0]*c[1]*s[2] + s[0]*c[1]*c[2]),
-			float32(c[0]*s[1]*c[2] + s[0]*s[1]*s[2]),
-			float32(s[0]*s[1]*c[2] - c[0]*s[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*c[1]*s[2]
+		ret.V = Vec3{c[0]*c[1]*s[2] + s[0]*c[1]*c[2],
+			c[0]*s[1]*c[2] + s[0]*s[1]*s[2],
+			s[0]*s[1]*c[2] - c[0]*s[1]*s[2],
 		}
 	case XZY:
-		ret.W = float32(c[0]*c[1]*c[2] + s[0]*s[1]*s[2])
-		ret.V = Vec3{float32(s[0]*c[1]*c[2] - c[0]*s[1]*s[2]),
-			float32(c[0]*c[1]*s[2] - s[0]*s[1]*c[2]),
-			float32(c[0]*s[1]*c[2] + s[0]*c[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] + s[0]*s[1]*s[2]
+		ret.V = Vec3{s[0]*c[1]*c[2] - c[0]*s[1]*s[2],
+			c[0]*c[1]*s[2] - s[0]*s[1]*c[2],
+			c[0]*s[1]*c[2] + s[0]*c[1]*s[2],
 		}
 	case XZX:
-		ret.W = float32(c[0]*c[1]*c[2] - s[0]*c[1]*s[2])
-		ret.V = Vec3{float32(c[0]*c[1]*s[2] + s[0]*c[1]*c[2]),
-			float32(c[0]*s[1]*s[2] - s[0]*s[1]*c[2]),
-			float32(c[0]*s[1]*c[2] + s[0]*s[1]*s[2]),
+		ret.W = c[0]*c[1]*c[2] - s[0]*c[1]*s[2]
+		ret.V = Vec3{c[0]*c[1]*s[2] + s[0]*c[1]*c[2],
+			c[0]*s[1]*s[2] - s[0]*s[1]*c[2],
+			c[0]*s[1]*c[2] + s[0]*s[1]*s[2],
 		}
 	default:
 		panic("Unsupported rotation order")
@@ -624,8 +615,8 @@ func QuatLookAtV(eye, center, up *Vec3) Quat {
 	cme := center.Sub(eye)
 	direction := cme.Normalized()
 
-	// Find the rotation between the front of the object (that we assume towards Z-,
-	// but this depends on your model) and the desired direction
+	// Find the rotation between the front of the object (that we assume towards
+	// Z-, but this depends on your model) and the desired direction
 	min1 := Vec3{0, 0, -1}
 	rotDir := QuatBetweenVectors(&min1, &direction)
 
@@ -634,8 +625,9 @@ func QuatLookAtV(eye, center, up *Vec3) Quat {
 	//right := direction.Cross(up)
 	//up = right.Cross(direction)
 
-	// Because of the 1rst rotation, the up is probably completely screwed up.
-	// Find the rotation between the "up" of the rotated object, and the desired up
+	// Because of the 1st rotation, the up is probably completely screwed up.
+	// Find the rotation between the "up" of the rotated object, and the desired
+	// up
 	dup := Vec3{0, 1, 0}
 	upCur := rotDir.Rotate(&dup)
 	rotUp := QuatBetweenVectors(&upCur, up)

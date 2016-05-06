@@ -1,6 +1,8 @@
 # glm ![Build Status](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/status.svg) ![Tests](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/test.svg) ![Coverage](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/cover.svg) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/luxengine/glm)
 
-More efficient version then go-gl math lib and better name (math32 is too long to type).
+VENDOR THIS IF YOU'RE USING IT. The API is not quite stable yet.
+
+More efficient version then go-gl math lib and better name (mgl32 is too long to type).
 
 The problem with go-gl implementation is that every operation returns a new matrix/quaternion/vector, you can't reuse memory. Benchmark reflect that this causes quite the slowdown. see [issue 29](https://github.com/go-gl/mathgl/issues/29). This library is a fork of mgl32 but a ton of methods we're added in order to allow the user to have more control over the memory. First, most methods take pointer argument and second there is more then 1 method to do the same operation.
 

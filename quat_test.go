@@ -10,7 +10,7 @@ import (
 func TestQuatMulIdentity(t *testing.T) {
 	t.Parallel()
 
-	i1 := &Quat{1.0, Vec3{0, 0, 0}}
+	i1 := Quat{1.0, Vec3{0, 0, 0}}
 	i2 := QuatIdent()
 	i3 := QuatIdent()
 
@@ -110,8 +110,6 @@ func TestAnglesToQuatZYX(t *testing.T) {
 	t.Parallel()
 
 	q := AnglesToQuat(.7854, 0.1, 0, ZYX)
-
-	t.Log("Calculated quaternion: ", q, "\n")
 
 	if !FloatEqualThreshold(q.W, .9227, 1e-3) {
 		t.Errorf("Quaternion W incorrect. Got: %f Expected: %f", q.W, .9227)

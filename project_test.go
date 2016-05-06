@@ -16,25 +16,13 @@ func TestProject(t *testing.T) {
 
 	if !win.ApproxEqualThreshold(answer, 1e-4) {
 		var diff Vec3
-		diff.SubOf(win, answer)
+		diff.SubOf(&win, answer)
 		t.Errorf("Project does something weird, differs from expected by of %v", diff.Len())
 	}
 
-	objr, err := UnProject(win, modelview, projection, initialX, initialY, width, height)
-	if err != nil {
-		t.Errorf("UnProject returned error: %v", err)
-	}
+	objr := UnProject(&win, modelview, projection, initialX, initialY, width, height)
 	if !objr.ApproxEqualThreshold(obj, 1e-4) {
 		t.Errorf("UnProject(%v) != %v (got %v)", win, obj, objr)
-	}
-}
-
-func TestUnprojectSingular(t *testing.T) {
-	t.Parallel()
-	if _, err := UnProject(&Vec3{}, &Mat4{}, &Mat4{}, 0, 0, 2048, 1152); err == nil {
-		t.Errorf("Did not get error from UnProject on singular matrix")
-	} else {
-		t.Logf("Successfully got error on UnProject: %v", err)
 	}
 }
 
@@ -44,22 +32,22 @@ func TestLookAtV(t *testing.T) {
 	iden := Ident4()
 	tests := []struct {
 		Description     string
-		Eye, Center, Up *Vec3
-		Expected        *Mat4
+		Eye, Center, Up Vec3
+		Expected        Mat4
 	}{
 		{
 			"forward",
-			&Vec3{0, 0, 0},
-			&Vec3{0, 0, -1},
-			&Vec3{0, 1, 0},
-			&iden,
+			Vec3{0, 0, 0},
+			Vec3{0, 0, -1},
+			Vec3{0, 1, 0},
+			iden,
 		},
 		{
 			"heading 90 degree",
-			&Vec3{0, 0, 0},
-			&Vec3{1, 0, 0},
-			&Vec3{0, 1, 0},
-			&Mat4{
+			Vec3{0, 0, 0},
+			Vec3{1, 0, 0},
+			Vec3{0, 1, 0},
+			Mat4{
 				0, 0, -1, 0,
 				0, 1, 0, 0,
 				1, 0, 0, 0,
@@ -68,10 +56,10 @@ func TestLookAtV(t *testing.T) {
 		},
 		{
 			"heading 180 degree",
-			&Vec3{0, 0, 0},
-			&Vec3{0, 0, 1},
-			&Vec3{0, 1, 0},
-			&Mat4{
+			Vec3{0, 0, 0},
+			Vec3{0, 0, 1},
+			Vec3{0, 1, 0},
+			Mat4{
 				-1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, -1, 0,
@@ -80,10 +68,10 @@ func TestLookAtV(t *testing.T) {
 		},
 		{
 			"attitude 90 degree",
-			&Vec3{0, 0, 0},
-			&Vec3{0, 0, -1},
-			&Vec3{1, 0, 0},
-			&Mat4{
+			Vec3{0, 0, 0},
+			Vec3{0, 0, -1},
+			Vec3{1, 0, 0},
+			Mat4{
 				0, 1, 0, 0,
 				-1, 0, 0, 0,
 				0, 0, 1, 0,
@@ -92,10 +80,10 @@ func TestLookAtV(t *testing.T) {
 		},
 		{
 			"bank 90 degree",
-			&Vec3{0, 0, 0},
-			&Vec3{0, -1, 0},
-			&Vec3{0, 0, -1},
-			&Mat4{
+			Vec3{0, 0, 0},
+			Vec3{0, -1, 0},
+			Vec3{0, 0, -1},
+			Mat4{
 				1, 0, 0, 0,
 				0, 0, 1, 0,
 				0, -1, 0, 0,
@@ -106,11 +94,11 @@ func TestLookAtV(t *testing.T) {
 
 	threshold := math.Pow(10, -2)
 	for _, c := range tests {
-		if r := LookAtV(c.Eye, c.Center, c.Up); !r.ApproxEqualThreshold(c.Expected, threshold) {
+		if r := LookAtV(&c.Eye, &c.Center, &c.Up); !r.ApproxEqualThreshold(&c.Expected, threshold) {
 			t.Errorf("%v failed: LookAtV(%v, %v, %v) != %v (got %v)", c.Description, c.Eye, c.Center, c.Up, c.Expected, r)
 		}
 
-		if r := LookAt(c.Eye[0], c.Eye[1], c.Eye[2], c.Center[0], c.Center[1], c.Center[2], c.Up[0], c.Up[1], c.Up[2]); !r.ApproxEqualThreshold(c.Expected, threshold) {
+		if r := LookAt(c.Eye[0], c.Eye[1], c.Eye[2], c.Center[0], c.Center[1], c.Center[2], c.Up[0], c.Up[1], c.Up[2]); !r.ApproxEqualThreshold(&c.Expected, threshold) {
 			t.Errorf("%v failed: LookAt(%v, %v, %v) != %v (got %v)", c.Description, c.Eye, c.Center, c.Up, c.Expected, r)
 		}
 	}
@@ -120,25 +108,23 @@ func TestOrtho(t *testing.T) {
 	t.Parallel()
 	iden := Ident4()
 	tests := []struct {
-		Left, Right,
-		Bottom, Top,
-		Near, Far float32
-		Expected *Mat4
+		Left, Right, Bottom, Top, Near, Far float32
+		Expected                            Mat4
 	}{
 		{
 			-1.0, 1.0, -1.0, 1.0, 1.0, -1.0,
-			&iden,
+			iden,
 		}, {
 			-10.0, 10.0, -10.0, 10.0, 0.0, 100.0,
-			&Mat4{0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, -0.02, 0.0, 0.0, 0.0, -1.0, 1.0},
+			Mat4{0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, -0.02, 0.0, 0.0, 0.0, -1.0, 1.0},
 		}, {
 			0.0, 10.0, 0.0, 10.0, 0.0, 100.0,
-			&Mat4{0.2, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.0, -0.02, 0.0, -1.0, -1.0, -1.0, 1.0},
+			Mat4{0.2, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.0, -0.02, 0.0, -1.0, -1.0, -1.0, 1.0},
 		},
 	}
 
 	for _, c := range tests {
-		if r := Ortho(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := Ortho(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Ortho(%v, %v, %v, %v, %v, %v) != %v (got %v)", c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far, c.Expected, r)
 		}
 	}
@@ -147,24 +133,23 @@ func TestOrtho(t *testing.T) {
 func TestOrtho2D(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		Left, Right,
-		Bottom, Top float32
-		Expected *Mat4
+		Left, Right, Bottom, Top float32
+		Expected                 Mat4
 	}{
 		{
 			-1.0, 1.0, -1.0, 1.0,
-			&Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1},
+			Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1},
 		}, {
 			-10.0, 10.0, -10.0, 10.0,
-			&Mat4{0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+			Mat4{0.1, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
 		}, {
 			0.0, 10.0, 0.0, 10.0,
-			&Mat4{0.2, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, -1.0, 0.0, 1.0},
+			Mat4{0.2, 0.0, 0.0, 0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, -1.0, 0.0, 1.0},
 		},
 	}
 
 	for _, c := range tests {
-		if r := Ortho2D(c.Left, c.Right, c.Bottom, c.Top); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := Ortho2D(c.Left, c.Right, c.Bottom, c.Top); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Ortho2D(%v, %v, %v, %v) != %v (got %v)", c.Left, c.Right, c.Bottom, c.Top, c.Expected, r)
 		}
 	}
@@ -175,22 +160,22 @@ func TestPerspective(t *testing.T) {
 	tests := []struct {
 		Fovy, Aspect,
 		Near, Far float32
-		Expected *Mat4
+		Expected Mat4
 	}{
 		{
 			DegToRad(450.0), 1.0, -1.0, 1.0,
-			&Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0},
+			Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0},
 		}, {
 			DegToRad(45.0), 4.0 / 3.0, 0.1, 100.0,
-			&Mat4{1.810660, 0.0, 0.0, 0.0, 0.0, 2.4142134, 0.0, 0.0, 0.0, 0.0, -1.002002, -1.0, 0.0, 0.0, -0.2002002, 0.0},
+			Mat4{1.810660, 0.0, 0.0, 0.0, 0.0, 2.4142134, 0.0, 0.0, 0.0, 0.0, -1.002002, -1.0, 0.0, 0.0, -0.2002002, 0.0},
 		}, {
 			DegToRad(90.0), 16.0 / 9.0, -1.0, 1.0,
-			&Mat4{0.562500, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, -0.0, -1.0, 0.0, 0.0, 1.0, 0.0},
+			Mat4{0.562500, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, -0.0, -1.0, 0.0, 0.0, 1.0, 0.0},
 		},
 	}
 
 	for _, c := range tests {
-		if r := Perspective(c.Fovy, c.Aspect, c.Near, c.Far); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := Perspective(c.Fovy, c.Aspect, c.Near, c.Far); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Perspective(%v, %v, %v, %v) != %v (got %v)", c.Fovy, c.Aspect, c.Near, c.Far, c.Expected, r)
 		}
 	}
@@ -202,17 +187,17 @@ func TestFrustum(t *testing.T) {
 		Left, Right,
 		Bottom, Top,
 		Near, Far float32
-		Expected *Mat4
+		Expected Mat4
 	}{
 		{
 			-1.0, 1.0, -1.0, 1.0, 1.0, 2.0,
-			&Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -3, -1, 0, 0, -4, 0},
+			Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -3, -1, 0, 0, -4, 0},
 		},
 		// TODO: more tests
 	}
 
 	for _, c := range tests {
-		if r := Frustum(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := Frustum(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Frustum(%v, %v, %v, %v, %v, %v) != %v (got %v)", c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far, c.Expected, r)
 		}
 	}

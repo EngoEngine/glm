@@ -8,6 +8,14 @@ import (
 // Vec2 is the representation of a vector with 2 components.
 type Vec2 [2]float32
 
+// Vec3 is the representation of a vector with 3 components.
+type Vec3 [3]float32
+
+// Vec4 is the representation of a vector with 4 components.
+type Vec4 [4]float32
+
+// String returns a pretty string for this vector. eg.
+// {-1.00000, 0.00000}
 func (v1 *Vec2) String() string {
 	ret := "{"
 	for n := 0; n < len(v1); n++ {
@@ -22,9 +30,8 @@ func (v1 *Vec2) String() string {
 	return ret + "}"
 }
 
-// Vec3 is the representation of a vector with 3 components.
-type Vec3 [3]float32
-
+// String returns a pretty string for this vector. eg.
+// {-1.00000, 0.00000, 0.00000}
 func (v1 *Vec3) String() string {
 	ret := "{"
 	for n := 0; n < len(v1); n++ {
@@ -39,9 +46,8 @@ func (v1 *Vec3) String() string {
 	return ret + "}"
 }
 
-// Vec4 is the representation of a vector with 4 components.
-type Vec4 [4]float32
-
+// String returns a pretty string for this vector. eg.
+// {-1.00000, 0.00000, 0.00000, 0.00000}
 func (v1 *Vec4) String() string {
 	ret := "{"
 	for n := 0; n < len(v1); n++ {
@@ -56,32 +62,38 @@ func (v1 *Vec4) String() string {
 	return ret + "}"
 }
 
-// Vec3 return a Vec3 from this Vec2 with {z}.
+// Vec3 return a Vec3 from this Vec2 with {z}. Similar to GLSL
+//    vec3(v2, z);
 func (v1 *Vec2) Vec3(z float32) Vec3 {
 	return Vec3{v1[0], v1[1], z}
 }
 
-// Vec4 return a Vec4 from this Vec2 with {z,w}.
+// Vec4 return a Vec4 from this Vec2 with {z,w}. Similar to GLSL
+//    vec4(v2, z, w);
 func (v1 *Vec2) Vec4(z, w float32) Vec4 {
 	return Vec4{v1[0], v1[1], z, w}
 }
 
-// Vec2 return a Vec2 from the first 2 components of this Vec3.
+// Vec2 return a Vec2 from the first 2 components of this Vec3. Similar to GLSL
+//    vec2(v3);
 func (v1 *Vec3) Vec2() Vec2 {
 	return Vec2{v1[0], v1[1]}
 }
 
-// Vec4 return a Vec4 from this Vec3 with {w}.
+// Vec4 return a Vec4 from this Vec3 with {w}. Similar to GLSL
+//    vec4(v3, w);
 func (v1 *Vec3) Vec4(w float32) Vec4 {
 	return Vec4{v1[0], v1[1], v1[2], w}
 }
 
-// Vec2 return a Vec2 from the first 2 components of this Vec4.
+// Vec2 return a Vec2 from the first 2 components of this Vec4. Similar to GLSL
+//    vec2(v4);
 func (v1 *Vec4) Vec2() Vec2 {
 	return Vec2{v1[0], v1[1]}
 }
 
-// Vec3 return a Vec3 from the first 3 components of this Vec4.
+// Vec3 return a Vec3 from the first 3 components of this Vec4. Similar to GLSL
+//    vec3(v4);
 func (v1 *Vec4) Vec3() Vec3 {
 	return Vec3{v1[0], v1[1], v1[2]}
 }
@@ -113,7 +125,7 @@ func (v1 *Vec2) SetPerp() {
 
 // Cross computes the pseudo 2D cross product, Dot(Perp(u), v)
 func (v1 *Vec2) Cross(v2 *Vec2) float32 {
-	return v1[1]*v2[0] - v1[0]*v2[1]
+	return v1[0]*v2[1] - v1[1]*v2[0]
 }
 
 // Cross is an operation only defined on 3D vectors, commonly refered to as "the
@@ -138,18 +150,20 @@ func (v1 *Vec2) Cross(v2 *Vec2) float32 {
 // v1.Cross(v2) = -v2.Cross(v1), this property can be useful to know when
 // finding normals, as taking the wrong cross product can lead to the opposite
 // normal of the one you want.
+//
+// https://en.wikipedia.org/wiki/Cross_product
 func (v1 *Vec3) Cross(v2 *Vec3) Vec3 {
 	return Vec3{v1[1]*v2[2] - v1[2]*v2[1], v1[2]*v2[0] - v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]}
 }
 
-// CrossOf is the same as Cross but with destination vector. v1 = v2 X v3
+// CrossOf is the same as Cross but with destination vector. v1 = v2 X v3.
 func (v1 *Vec3) CrossOf(v2, v3 *Vec3) {
 	v1[0] = v2[1]*v3[2] - v2[2]*v3[1]
 	v1[1] = v2[2]*v3[0] - v2[0]*v3[2]
 	v1[2] = v2[0]*v3[1] - v2[1]*v3[0]
 }
 
-// CrossWith is the same as cross except it stores the result in v1
+// CrossWith is the same as cross except it stores the result in v1.
 func (v1 *Vec3) CrossWith(v2 *Vec3) {
 	vx, vy, vz := v1[0], v1[1], v1[2]
 	v1[0] = vy*v2[2] - vz*v2[1]
@@ -161,10 +175,10 @@ func (v1 *Vec3) CrossWith(v2 *Vec3) {
 // mixed product.
 //
 // https://en.wikipedia.org/wiki/Triple_product
-func ScalarTripleProduct(v1, v2, v3 *Vec3) float32 {
-	return v1[0]*(v2[1]*v3[2]-v2[2]*v3[1]) +
-		v1[1]*(v2[2]*v3[0]-v2[0]*v3[2]) +
-		v1[2]*(v2[0]*v3[1]-v2[1]*v3[0])
+func ScalarTripleProduct(v0, v1, v2 *Vec3) float32 {
+	return v0[0]*(v1[1]*v2[2]-v1[2]*v2[1]) +
+		v0[1]*(v1[2]*v2[0]-v1[0]*v2[2]) +
+		v0[2]*(v1[0]*v2[1]-v1[1]*v2[0])
 }
 
 // Add is equivalent to v3 := v1+v2

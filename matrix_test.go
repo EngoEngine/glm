@@ -169,58 +169,46 @@ func TestString(t *testing.T) {
 `, 0.0, 1.0)
 
 	if str != m.String() {
-		t.Errorf("Mat string conversion not working got %q expected %q", m.String(), str)
+		t.Errorf("Mat string conversion not working got \n%q expected \n%q", m.String(), str)
 	}
 }
 
 func TestMat2Conv(t *testing.T) {
 	t.Parallel()
-	m2 := Mat2{
-		1, 0,
-		0, 1,
+	m2 := Ident2()
+
+	if m3 := m2.Mat3(); m3 != Ident3() {
+		t.Errorf("Mat2 \n%sMat3 \n%s", m2.String(), m3.String())
 	}
-	m2tom3 := m2.Mat3()
-	if m2tom3 != Ident3() {
-		t.Errorf("did not get iden from casting Mat2 to Mat3")
-	}
-	m2tom4 := m2.Mat4()
-	if m2tom4 != Ident4() {
-		t.Errorf("did not get iden from casting Mat2 to Mat3")
+
+	if m4 := m2.Mat4(); m4 != Ident4() {
+		t.Errorf("Mat2 \n%sMat4 \n%s", m2.String(), m4.String())
 	}
 }
 
 func TestMat3Conv(t *testing.T) {
 	t.Parallel()
-	m3 := Mat3{
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1,
+	m3 := Ident3()
+
+	if m2 := m3.Mat2(); m2 != Ident2() {
+		t.Errorf("Mat3 \n%sMat2 \n%s", m3.String(), m2.String())
 	}
-	m3tom2 := m3.Mat2()
-	if m3tom2 != Ident2() {
-		t.Errorf("did not get iden from casting Mat3 to Mat2")
-	}
-	m3tom4 := m3.Mat4()
-	if m3tom4 != Ident4() {
-		t.Errorf("did not get iden from casting Mat3 to Mat4")
+
+	if m4 := m3.Mat4(); m4 != Ident4() {
+		t.Errorf("Mat3 \n%sMat4 \n%s", m3.String(), m4.String())
 	}
 }
 
 func TestMat4Conv(t *testing.T) {
 	t.Parallel()
-	m4 := Mat4{
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
+	m4 := Ident4()
+
+	if m2 := m4.Mat2(); m2 != Ident2() {
+		t.Errorf("Mat4 \n%sMat2 \n%s", m4.String(), m2.String())
 	}
-	m4tom2 := m4.Mat2()
-	if m4tom2 != Ident2() {
-		t.Errorf("did not get identity from casting Mat4 to Mat2")
-	}
-	m4tom3 := m4.Mat3()
-	if m4tom3 != Ident3() {
-		t.Errorf("did not get identity from casting Mat4 to Mat3")
+
+	if m3 := m4.Mat3(); m3 != Ident3() {
+		t.Errorf("Mat4 \n%sMat3 \n%s", m4.String(), m3.String())
 	}
 }
 func TestMat2SetCol(t *testing.T) {

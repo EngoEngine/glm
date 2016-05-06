@@ -7,130 +7,112 @@ import (
 	"text/tabwriter"
 )
 
-// Mat2 represents a 2x2 matrix.
+// Mat2 represents a column major 2x2 matrix.
 type Mat2 [4]float32
 
-// Mat3 represents a 3x3 matrix.
+// Mat3 represents a column major 3x3 matrix.
 type Mat3 [9]float32
 
-// Mat4 represents a 4x4 matrix.
+// Mat4 represents a column major 4x4 matrix.
 type Mat4 [16]float32
 
-// Mat3 returns
-//    [m m 0]
-//    [m m 0]
-//    [0 0 1]
+// Mat3 returns the mat3 values in the top-left corner and the rest filled with
+// the identity matrix values.
+//    [m0 m2  0]
+//    [m1 m3  0]
+//    [ 0  0  1]
 func (m1 *Mat2) Mat3() Mat3 {
-	third := Vec3{0, 0, 1}
-	col0, col1 := m1.Cols()
-	v0 := col0.Vec3(0)
-	v1 := col1.Vec3(0)
-	return Mat3FromCols(
-		&v0,
-		&v1,
-		&third,
-	)
+	return Mat3{
+		m1[0], m1[1], 0,
+		m1[2], m1[3], 0,
+		0, 0, 1,
+	}
 }
 
-// Mat4 returns
-//    [m m 0 0]
-//    [m m 0 0]
-//    [0 0 0 0]
-//    [0 0 0 1]
+// Mat4 returns the mat2 values in the top-left corner and the rest filled with
+// the identity matrix values.
+//    [m0 m2  0  0]
+//    [m1 m3  0  0]
+//    [ 0  0  1  0]
+//    [ 0  0  0  1]
 func (m1 *Mat2) Mat4() Mat4 {
-	a, b := Vec4{0, 0, 1, 0}, Vec4{0, 0, 0, 1}
-	col0, col1 := m1.Cols()
-	v0 := col0.Vec4(0, 0)
-	v1 := col1.Vec4(0, 0)
-	return Mat4FromCols(
-		&v0,
-		&v1,
-		&a,
-		&b,
-	)
+	return Mat4{
+		m1[0], m1[1], 0, 0,
+		m1[2], m1[3], 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	}
 }
 
-// Mat2 returns
-//    [m m ?]
-//    [m m ?]
-//    [? ? ?]
+// Mat2 returns the upper 2x2 matrix.
+//    [m0 m3  ?]
+//    [m1 m4  ?]
+//    [ ?  ?  ?]
 func (m1 *Mat3) Mat2() Mat2 {
-	col0, col1, _ := m1.Cols()
-	v0 := col0.Vec2()
-	v1 := col1.Vec2()
-	return Mat2FromCols(
-		&v0,
-		&v1,
-	)
+	return Mat2{
+		m1[0], m1[1],
+		m1[3], m1[4],
+	}
 }
 
-// Mat4 returns
-//    [m m m 0]
-//    [m m m 0]
-//    [m m m 0]
-//    [0 0 0 1]
+// Mat4 returns the mat3 values in the top-left corner and the rest filled with
+// the identity matrix values.
+//    [m0 m3 m6  0]
+//    [m1 m4 m7  0]
+//    [m2 m5 m8  0]
+//    [ 0  0  0  1]
 func (m1 *Mat3) Mat4() Mat4 {
-	a := Vec4{0, 0, 0, 1}
-	col0, col1, col2 := m1.Cols()
-	v0 := col0.Vec4(0)
-	v1 := col1.Vec4(0)
-	v2 := col2.Vec4(0)
-	return Mat4FromCols(
-		&v0,
-		&v1,
-		&v2,
-		&a,
-	)
+	return Mat4{
+		m1[0], m1[1], m1[2], 0,
+		m1[3], m1[4], m1[5], 0,
+		m1[6], m1[7], m1[8], 0,
+		0, 0, 0, 1,
+	}
 }
 
-// Mat2 returns
-//    [m m ? ?]
-//    [m m ? ?]
-//    [? ? ? ?]
-//    [? ? ? ?]
+// Mat2 returns the upper 2x2 matrix.
+//    [m0 m4  ?  ?]
+//    [m1 m5  ?  ?]
+//    [ ?  ?  ?  ?]
+//    [ ?  ?  ?  ?]
 func (m1 *Mat4) Mat2() Mat2 {
-	col0, col1, _, _ := m1.Cols()
-	v0 := col0.Vec2()
-	v1 := col1.Vec2()
-	return Mat2FromCols(
-		&v0,
-		&v1,
-	)
+	return Mat2{
+		m1[0], m1[1],
+		m1[4], m1[5],
+	}
 }
 
-// Mat3 returns
-//    [m m m ?]
-//    [m m m ?]
-//    [m m m ?]
-//    [? ? ? ?]
+// Mat3 returns returns the upper 3x3 matrix.
+//    [m0  m4   m8  ?]
+//    [m1  m5   m9  ?]
+//    [m2  m6  m10  ?]
+//    [ ?   ?    ?  ?]
 func (m1 *Mat4) Mat3() Mat3 {
-	col0, col1, col2, _ := m1.Cols()
-	v0 := col0.Vec3()
-	v1 := col1.Vec3()
-	v2 := col2.Vec3()
-	return Mat3FromCols(
-		&v0,
-		&v1,
-		&v2,
-	)
-}
-
-// Mat3x4 returns
-//    [m m m m]
-//    [m m m m]
-//    [m m m m]
-//    [? ? ? ?]
-func (m1 *Mat4) Mat3x4() Mat3x4 {
-	return Mat3x4{m1[0], m1[1], m1[2],
+	return Mat3{
+		m1[0], m1[1], m1[2],
 		m1[4], m1[5], m1[6],
 		m1[8], m1[9], m1[10],
-		m1[12], m1[13], m1[14]}
+	}
 }
 
-// Mat2x3 returns
-//    [m m m]
-//    [m m m]
-//    [? ? ?]
+// Mat3x4 returns the top 3x4 matrix.
+//    [m0  m4  m7 m10]
+//    [m1  m5  m8 m11]
+//    [m2  m6  m9 m12]
+//    [ ?   ?   ?   ?]
+func (m1 *Mat4) Mat3x4() Mat3x4 {
+	return Mat3x4{
+		m1[0], m1[1], m1[2],
+		m1[4], m1[5], m1[6],
+		m1[8], m1[9], m1[10],
+		m1[12], m1[13], m1[14],
+	}
+}
+
+// Mat2x3 returns the top 2x3 matrix.
+//    [m0 m3 m6]
+//    [m1 m4 m7]
+//    [ ?  ?  ?]
 func (m1 *Mat3) Mat2x3() Mat2x3 {
 	return Mat2x3{
 		m1[0], m1[1],
@@ -1665,6 +1647,16 @@ func (Mat4) Index(row, col int) int {
 	return col*4 + row
 }
 
+// RowLength returns the length of the row.
+func (Mat4) RowLength() int {
+	return 4
+}
+
+// Colength returns the length of the column.
+func (Mat4) Colength() int {
+	return 4
+}
+
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecM for a MxN matrix.
@@ -1763,13 +1755,13 @@ func (m1 *Mat4) Iden() {
 	m1[15] = 1
 }
 
-// String pretty prints the matrix
+// String pretty prints the matrix.
 func (m1 *Mat4) String() string {
-	buf := new(bytes.Buffer)
-	w := tabwriter.NewWriter(buf, 4, 4, 1, ' ', tabwriter.AlignRight)
-	for i := 0; i < 4; i++ {
-		row := m1.Row(i)
-		for _, col := range []float32{row[0], row[1], row[2], row[3]} {
+	const length = 4
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
+	for i := 0; i < length; i++ {
+		for _, col := range m1.Row(i) {
 			fmt.Fprintf(w, "%f\t", col)
 		}
 
@@ -1780,25 +1772,27 @@ func (m1 *Mat4) String() string {
 	return buf.String()
 }
 
-// Mat3x4 stuff
-
 //Mat3x4 is a 3 row 4 column matrix.
 type Mat3x4 [12]float32
 
 // Ident3x4 returns the cheating matrix 3x4 with its diagonal as [1,1,1]
 func Ident3x4() Mat3x4 {
-	return Mat3x4{1, 0, 0,
+	return Mat3x4{
+		1, 0, 0,
 		0, 1, 0,
 		0, 0, 1,
-		0, 0, 0}
+		0, 0, 0,
+	}
 }
 
 // Mat4 returns a mat4 with the last row as [0 0 0 1].
 func (m1 *Mat3x4) Mat4() Mat4 {
-	return Mat4{m1[0], m1[1], m1[2], 0,
+	return Mat4{
+		m1[0], m1[1], m1[2], 0,
 		m1[3], m1[4], m1[5], 0,
 		m1[6], m1[7], m1[8], 0,
-		m1[9], m1[10], m1[11], 1}
+		m1[9], m1[10], m1[11], 1,
+	}
 }
 
 // Mat4In is a memory friendly version of Mat4.

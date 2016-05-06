@@ -248,3 +248,128 @@ func TestRotate3D(t *testing.T) {
 		}
 	}
 }
+
+func TestTranslate2D(t *testing.T) {
+	tests := []struct {
+		t Vec2
+		m Mat3
+	}{
+		{
+			t: Vec2{0, 0},
+			m: Ident3(),
+		},
+		{
+			t: Vec2{1, 2},
+			m: Mat3{
+				1, 0, 0,
+				0, 1, 0,
+				1, 2, 1,
+			},
+		},
+		{
+			t: Vec2{-3, 9},
+			m: Mat3{
+				1, 0, 0,
+				0, 1, 0,
+				-3, 9, 1,
+			},
+		},
+
+		{
+			t: Vec2{1e8, -1e4},
+			m: Mat3{
+				1, 0, 0,
+				0, 1, 0,
+				1e8, -1e4, 1,
+			},
+		},
+	}
+
+	for i, test := range tests {
+		if m := Translate2D(test.t[0], test.t[1]); !m.ApproxEqual(&test.m) {
+			t.Errorf("[%d] Translate2D(%f, %f) = %s, want %s", i, test.t[0], test.t[1], m.String(), test.m.String())
+		}
+	}
+}
+
+func TestHomogRotate2D(t *testing.T) {
+	tests := []struct {
+		angle float32
+		mat   Mat3
+	}{
+		{
+			angle: 0,
+			mat: Mat3{
+				1, 0, 0,
+				0, 1, 0,
+				0, 0, 1,
+			},
+		},
+		{
+			angle: math.Pi / 6,
+			mat: Mat3{
+				0.866025, 0.500000, 0,
+				-0.500000, 0.866025, 0,
+				0, 0, 1,
+			},
+		},
+		{
+			angle: math.Pi * 7 / 8,
+			mat: Mat3{
+				-0.92388, 0.382683, 0,
+				-0.382683, -0.92388, 0,
+				0, 0, 1,
+			},
+		},
+		{ // https://www.wolframalpha.com/input/?i=rotation+matrix&rawformassumption=%7B%22F%22,+%22RotationCalculator%22,+%22alpha%22%7D+-%3E%22315%22&rawformassumption=%7B%22FP%22,+%22RotationCalculator%22,+%22dir%22%7D+-%3E+%22plus%22&rawformassumption=%7B%22F%22,+%22RotationCalculator%22,+%22point%22%7D+-%3E%22%7B0,+0%7D%22&rawformassumption=%7B%22C%22,+%22rotation+matrix%22%7D+-%3E+%7B%22Calculator%22%7D&rawformassumption=%7B%22MC%22,%22%22%7D-%3E%7B%22Formula%22%7D
+			angle: math.Pi * 7 / 4,
+			mat: Mat3{
+				0.7071067814, -0.7071067814, 0,
+				0.7071067814, 0.7071067814, 0,
+				0, 0, 1,
+			},
+		},
+	}
+	for i, test := range tests {
+		if m := HomogRotate2D(test.angle); !m.ApproxEqualThreshold(&test.mat, 1e-4) {
+			t.Errorf("[%d] HomogRotate2D(%f) = \n%swant \n%s", i, test.angle, m.String(), test.mat.String())
+		}
+	}
+}
+
+func TestScale2D(t *testing.T) {
+	tests := []struct {
+		sx, sy float32
+		mat    Mat3
+	}{
+		{
+			sx:  1,
+			sy:  1,
+			mat: Ident3(),
+		},
+		{
+			sx: 3,
+			sy: 2,
+			mat: Mat3{
+				3, 0, 0,
+				0, 2, 0,
+				0, 0, 1,
+			},
+		},
+		{
+			sx: -14.5,
+			sy: 0.0001,
+			mat: Mat3{
+				-14.5, 0, 0,
+				0, 0.0001, 0,
+				0, 0, 1,
+			},
+		},
+	}
+
+	for i, test := range tests {
+		if m := Scale2D(test.sx, test.sy); !m.ApproxEqual(&test.mat) {
+			t.Errorf("[%d] Scale2D(%f, %f) = \n%swant\n%s", i, test.sx, test.sy, m.String(), test.mat.String())
+		}
+	}
+}
