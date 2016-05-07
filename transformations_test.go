@@ -63,7 +63,7 @@ func TestHomogRotate3D(t *testing.T) {
 
 	threshold := math.Pow(10, -2)
 	for _, c := range tests {
-		if r := HomogRotate3D(c.Angle, c.Axis); !r.ApproxEqualThreshold(c.Expected, threshold) {
+		if r := HomogRotate3D(c.Angle, c.Axis); !r.EqualThreshold(c.Expected, threshold) {
 			t.Errorf("%v failed: HomogRotate3D(%v, %v) != %v (got %v)", c.Description, c.Angle, c.Axis, c.Expected, r)
 		}
 	}
@@ -286,7 +286,7 @@ func TestTranslate2D(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if m := Translate2D(test.t[0], test.t[1]); !m.ApproxEqual(&test.m) {
+		if m := Translate2D(test.t[0], test.t[1]); !m.Equal(&test.m) {
 			t.Errorf("[%d] Translate2D(%f, %f) = %s, want %s", i, test.t[0], test.t[1], m.String(), test.m.String())
 		}
 	}
@@ -331,7 +331,7 @@ func TestHomogRotate2D(t *testing.T) {
 		},
 	}
 	for i, test := range tests {
-		if m := HomogRotate2D(test.angle); !m.ApproxEqualThreshold(&test.mat, 1e-4) {
+		if m := HomogRotate2D(test.angle); !m.EqualThreshold(&test.mat, 1e-4) {
 			t.Errorf("[%d] HomogRotate2D(%f) = \n%swant \n%s", i, test.angle, m.String(), test.mat.String())
 		}
 	}
@@ -368,7 +368,7 @@ func TestScale2D(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if m := Scale2D(test.sx, test.sy); !m.ApproxEqual(&test.mat) {
+		if m := Scale2D(test.sx, test.sy); !m.Equal(&test.mat) {
 			t.Errorf("[%d] Scale2D(%f, %f) = \n%swant\n%s", i, test.sx, test.sy, m.String(), test.mat.String())
 		}
 	}

@@ -33,11 +33,11 @@ func TestTransform_Translate(t *testing.T) {
 		tr[1].Iden()
 		tr[1].TranslateVec3(&test)
 		trm := [2]Mat4{tr[0].Mat4(), tr[1].Mat4()}
-		if !expect.ApproxEqualThreshold(&trm[0], 1e-4) {
+		if !expect.EqualThreshold(&trm[0], 1e-4) {
 			t.Errorf("[%d] Translate3f\n%snot equal to\n%s", i, expect.String(), trm[0].String())
 		}
 
-		if !expect.ApproxEqualThreshold(&trm[1], 1e-4) {
+		if !expect.EqualThreshold(&trm[1], 1e-4) {
 			t.Errorf("[%d] Translate3f\n%snot equal to\n%s", i, expect.String(), trm[1].String())
 		}
 	}
@@ -63,11 +63,11 @@ func TestTransform_SetTranslate(t *testing.T) {
 		tr[0].Translate3f(test[0], test[1], test[2])
 		tr[1].TranslateVec3(&test)
 		trm := [2]Mat4{tr[0].Mat4(), tr[1].Mat4()}
-		if !expect.ApproxEqualThreshold(&trm[0], 1e-4) {
+		if !expect.EqualThreshold(&trm[0], 1e-4) {
 			t.Errorf("[%d] Translate3f\n%snot equal to\n%s", i, expect.String(), trm[0].String())
 		}
 
-		if !expect.ApproxEqualThreshold(&trm[1], 1e-4) {
+		if !expect.EqualThreshold(&trm[1], 1e-4) {
 			t.Errorf("[%d] Translate3f\n%snot equal to\n%s", i, expect.String(), trm[1].String())
 		}
 	}

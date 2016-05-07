@@ -146,7 +146,7 @@ func Jacobi(a, v *glm.Mat3) {
 	var i, j, n, p, q int
 	var prevoff, c, s float32
 	// Initialize v to identity matrix
-	v.Iden()
+	v.Ident()
 
 	var J glm.Mat3
 	// Repeat for some maximum number of iterations

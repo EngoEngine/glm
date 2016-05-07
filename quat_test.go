@@ -84,7 +84,7 @@ func TestQuatIdentityToMatrix(t *testing.T) {
 	matrix := quat.Mat4()
 	answer := Ident4()
 
-	if !matrix.ApproxEqual(&answer) {
+	if !matrix.Equal(&answer) {
 		t.Errorf("Identity quaternion does not yield identity matrix")
 	}
 }
@@ -100,7 +100,7 @@ func TestQuatRotationToMatrix(t *testing.T) {
 	matrix := quat.Mat4()
 	answer := HomogRotate3D(angle, &axis)
 
-	if !matrix.ApproxEqualThreshold(&answer, 1e-4) {
+	if !matrix.EqualThreshold(&answer, 1e-4) {
 		t.Errorf("Rotation quaternion does not yield correct rotation matrix; got: %v expected: %v", matrix, answer)
 	}
 }
@@ -1098,7 +1098,7 @@ func TestQuat_Mat3(t *testing.T) {
 		q := test.q1
 		q.Normalize()
 		m := q.Mat3()
-		if !m.ApproxEqualThreshold(&test.mat3, 1e-4) {
+		if !m.EqualThreshold(&test.mat3, 1e-4) {
 			t.Errorf("[%d] mat3(q1) = %v, want %v", i, m, test.mat3)
 		}
 	}
@@ -1111,7 +1111,7 @@ func TestQuat_Mat4(t *testing.T) {
 		q.Normalize()
 		tmp := q.Mat4()
 		m := tmp.Mat3()
-		if !m.ApproxEqualThreshold(&test.mat3, 1e-4) {
+		if !m.EqualThreshold(&test.mat3, 1e-4) {
 			t.Errorf("[%d] mat3(q1) = %v, want %v", i, m, test.mat3)
 		}
 	}

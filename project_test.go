@@ -94,11 +94,11 @@ func TestLookAtV(t *testing.T) {
 
 	threshold := math.Pow(10, -2)
 	for _, c := range tests {
-		if r := LookAtV(&c.Eye, &c.Center, &c.Up); !r.ApproxEqualThreshold(&c.Expected, threshold) {
+		if r := LookAtV(&c.Eye, &c.Center, &c.Up); !r.EqualThreshold(&c.Expected, threshold) {
 			t.Errorf("%v failed: LookAtV(%v, %v, %v) != %v (got %v)", c.Description, c.Eye, c.Center, c.Up, c.Expected, r)
 		}
 
-		if r := LookAt(c.Eye[0], c.Eye[1], c.Eye[2], c.Center[0], c.Center[1], c.Center[2], c.Up[0], c.Up[1], c.Up[2]); !r.ApproxEqualThreshold(&c.Expected, threshold) {
+		if r := LookAt(c.Eye[0], c.Eye[1], c.Eye[2], c.Center[0], c.Center[1], c.Center[2], c.Up[0], c.Up[1], c.Up[2]); !r.EqualThreshold(&c.Expected, threshold) {
 			t.Errorf("%v failed: LookAt(%v, %v, %v) != %v (got %v)", c.Description, c.Eye, c.Center, c.Up, c.Expected, r)
 		}
 	}
@@ -124,7 +124,7 @@ func TestOrtho(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := Ortho(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+		if r := Ortho(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.EqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Ortho(%v, %v, %v, %v, %v, %v) != %v (got %v)", c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far, c.Expected, r)
 		}
 	}
@@ -149,7 +149,7 @@ func TestOrtho2D(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := Ortho2D(c.Left, c.Right, c.Bottom, c.Top); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+		if r := Ortho2D(c.Left, c.Right, c.Bottom, c.Top); !r.EqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Ortho2D(%v, %v, %v, %v) != %v (got %v)", c.Left, c.Right, c.Bottom, c.Top, c.Expected, r)
 		}
 	}
@@ -175,7 +175,7 @@ func TestPerspective(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := Perspective(c.Fovy, c.Aspect, c.Near, c.Far); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+		if r := Perspective(c.Fovy, c.Aspect, c.Near, c.Far); !r.EqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Perspective(%v, %v, %v, %v) != %v (got %v)", c.Fovy, c.Aspect, c.Near, c.Far, c.Expected, r)
 		}
 	}
@@ -197,7 +197,7 @@ func TestFrustum(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := Frustum(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+		if r := Frustum(c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far); !r.EqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("Frustum(%v, %v, %v, %v, %v, %v) != %v (got %v)", c.Left, c.Right, c.Bottom, c.Top, c.Near, c.Far, c.Expected, r)
 		}
 	}

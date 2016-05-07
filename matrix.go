@@ -308,7 +308,7 @@ func (m1 *Mat2) TransposeOf(m2 *Mat2) {
 // expansion, and uses no loops. Of course, the addition and multiplication must
 // still be done.
 func (m1 *Mat2) Det() float32 {
-	return m1[0]*m1[2] - m1[1]*m1[3]
+	return m1[0]*m1[3] - m1[1]*m1[2]
 }
 
 // Inverse computes the inverse of a square matrix. An inverse is a square
@@ -319,39 +319,49 @@ func (m1 *Mat2) Inverse() Mat2 {
 	if FloatEqual(det, 0) {
 		return Mat2{}
 	}
-
-	retMat := Mat2{m1[3], -m1[1], -m1[2], m1[0]}
-
-	return retMat.Mul(1 / det)
+	over := 1 / det
+	return Mat2{m1[3] * over, -m1[1] * over, -m1[2] * over, m1[0] * over}
 }
 
-// ApproxEqual performs an element-wise approximate equality test between two
+// Invert is the same as Inverse but it acts on the caller.
+func (m1 *Mat2) Invert() {
+	det := m1.Det()
+	if FloatEqual(det, 0) {
+		*m1 = Mat2{}
+		return
+	}
+	over := 1 / det
+	*m1 = Mat2{m1[3] * over, -m1[1] * over, -m1[2] * over, m1[0] * over}
+}
+
+// InverseOf sets m1 to the inverse of m2.
+func (m1 *Mat2) InverseOf(m2 *Mat2) {
+	det := m2.Det()
+	if FloatEqual(det, 0) {
+		*m1 = Mat2{}
+		return
+	}
+	over := 1 / det
+	*m1 = Mat2{m2[3] * over, -m2[1] * over, -m2[2] * over, m2[0] * over}
+}
+
+// Equal performs an element-wise approximate equality test between two
 // matrices, as if FloatEqual had been used.
-func (m1 *Mat2) ApproxEqual(m2 *Mat2) bool {
+func (m1 *Mat2) Equal(m2 *Mat2) bool {
 	return FloatEqual(m1[0], m2[0]) &&
 		FloatEqual(m1[1], m2[1]) &&
 		FloatEqual(m1[2], m2[2]) &&
 		FloatEqual(m1[3], m2[3])
 }
 
-// ApproxEqualThreshold performs an element-wise approximate equality test
+// EqualThreshold performs an element-wise approximate equality test
 // between two matrices with a given epsilon threshold, as if
 // FloatEqualThreshold had been used.
-func (m1 *Mat2) ApproxEqualThreshold(m2 *Mat2, threshold float32) bool {
+func (m1 *Mat2) EqualThreshold(m2 *Mat2, threshold float32) bool {
 	return FloatEqualThreshold(m1[0], m2[0], threshold) &&
 		FloatEqualThreshold(m1[1], m2[1], threshold) &&
 		FloatEqualThreshold(m1[2], m2[2], threshold) &&
 		FloatEqualThreshold(m1[3], m2[3], threshold)
-}
-
-// ApproxFuncEqual performs an element-wise approximate equality test between
-// two matrices with a given equality functions, intended to be used with
-// FloatEqualFunc; although and comparison function may be used in practice.
-func (m1 *Mat2) ApproxFuncEqual(m2 *Mat2, eq func(float32, float32) bool) bool {
-	return eq(m1[0], m2[0]) &&
-		eq(m1[1], m2[1]) &&
-		eq(m1[2], m2[2]) &&
-		eq(m1[3], m2[3])
 }
 
 // At returns the matrix element at the given row and column.
@@ -443,8 +453,8 @@ func (m1 *Mat2) AbsOf(m2 *Mat2) {
 	}
 }
 
-// Iden sets this matrix to the identity matrix.
-func (m1 *Mat2) Iden() {
+// Ident sets this matrix to the identity matrix.
+func (m1 *Mat2) Ident() {
 	*m1 = Mat2{1, 0, 0, 1}
 }
 
@@ -464,6 +474,12 @@ func (m1 *Mat2) String() string {
 
 	return buf.String()
 }
+
+// RowLen returns the length of a row for this matrix type.
+func (Mat2) RowLen() int { return 2 }
+
+// ColLen returns the length of a col for this matrix type.
+func (Mat2) ColLen() int { return 2 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
 func (m1 *Mat3) SetCol(col int, v *Vec3) {
@@ -700,28 +716,20 @@ func (m1 *Mat3) Transposed() Mat3 {
 
 // Transpose is a memory friendly version of Transposed.
 func (m1 *Mat3) Transpose() {
-	v1 := m1[1]
-	v2 := m1[2]
-	v5 := m1[5]
-	v3 := m1[3]
-	v6 := m1[6]
-	v7 := m1[7]
-	m1[1] = v3
-	m1[2] = v6
-	m1[3] = v1
-	m1[5] = v7
-	m1[6] = v2
-	m1[7] = v5
+	m1[1], m1[2], m1[3], m1[5], m1[6], m1[7] = m1[3], m1[6], m1[1], m1[7], m1[2], m1[5]
 }
 
 // TransposeOf is a memory friendly version of Transposed.
 func (m1 *Mat3) TransposeOf(m2 *Mat3) {
+	m1[0] = m2[0]
 	m1[1] = m2[3]
 	m1[2] = m2[6]
 	m1[3] = m2[1]
+	m1[4] = m2[4]
 	m1[5] = m2[7]
 	m1[6] = m2[2]
 	m1[7] = m2[5]
+	m1[8] = m2[8]
 }
 
 // Det returns the determinant of a matrix. The determinant is a measure of a square matrix's
@@ -729,7 +737,8 @@ func (m1 *Mat3) TransposeOf(m2 *Mat3) {
 // determinant is hard coded based on pre-computed cofactor expansion, and uses
 // no loops. Of course, the addition and multiplication must still be done.
 func (m1 *Mat3) Det() float32 {
-	return m1[0]*m1[4]*m1[8] + m1[3]*m1[7]*m1[2] + m1[6]*m1[1]*m1[5] - m1[6]*m1[4]*m1[2] - m1[3]*m1[1]*m1[8] - m1[0]*m1[7]*m1[5]
+	return m1[0]*m1[4]*m1[8] + m1[3]*m1[7]*m1[2] + m1[6]*m1[1]*m1[5] -
+		m1[6]*m1[4]*m1[2] - m1[3]*m1[1]*m1[8] - m1[0]*m1[7]*m1[5]
 }
 
 // Inverse computes the inverse of a square matrix. An inverse is a square
@@ -769,6 +778,7 @@ func (m1 *Mat3) Invert() {
 		m1[6] = 0
 		m1[7] = 0
 		m1[8] = 0
+		return
 	}
 
 	v0 := m1[0]
@@ -797,6 +807,7 @@ func (m1 *Mat3) Invert() {
 func (m1 *Mat3) InverseOf(m2 *Mat3) {
 	det := m2.Det()
 	if FloatEqual(det, float32(0.0)) {
+		*m1 = Mat3{}
 		return
 	}
 
@@ -822,30 +833,21 @@ func (m1 *Mat3) InverseOf(m2 *Mat3) {
 	m1.MulWith(1.0 / det)
 }
 
-// ApproxEqual performs an element-wise approximate equality test between two matrices,
+// Equal performs an element-wise approximate equality test between two matrices,
 // as if FloatEqual had been used.
-func (m1 *Mat3) ApproxEqual(m2 *Mat3) bool {
+func (m1 *Mat3) Equal(m2 *Mat3) bool {
 	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) &&
 		FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) &&
 		FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) && FloatEqual(m1[8], m2[8])
 
 }
 
-// ApproxEqualThreshold performs an element-wise approximate equality test between two matrices
+// EqualThreshold performs an element-wise approximate equality test between two matrices
 // with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat3) ApproxEqualThreshold(m2 *Mat3, threshold float32) bool {
+func (m1 *Mat3) EqualThreshold(m2 *Mat3, threshold float32) bool {
 	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) &&
 		FloatEqualThreshold(m1[3], m2[3], threshold) && FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) &&
 		FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) && FloatEqualThreshold(m1[8], m2[8], threshold)
-}
-
-// ApproxFuncEqual performs an element-wise approximate equality test between two matrices
-// with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
-// function may be used in practice.
-func (m1 *Mat3) ApproxFuncEqual(m2 *Mat3, eq func(float32, float32) bool) bool {
-	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) &&
-		eq(m1[3], m2[3]) && eq(m1[4], m2[4]) && eq(m1[5], m2[5]) &&
-		eq(m1[6], m2[6]) && eq(m1[7], m2[7]) && eq(m1[8], m2[8])
 }
 
 // At returns the matrix element at the given row and column.
@@ -909,6 +911,12 @@ func (m1 *Mat3) Trace() float32 {
 	return m1[0] + m1[4] + m1[8]
 }
 
+// RowLen returns the length of the row of this matrix type.
+func (m1 *Mat3) RowLen() int { return 3 }
+
+// ColLen returns the length of the col of this matrix type.
+func (m1 *Mat3) ColLen() int { return 3 }
+
 // Abs returns the element-wise absolute value of this matrix
 func (m1 *Mat3) Abs() Mat3 {
 	return Mat3{math.Abs(m1[0]), math.Abs(m1[1]), math.Abs(m1[2]),
@@ -942,8 +950,8 @@ func (m1 *Mat3) AbsOf(m2 *Mat3) {
 	m1[8] = math.Abs(m2[8])
 }
 
-// Iden sets this matrix as the identity matrix.
-func (m1 *Mat3) Iden() {
+// Ident sets this matrix as the identity matrix.
+func (m1 *Mat3) Ident() {
 	m1[0] = 1
 	m1[1] = 0
 	m1[2] = 0
@@ -985,6 +993,12 @@ func (m1 *Mat3) String() string {
 
 	return buf.String()
 }
+
+// RowLen returns the row length for this matrix type.
+func (m1 *Mat4) RowLen() int { return 4 }
+
+// ColLen returns the col length for this matrix type.
+func (m1 *Mat4) ColLen() int { return 4 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
 func (m1 *Mat4) SetCol(col int, v *Vec4) {
@@ -1414,22 +1428,7 @@ func (m1 *Mat4) Inverse() Mat4 {
 func (m1 *Mat4) Invert() {
 	det := m1.Det()
 	if FloatEqual(det, float32(0.0)) {
-		m1[0] = 0
-		m1[1] = 0
-		m1[2] = 0
-		m1[3] = 0
-		m1[4] = 0
-		m1[5] = 0
-		m1[6] = 0
-		m1[7] = 0
-		m1[8] = 0
-		m1[9] = 0
-		m1[10] = 0
-		m1[11] = 0
-		m1[12] = 0
-		m1[13] = 0
-		m1[14] = 0
-		m1[15] = 0
+		*m1 = Mat4{}
 		return
 	}
 
@@ -1504,22 +1503,7 @@ func (m1 *Mat4) Invert() {
 func (m1 *Mat4) InverseOf(m2 *Mat4) {
 	det := m2.Det()
 	if FloatEqual(det, float32(0.0)) {
-		m1[0] = 0
-		m1[1] = 0
-		m1[2] = 0
-		m1[3] = 0
-		m1[4] = 0
-		m1[5] = 0
-		m1[6] = 0
-		m1[7] = 0
-		m1[8] = 0
-		m1[9] = 0
-		m1[10] = 0
-		m1[11] = 0
-		m1[12] = 0
-		m1[13] = 0
-		m1[14] = 0
-		m1[15] = 0
+		*m1 = Mat4{}
 		return
 	}
 
@@ -1590,32 +1574,22 @@ func (m1 *Mat4) InverseOf(m2 *Mat4) {
 	m1.MulWith(1.0 / det)
 }
 
-// ApproxEqual performs an element-wise approximate equality test between two matrices,
+// Equal performs an element-wise approximate equality test between two matrices,
 // as if FloatEqual had been used.
-func (m1 *Mat4) ApproxEqual(m2 *Mat4) bool {
+func (m1 *Mat4) Equal(m2 *Mat4) bool {
 	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) &&
 		FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) &&
 		FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11]) &&
 		FloatEqual(m1[12], m2[12]) && FloatEqual(m1[13], m2[13]) && FloatEqual(m1[14], m2[14]) && FloatEqual(m1[15], m2[15])
 }
 
-// ApproxEqualThreshold performs an element-wise approximate equality test between two matrices
+// EqualThreshold performs an element-wise approximate equality test between two matrices
 // with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat4) ApproxEqualThreshold(m2 *Mat4, threshold float32) bool {
+func (m1 *Mat4) EqualThreshold(m2 *Mat4, threshold float32) bool {
 	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
 		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) &&
 		FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold) &&
 		FloatEqualThreshold(m1[12], m2[12], threshold) && FloatEqualThreshold(m1[13], m2[13], threshold) && FloatEqualThreshold(m1[14], m2[14], threshold) && FloatEqualThreshold(m1[15], m2[15], threshold)
-}
-
-// ApproxFuncEqual performs an element-wise approximate equality test between two matrices
-// with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
-// function may be used in practice.
-func (m1 *Mat4) ApproxFuncEqual(m2 *Mat4, eq func(float32, float32) bool) bool {
-	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3]) &&
-		eq(m1[4], m2[4]) && eq(m1[5], m2[5]) && eq(m1[6], m2[6]) && eq(m1[7], m2[7]) &&
-		eq(m1[8], m2[8]) && eq(m1[9], m2[9]) && eq(m1[10], m2[10]) && eq(m1[11], m2[11]) &&
-		eq(m1[12], m2[12]) && eq(m1[13], m2[13]) && eq(m1[14], m2[14]) && eq(m1[15], m2[15])
 }
 
 // At returns the matrix element at the given row and column.
@@ -1645,16 +1619,6 @@ func (m1 *Mat4) Set(row, col int, value float32) {
 // a panic if you try to access the array with it if it's truly out of bounds.
 func (Mat4) Index(row, col int) int {
 	return col*4 + row
-}
-
-// RowLength returns the length of the row.
-func (Mat4) RowLength() int {
-	return 4
-}
-
-// Colength returns the length of the column.
-func (Mat4) Colength() int {
-	return 4
 }
 
 // Row returns a vector representing the corresponding row (starting at row 0).
@@ -1735,8 +1699,8 @@ func (m1 *Mat4) AbsSelf() {
 	m1[15] = math.Abs(m1[15])
 }
 
-// Iden sets this matrix to the identity matrix
-func (m1 *Mat4) Iden() {
+// Ident sets this matrix to the identity matrix
+func (m1 *Mat4) Ident() {
 	m1[0] = 1
 	m1[1] = 0
 	m1[2] = 0
@@ -2000,26 +1964,26 @@ func (m1 *Mat3x4) Inverse() Mat3x4 {
 	return retMat.Mul(1.0 / det)
 }
 
-// ApproxEqual performs an element-wise approximate equality test between two matrices,
+// Equal performs an element-wise approximate equality test between two matrices,
 // as if FloatEqual had been used.
-func (m1 *Mat3x4) ApproxEqual(m2 *Mat3x4) bool {
+func (m1 *Mat3x4) Equal(m2 *Mat3x4) bool {
 	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) &&
 		FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) &&
 		FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11])
 }
 
-// ApproxEqualThreshold performs an element-wise approximate equality test between two matrices
+// EqualThreshold performs an element-wise approximate equality test between two matrices
 // with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat3x4) ApproxEqualThreshold(m2 *Mat3x4, threshold float32) bool {
+func (m1 *Mat3x4) EqualThreshold(m2 *Mat3x4, threshold float32) bool {
 	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
 		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) &&
 		FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold)
 }
 
-// ApproxFuncEqual performs an element-wise approximate equality test between two matrices
+// FuncEqual performs an element-wise approximate equality test between two matrices
 // with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
 // function may be used in practice.
-func (m1 *Mat3x4) ApproxFuncEqual(m2 *Mat3x4, eq func(float32, float32) bool) bool {
+func (m1 *Mat3x4) FuncEqual(m2 *Mat3x4, eq func(float32, float32) bool) bool {
 	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3]) &&
 		eq(m1[4], m2[4]) && eq(m1[5], m2[5]) && eq(m1[6], m2[6]) && eq(m1[7], m2[7]) &&
 		eq(m1[8], m2[8]) && eq(m1[9], m2[9]) && eq(m1[10], m2[10]) && eq(m1[11], m2[11])
@@ -2196,18 +2160,30 @@ func (m1 *Mat3x4) String() string {
 // [0 0 1]. This helps with physics by saving 12 bytes and faster calculations.
 type Mat2x3 [6]float32
 
-// Ident2x3 returns the cheating matrix 2x3 with its diagonal as [1 1]
+// Ident2x3 returns the cheat 2x3 matrix with it's diagonal as [1 1].
 func Ident2x3() Mat2x3 {
-	return Mat2x3{1, 0,
+	return Mat2x3{
+		1, 0,
 		0, 1,
-		0, 0}
+		0, 0,
+	}
+}
+
+// Mat2 returns a Mat2 with the last row as [0 0 1].
+func (m1 *Mat2x3) Mat2() Mat2 {
+	return Mat2{
+		m1[0], m1[1],
+		m1[2], m1[3],
+	}
 }
 
 // Mat3 returns a Mat3 with the last row as [0 0 1].
 func (m1 *Mat2x3) Mat3() Mat3 {
-	return Mat3{m1[0], m1[1], 0,
+	return Mat3{
+		m1[0], m1[1], 0,
 		m1[2], m1[3], 0,
-		m1[4], m1[5], 1}
+		m1[4], m1[5], 1,
+	}
 }
 
 // Mat3In is a memory friendly version of Mat3.
@@ -2215,6 +2191,12 @@ func (m1 *Mat2x3) Mat3In(m2 *Mat3) {
 	m2[0], m2[3], m2[6] = m1[0], m1[2], m1[4]
 	m2[1], m2[4], m2[7] = m1[1], m1[3], m1[5]
 	m2[2], m2[5], m2[8] = 0, 0, 1
+}
+
+// Mat2In is a memory friendly version of Mat2.
+func (m1 *Mat2x3) Mat2In(m2 *Mat2) {
+	m2[0], m2[2] = m1[0], m1[2]
+	m2[1], m2[3] = m1[1], m1[3]
 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
@@ -2373,25 +2355,25 @@ func (m1 *Mat2x3) Inverse() Mat2x3 {
 	return retMat.Mul(1 / det)
 }
 
-// ApproxEqual performs an element-wise approximate equality test between two matrices,
+// Equal performs an element-wise approximate equality test between two matrices,
 // as if FloatEqual had been used.
-func (m1 *Mat2x3) ApproxEqual(m2 *Mat2x3) bool {
+func (m1 *Mat2x3) Equal(m2 *Mat2x3) bool {
 	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) &&
 		FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5])
 }
 
-// ApproxEqualThreshold performs an element-wise approximate equality test between two matrices
+// EqualThreshold performs an element-wise approximate equality test between two matrices
 // with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat2x3) ApproxEqualThreshold(m2 *Mat2x3, threshold float32) bool {
+func (m1 *Mat2x3) EqualThreshold(m2 *Mat2x3, threshold float32) bool {
 	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) &&
 		FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
 		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold)
 }
 
-// ApproxFuncEqual performs an element-wise approximate equality test between two matrices
+// FuncEqual performs an element-wise approximate equality test between two matrices
 // with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
 // function may be used in practice.
-func (m1 *Mat2x3) ApproxFuncEqual(m2 *Mat2x3, eq func(float32, float32) bool) bool {
+func (m1 *Mat2x3) FuncEqual(m2 *Mat2x3, eq func(float32, float32) bool) bool {
 	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3]) &&
 		eq(m1[4], m2[4]) && eq(m1[5], m2[5])
 }

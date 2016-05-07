@@ -41,7 +41,7 @@ func TestMat3x4_Inv(t *testing.T) {
 	i4 := m4.Inverse()
 	i3 := m3x4.Inverse()
 	i3_4 := i3.Mat4()
-	if !i3_4.ApproxEqualThreshold(&i4, 1e-4) {
+	if !i3_4.EqualThreshold(&i4, 1e-4) {
 		t.Errorf("Inv(m) =\n%s, want\n%s", i3_4.String(), i4.String())
 		return
 	}

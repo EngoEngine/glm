@@ -102,7 +102,7 @@ func Project(obj *Vec3, modelview, projection *Mat4, initialX, initialY, width, 
 }
 
 // UnProject transforms a set of window coordinates to object space. If your MVP
-// matrix is not invertible this will retrn garbage.
+// matrix is not invertible this will return garbage.
 //
 // Note that the projection may not be perfect if you use strict pixel locations
 // rather than the exact values given by Project.
