@@ -16,6 +16,123 @@ type Mat3 [9]float32
 // Mat4 represents a column major 4x4 matrix.
 type Mat4 [16]float32
 
+// Mat3x4 is a 3 row 4 column matrix.
+type Mat3x4 [12]float32
+
+// Mat2x3 is a 2 row 3 column matrix.
+type Mat2x3 [6]float32
+
+// RowLen returns the length of a row for this matrix type.
+func (Mat2) RowLen() int { return 2 }
+
+// ColLen returns the length of a col for this matrix type.
+func (Mat2) ColLen() int { return 2 }
+
+// RowLen returns the length of the row of this matrix type.
+func (Mat3) RowLen() int { return 3 }
+
+// ColLen returns the length of the col of this matrix type.
+func (Mat3) ColLen() int { return 3 }
+
+// RowLen returns the row length for this matrix type.
+func (Mat4) RowLen() int { return 4 }
+
+// ColLen returns the col length for this matrix type.
+func (Mat4) ColLen() int { return 4 }
+
+// RowLen returns the row length for this matrix type.
+func (Mat3x4) RowLen() int { return 4 }
+
+// ColLen returns the col length for this matrix type.
+func (Mat3x4) ColLen() int { return 3 }
+
+// RowLen returns the row length for this matrix type.
+func (Mat2x3) RowLen() int { return 3 }
+
+// ColLen returns the col length for this matrix type.
+func (Mat2x3) ColLen() int { return 2 }
+
+// String pretty prints the matrix
+func (m1 *Mat2) String() string {
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
+	for i := 0; i < m1.ColLen(); i++ {
+		row := m1.Row(i)
+		for _, col := range []float32{row[0], row[1]} {
+			fmt.Fprintf(w, "%f\t", col)
+		}
+
+		fmt.Fprintln(w, "")
+	}
+	w.Flush()
+
+	return buf.String()
+}
+
+// String pretty prints the matrix
+func (m1 *Mat3) String() string {
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
+	for i := 0; i < m1.ColLen(); i++ {
+		row := m1.Row(i)
+		for _, col := range []float32{row[0], row[1], row[2]} {
+			fmt.Fprintf(w, "%f\t", col)
+		}
+
+		fmt.Fprintln(w, "")
+	}
+	w.Flush()
+
+	return buf.String()
+}
+
+// String pretty prints the matrix.
+func (m1 *Mat4) String() string {
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
+	for i := 0; i < m1.ColLen(); i++ {
+		for _, col := range m1.Row(i) {
+			fmt.Fprintf(w, "%f\t", col)
+		}
+
+		fmt.Fprintln(w, "")
+	}
+	w.Flush()
+
+	return buf.String()
+}
+
+// String pretty prints the matrix
+func (m1 *Mat3x4) String() string {
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
+	for i := 0; i < m1.ColLen(); i++ {
+		for _, col := range m1.Row(i) {
+			fmt.Fprintf(w, "%f\t", col)
+		}
+
+		fmt.Fprintln(w, "")
+	}
+	w.Flush()
+
+	return buf.String()
+}
+
+// String pretty prints the matrix
+func (m1 *Mat2x3) String() string {
+	var buf bytes.Buffer
+	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
+	for i := 0; i < 2; i++ {
+		for _, col := range m1.Row(i) {
+			fmt.Fprintf(w, "%f\t", col)
+		}
+		fmt.Fprintln(w, "")
+	}
+	w.Flush()
+
+	return buf.String()
+}
+
 // Mat3 returns the mat3 values in the top-left corner and the rest filled with
 // the identity matrix values.
 //    [m0 m2  0]
@@ -70,6 +187,31 @@ func (m1 *Mat3) Mat4() Mat4 {
 	}
 }
 
+// Mat2x3 returns the top 2x3 matrix.
+//    [m0 m3 m6]
+//    [m1 m4 m7]
+//    [ ?  ?  ?]
+func (m1 *Mat3) Mat2x3() Mat2x3 {
+	return Mat2x3{
+		m1[0], m1[1],
+		m1[3], m1[4],
+		m1[6], m1[7],
+	}
+}
+
+// Mat3x4 returns the top 2x3 matrix.
+//    [m0 m3 m6 0]
+//    [m1 m4 m7 0]
+//    [m2 m5 m8 0]
+func (m1 *Mat3) Mat3x4() Mat3x4 {
+	return Mat3x4{
+		m1[0], m1[1], m1[2],
+		m1[3], m1[4], m1[5],
+		m1[6], m1[7], m1[8],
+		0, 0, 0,
+	}
+}
+
 // Mat2 returns the upper 2x2 matrix.
 //    [m0 m4  ?  ?]
 //    [m1 m5  ?  ?]
@@ -109,16 +251,194 @@ func (m1 *Mat4) Mat3x4() Mat3x4 {
 	}
 }
 
-// Mat2x3 returns the top 2x3 matrix.
-//    [m0 m3 m6]
-//    [m1 m4 m7]
-//    [ ?  ?  ?]
-func (m1 *Mat3) Mat2x3() Mat2x3 {
-	return Mat2x3{
-		m1[0], m1[1],
-		m1[3], m1[4],
-		m1[6], m1[7],
+// Mat4 returns a mat4 with the last row as [0 0 0 1].
+func (m1 *Mat3x4) Mat4() Mat4 {
+	return Mat4{
+		m1[0], m1[1], m1[2], 0,
+		m1[3], m1[4], m1[5], 0,
+		m1[6], m1[7], m1[8], 0,
+		m1[9], m1[10], m1[11], 1,
 	}
+}
+
+// Mat4In is a memory friendly version of Mat4.
+func (m1 *Mat3x4) Mat4In(m2 *Mat4) {
+	m2[0], m2[4], m2[8], m2[12] = m1[0], m1[3], m1[6], m1[9]
+	m2[1], m2[5], m2[9], m2[13] = m1[1], m1[4], m1[7], m1[10]
+	m2[2], m2[6], m2[10], m2[14] = m1[2], m1[5], m1[8], m1[11]
+	m2[3], m2[7], m2[11], m2[15] = 0, 0, 0, 1
+}
+
+// Mat2 returns a Mat2 with the last row as [0 0 1].
+func (m1 *Mat2x3) Mat2() Mat2 {
+	return Mat2{
+		m1[0], m1[1],
+		m1[2], m1[3],
+	}
+}
+
+// Mat3 returns a Mat3 with the last row as [0 0 1].
+func (m1 *Mat2x3) Mat3() Mat3 {
+	return Mat3{
+		m1[0], m1[1], 0,
+		m1[2], m1[3], 0,
+		m1[4], m1[5], 1,
+	}
+}
+
+// Mat3In is a memory friendly version of Mat3.
+func (m1 *Mat2x3) Mat3In(m2 *Mat3) {
+	m2[0], m2[3], m2[6] = m1[0], m1[2], m1[4]
+	m2[1], m2[4], m2[7] = m1[1], m1[3], m1[5]
+	m2[2], m2[5], m2[8] = 0, 0, 1
+}
+
+// Mat2In is a memory friendly version of Mat2.
+func (m1 *Mat2x3) Mat2In(m2 *Mat2) {
+	m2[0], m2[2] = m1[0], m1[2]
+	m2[1], m2[3] = m1[1], m1[3]
+}
+
+// Ident2 returns the 2x2 identity matrix.
+func Ident2() Mat2 { return Mat2{1, 0, 0, 1} }
+
+// Ident3 returns the 3x3 identity matrix.
+func Ident3() Mat3 { return Mat3{1, 0, 0, 0, 1, 0, 0, 0, 1} }
+
+// Ident4 returns the 4x4 identity matrix.
+func Ident4() Mat4 { return Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} }
+
+// Ident3x4 returns the 3x4 fake identity matrix.
+func Ident3x4() Mat3x4 { return Mat3x4{1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0} }
+
+// Ident2x3 returns the 2x3 fake identity matrix.
+func Ident2x3() Mat2x3 { return Mat2x3{1, 0, 0, 1, 0, 0} }
+
+// Ident sets this matrix to the identity matrix.
+func (m1 *Mat2) Ident() { *m1 = Ident2() }
+
+// Ident sets this matrix to the identity matrix.
+func (m1 *Mat3) Ident() { *m1 = Ident3() }
+
+// Ident sets this matrix to the identity matrix.
+func (m1 *Mat4) Ident() { *m1 = Ident4() }
+
+// Ident sets this matrix to the identity matrix.
+func (m1 *Mat2x3) Ident() { *m1 = Ident2x3() }
+
+// Ident sets this matrix to the identity matrix.
+func (m1 *Mat3x4) Ident() { *m1 = Ident3x4() }
+
+// At returns the matrix element at the given row and column.
+func (m1 *Mat2) At(row, col int) float32 { return m1[col*2+row] }
+
+// Set sets the corresponding matrix element at the given row and column.
+func (m1 *Mat2) Set(row, col int, value float32) { m1[col*2+row] = value }
+
+// Index returns the index of the given row and column. Used to directly access
+// the array.
+func (Mat2) Index(row, col int) int { return col*2 + row }
+
+// At returns the matrix element at the given row and column.
+func (m1 *Mat3) At(row, col int) float32 { return m1[col*3+row] }
+
+// Set sets the corresponding matrix element at the given row and column.
+func (m1 *Mat3) Set(row, col int, value float32) { m1[col*3+row] = value }
+
+// Index returns the index of the given row and column. Used to directly access
+// the array.
+func (Mat3) Index(row, col int) int { return col*3 + row }
+
+// At returns the matrix element at the given row and column.
+func (m1 *Mat4) At(row, col int) float32 { return m1[col*4+row] }
+
+// Set sets the corresponding matrix element at the given row and column.
+func (m1 *Mat4) Set(row, col int, value float32) { m1[col*4+row] = value }
+
+// Index returns the index of the given row and column. Used to directly access
+// the array.
+func (Mat4) Index(row, col int) int { return col*4 + row }
+
+// At returns the matrix element at the given row and column.
+func (m1 *Mat3x4) At(row, col int) float32 { return m1[col*3+row] }
+
+// Set sets the corresponding matrix element at the given row and column.
+func (m1 *Mat3x4) Set(row, col int, value float32) { m1[col*3+row] = value }
+
+// Index returns the index of the given row and column. Used to directly access
+// the array.
+func (Mat3x4) Index(row, col int) int { return col*3 + row }
+
+// At returns the matrix element at the given row and column.
+func (m1 *Mat2x3) At(row, col int) float32 { return m1[col*2+row] }
+
+// Set sets the corresponding matrix element at the given row and column.
+func (m1 *Mat2x3) Set(row, col int, value float32) { m1[col*2+row] = value }
+
+// Index returns the index of the given row and column. Used to directly access
+// the array.
+func (Mat2x3) Index(row, col int) int { return col*2 + row }
+
+// Equal performs an element-wise approximate equality test between two
+// matrices, as if FloatEqual had been used.
+func (m1 *Mat2) Equal(m2 *Mat2) bool {
+	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3])
+}
+
+// EqualThreshold performs an element-wise approximate equality test
+// between two matrices with a given epsilon threshold, as if
+// FloatEqualThreshold had been used.
+func (m1 *Mat2) EqualThreshold(m2 *Mat2, threshold float32) bool {
+	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold)
+}
+
+// Equal performs an element-wise approximate equality test between two matrices,
+// as if FloatEqual had been used.
+func (m1 *Mat3) Equal(m2 *Mat3) bool {
+	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) && FloatEqual(m1[8], m2[8])
+
+}
+
+// EqualThreshold performs an element-wise approximate equality test between two matrices
+// with a given epsilon threshold, as if FloatEqualThreshold had been used.
+func (m1 *Mat3) EqualThreshold(m2 *Mat3, threshold float32) bool {
+	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) && FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) && FloatEqualThreshold(m1[8], m2[8], threshold)
+}
+
+// Equal performs an element-wise approximate equality test between two matrices,
+// as if FloatEqual had been used.
+func (m1 *Mat4) Equal(m2 *Mat4) bool {
+	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) && FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11]) && FloatEqual(m1[12], m2[12]) && FloatEqual(m1[13], m2[13]) && FloatEqual(m1[14], m2[14]) && FloatEqual(m1[15], m2[15])
+}
+
+// EqualThreshold performs an element-wise approximate equality test between two matrices
+// with a given epsilon threshold, as if FloatEqualThreshold had been used.
+func (m1 *Mat4) EqualThreshold(m2 *Mat4, threshold float32) bool {
+	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) && FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) && FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold) && FloatEqualThreshold(m1[12], m2[12], threshold) && FloatEqualThreshold(m1[13], m2[13], threshold) && FloatEqualThreshold(m1[14], m2[14], threshold) && FloatEqualThreshold(m1[15], m2[15], threshold)
+}
+
+// Equal performs an element-wise approximate equality test between two matrices,
+// as if FloatEqual had been used.
+func (m1 *Mat3x4) Equal(m2 *Mat3x4) bool {
+	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) && FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11])
+}
+
+// EqualThreshold performs an element-wise approximate equality test between two matrices
+// with a given epsilon threshold, as if FloatEqualThreshold had been used.
+func (m1 *Mat3x4) EqualThreshold(m2 *Mat3x4, threshold float32) bool {
+	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) && FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) && FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold)
+}
+
+// Equal performs an element-wise approximate equality test between two matrices,
+// as if FloatEqual had been used.
+func (m1 *Mat2x3) Equal(m2 *Mat2x3) bool {
+	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5])
+}
+
+// EqualThreshold performs an element-wise approximate equality test between two matrices
+// with a given epsilon threshold, as if FloatEqualThreshold had been used.
+func (m1 *Mat2x3) EqualThreshold(m2 *Mat2x3, threshold float32) bool {
+	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) && FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold)
 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
@@ -135,14 +455,6 @@ func (m1 *Mat2) SetRow(row int, v *Vec2) {
 // returns main diagonal (meaning all elements such that row==col).
 func (m1 *Mat2) Diag() Vec2 {
 	return Vec2{m1[0], m1[3]}
-}
-
-// Ident2 returns the 2x2 identity matrix.
-// The identity matrix is a square matrix with the value 1 on its
-// diagonals. The characteristic property of the identity matrix is that
-// any matrix multiplied by it is itself. (MI = M; IN = N)
-func Ident2() Mat2 {
-	return Mat2{1, 0, 0, 1}
 }
 
 // Diag2 creates a diagonal matrix from the entries of the input vector.
@@ -292,9 +604,7 @@ func (m1 *Mat2) Transposed() Mat2 {
 //    [[c d]] =  [[b d f]]
 //    [[e f]]
 func (m1 *Mat2) Transpose() {
-	v1 := m1[1]
-	m1[1] = m1[2]
-	m1[2] = v1
+	m1[1], m1[2] = m1[2], m1[1]
 }
 
 //TransposeOf is a memory friendly version of Transposed.
@@ -345,44 +655,6 @@ func (m1 *Mat2) InverseOf(m2 *Mat2) {
 	*m1 = Mat2{m2[3] * over, -m2[1] * over, -m2[2] * over, m2[0] * over}
 }
 
-// Equal performs an element-wise approximate equality test between two
-// matrices, as if FloatEqual had been used.
-func (m1 *Mat2) Equal(m2 *Mat2) bool {
-	return FloatEqual(m1[0], m2[0]) &&
-		FloatEqual(m1[1], m2[1]) &&
-		FloatEqual(m1[2], m2[2]) &&
-		FloatEqual(m1[3], m2[3])
-}
-
-// EqualThreshold performs an element-wise approximate equality test
-// between two matrices with a given epsilon threshold, as if
-// FloatEqualThreshold had been used.
-func (m1 *Mat2) EqualThreshold(m2 *Mat2, threshold float32) bool {
-	return FloatEqualThreshold(m1[0], m2[0], threshold) &&
-		FloatEqualThreshold(m1[1], m2[1], threshold) &&
-		FloatEqualThreshold(m1[2], m2[2], threshold) &&
-		FloatEqualThreshold(m1[3], m2[3], threshold)
-}
-
-// At returns the matrix element at the given row and column.
-// This is equivalent to mat[col * numRow + row] where numRow is constant
-// (E.G. for a Mat3x2 it's equal to 3).
-func (m1 *Mat2) At(row, col int) float32 {
-	return m1[col*2+row]
-}
-
-// Set sets the corresponding matrix element at the given row and column.
-// This has a pointer receiver because it mutates the matrix.
-func (m1 *Mat2) Set(row, col int, value float32) {
-	m1[col*2+row] = value
-}
-
-// Index returns the index of the given row and column, to be used with direct
-// access. E.G. Index(0,0) = 0.
-func (Mat2) Index(row, col int) int {
-	return col*2 + row
-}
-
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it will
 // be a normal VecM for a MxN matrix.
@@ -422,71 +694,26 @@ func (m1 *Mat2) Abs() Mat2 {
 
 // AbsSelf is a memory friendly version of Abs.
 func (m1 *Mat2) AbsSelf() {
-	if m1[0] < 0 {
-		m1[0] = -m1[0]
-	}
-	if m1[1] < 0 {
-		m1[1] = -m1[1]
-	}
-	if m1[2] < 0 {
-		m1[2] = -m1[2]
-	}
-	if m1[3] < 0 {
-		m1[3] = -m1[3]
-	}
+	m1[0] = math.Abs(m1[0])
+	m1[1] = math.Abs(m1[1])
+	m1[2] = math.Abs(m1[2])
+	m1[3] = math.Abs(m1[3])
 }
 
 // AbsOf is a memory friendly version of Abs.
 func (m1 *Mat2) AbsOf(m2 *Mat2) {
-	*m1 = *m2
-	if m1[0] < 0 {
-		m1[0] = -m1[0]
-	}
-	if m1[1] < 0 {
-		m1[1] = -m1[1]
-	}
-	if m1[2] < 0 {
-		m1[2] = -m1[2]
-	}
-	if m1[3] < 0 {
-		m1[3] = -m1[3]
-	}
+	m1[0] = math.Abs(m2[0])
+	m1[1] = math.Abs(m2[1])
+	m1[2] = math.Abs(m2[2])
+	m1[3] = math.Abs(m2[3])
 }
 
-// Ident sets this matrix to the identity matrix.
-func (m1 *Mat2) Ident() {
-	*m1 = Mat2{1, 0, 0, 1}
-}
-
-// String pretty prints the matrix
-func (m1 *Mat2) String() string {
-	buf := new(bytes.Buffer)
-	w := tabwriter.NewWriter(buf, 4, 4, 1, ' ', tabwriter.AlignRight)
-	for i := 0; i < 2; i++ {
-		row := m1.Row(i)
-		for _, col := range []float32{row[0], row[1]} {
-			fmt.Fprintf(w, "%f\t", col)
-		}
-
-		fmt.Fprintln(w, "")
-	}
-	w.Flush()
-
-	return buf.String()
-}
-
-// RowLen returns the length of a row for this matrix type.
-func (Mat2) RowLen() int { return 2 }
-
-// ColLen returns the length of a col for this matrix type.
-func (Mat2) ColLen() int { return 2 }
-
-// SetCol sets a Column within the Matrix, so it mutates the calling matrix.
+// SetCol sets a column within the matrix.
 func (m1 *Mat3) SetCol(col int, v *Vec3) {
 	m1[col*3+0], m1[col*3+1], m1[col*3+2] = v[0], v[1], v[2]
 }
 
-// SetRow sets a Row within the Matrix, so it mutates the calling matrix.
+// SetRow sets a row within the matrix.
 func (m1 *Mat3) SetRow(row int, v *Vec3) {
 	m1[row+0], m1[row+3], m1[row+6] = v[0], v[1], v[2]
 }
@@ -495,14 +722,6 @@ func (m1 *Mat3) SetRow(row int, v *Vec3) {
 // returns main diagonal (meaning all elements such that row==col).
 func (m1 *Mat3) Diag() Vec3 {
 	return Vec3{m1[0], m1[4], m1[8]}
-}
-
-// Ident3 returns the 3x3 identity matrix.
-// The identity matrix is a square matrix with the value 1 on its
-// diagonals. The characteristic property of the identity matrix is that
-// any matrix multiplied by it is itself. (MI = M; IN = N)
-func Ident3() Mat3 {
-	return Mat3{1, 0, 0, 0, 1, 0, 0, 0, 1}
 }
 
 // Diag3 creates a diagonal matrix from the entries of the input vector.
@@ -621,7 +840,7 @@ func (m1 *Mat3) MulWith(c float32) {
 	m1[8] *= c
 }
 
-// Mul3x1 performs a "matrix product" between this matrix
+// Mul3x1 performs a matrix product between this matrix
 // and another of the given dimension. For any two matrices of dimensionality
 // MxN and NxO, the result will be MxO. For instance, Mat4 multiplied using
 // Mul4x2 will result in a Mat4x2.
@@ -769,15 +988,7 @@ func (m1 *Mat3) Inverse() Mat3 {
 func (m1 *Mat3) Invert() {
 	det := m1.Det()
 	if FloatEqual(det, float32(0.0)) {
-		m1[0] = 0
-		m1[1] = 0
-		m1[2] = 0
-		m1[3] = 0
-		m1[4] = 0
-		m1[5] = 0
-		m1[6] = 0
-		m1[7] = 0
-		m1[8] = 0
+		*m1 = Mat3{}
 		return
 	}
 
@@ -833,52 +1044,6 @@ func (m1 *Mat3) InverseOf(m2 *Mat3) {
 	m1.MulWith(1.0 / det)
 }
 
-// Equal performs an element-wise approximate equality test between two matrices,
-// as if FloatEqual had been used.
-func (m1 *Mat3) Equal(m2 *Mat3) bool {
-	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) &&
-		FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) &&
-		FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) && FloatEqual(m1[8], m2[8])
-
-}
-
-// EqualThreshold performs an element-wise approximate equality test between two matrices
-// with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat3) EqualThreshold(m2 *Mat3, threshold float32) bool {
-	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) &&
-		FloatEqualThreshold(m1[3], m2[3], threshold) && FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) &&
-		FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) && FloatEqualThreshold(m1[8], m2[8], threshold)
-}
-
-// At returns the matrix element at the given row and column.
-// This is equivalent to mat[col * numRow + row] where numRow is constant
-// (E.G. for a Mat3x2 it's equal to 3)
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// At(5,0) will work just like At(1,1). Or it may panic if it's out of bounds.
-func (m1 *Mat3) At(row, col int) float32 {
-	return m1[col*3+row]
-}
-
-// Set sets the corresponding matrix element at the given row and column.
-// This has a pointer receiver because it mutates the matrix.
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// Set(5,0,val) will work just like Set(1,1,val). Or it may panic if it's out of bounds.
-func (m1 *Mat3) Set(row, col int, value float32) {
-	m1[col*3+row] = value
-}
-
-// Index returns the index of the given row and column, to be used with direct
-// access. E.G. Index(0,0) = 0.
-//
-// This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
-// (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
-// a panic if you try to access the array with it if it's truly out of bounds.
-func (Mat3) Index(row, col int) int {
-	return col*3 + row
-}
-
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecM for a MxN matrix.
@@ -910,12 +1075,6 @@ func (m1 *Mat3) Cols() (col0, col1, col2 Vec3) {
 func (m1 *Mat3) Trace() float32 {
 	return m1[0] + m1[4] + m1[8]
 }
-
-// RowLen returns the length of the row of this matrix type.
-func (m1 *Mat3) RowLen() int { return 3 }
-
-// ColLen returns the length of the col of this matrix type.
-func (m1 *Mat3) ColLen() int { return 3 }
 
 // Abs returns the element-wise absolute value of this matrix
 func (m1 *Mat3) Abs() Mat3 {
@@ -950,19 +1109,6 @@ func (m1 *Mat3) AbsOf(m2 *Mat3) {
 	m1[8] = math.Abs(m2[8])
 }
 
-// Ident sets this matrix as the identity matrix.
-func (m1 *Mat3) Ident() {
-	m1[0] = 1
-	m1[1] = 0
-	m1[2] = 0
-	m1[3] = 0
-	m1[4] = 1
-	m1[5] = 0
-	m1[6] = 0
-	m1[7] = 0
-	m1[8] = 1
-}
-
 // SetOrientation sets this matrix to the orientation matrix represented by that quaternion.
 func (m1 *Mat3) SetOrientation(q1 *Quat) {
 	w, x, y, z := q1.W, q1.V[0], q1.V[1], q1.V[2]
@@ -976,29 +1122,6 @@ func (m1 *Mat3) SetOrientation(q1 *Quat) {
 	m1[7] = 2*y*z - 2*w*x
 	m1[8] = 1 - 2*x*x - 2*y*y
 }
-
-// String pretty prints the matrix
-func (m1 *Mat3) String() string {
-	buf := new(bytes.Buffer)
-	w := tabwriter.NewWriter(buf, 4, 4, 1, ' ', tabwriter.AlignRight)
-	for i := 0; i < 3; i++ {
-		row := m1.Row(i)
-		for _, col := range []float32{row[0], row[1], row[2]} {
-			fmt.Fprintf(w, "%f\t", col)
-		}
-
-		fmt.Fprintln(w, "")
-	}
-	w.Flush()
-
-	return buf.String()
-}
-
-// RowLen returns the row length for this matrix type.
-func (m1 *Mat4) RowLen() int { return 4 }
-
-// ColLen returns the col length for this matrix type.
-func (m1 *Mat4) ColLen() int { return 4 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
 func (m1 *Mat4) SetCol(col int, v *Vec4) {
@@ -1014,14 +1137,6 @@ func (m1 *Mat4) SetRow(row int, v *Vec4) {
 // returns main diagonal (meaning all elements such that row==col).
 func (m1 *Mat4) Diag() Vec4 {
 	return Vec4{m1[0], m1[5], m1[10], m1[15]}
-}
-
-// Ident4 returns the 4x4 identity matrix.
-// The identity matrix is a square matrix with the value 1 on its
-// diagonals. The characteristic property of the identity matrix is that
-// any matrix multiplied by it is itself. (MI = M; IN = N)
-func Ident4() Mat4 {
-	return Mat4{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
 }
 
 // Diag4 creates a diagonal matrix from the entries of the input vector.
@@ -1313,28 +1428,7 @@ func (m1 *Mat4) TransposeOf(m2 *Mat4) {
 
 // Transpose is a memory friendly version of Transposed.
 func (m1 *Mat4) Transpose() {
-	//m1[0] = m1[0]
-	v1 := m1[1]
-	m1[1] = m1[4]
-	v2 := m1[2]
-	m1[2] = m1[8]
-	v3 := m1[3]
-	m1[3] = m1[12]
-	m1[4] = v1
-	//m1[5] = m1[5]
-	v6 := m1[6]
-	m1[6] = m1[9]
-	v7 := m1[7]
-	m1[7] = m1[13]
-	m1[8] = v2
-	m1[9] = v6
-	//m1[10] = m1[10]
-	v11 := m1[11]
-	m1[11] = m1[14]
-	m1[12] = v3
-	m1[13] = v7
-	m1[14] = v11
-	//m1[15] = m1[15]
+	m1[1], m1[2], m1[3], m1[4], m1[6], m1[7], m1[8], m1[9], m1[11], m1[12], m1[13], m1[14] = m1[4], m1[8], m1[12], m1[1], m1[9], m1[13], m1[2], m1[6], m1[14], m1[3], m1[7], m1[11]
 }
 
 // Det returns the determinant of a matrix. The determinant is a measure of a square matrix's
@@ -1574,53 +1668,6 @@ func (m1 *Mat4) InverseOf(m2 *Mat4) {
 	m1.MulWith(1.0 / det)
 }
 
-// Equal performs an element-wise approximate equality test between two matrices,
-// as if FloatEqual had been used.
-func (m1 *Mat4) Equal(m2 *Mat4) bool {
-	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) &&
-		FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) &&
-		FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11]) &&
-		FloatEqual(m1[12], m2[12]) && FloatEqual(m1[13], m2[13]) && FloatEqual(m1[14], m2[14]) && FloatEqual(m1[15], m2[15])
-}
-
-// EqualThreshold performs an element-wise approximate equality test between two matrices
-// with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat4) EqualThreshold(m2 *Mat4, threshold float32) bool {
-	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
-		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) &&
-		FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold) &&
-		FloatEqualThreshold(m1[12], m2[12], threshold) && FloatEqualThreshold(m1[13], m2[13], threshold) && FloatEqualThreshold(m1[14], m2[14], threshold) && FloatEqualThreshold(m1[15], m2[15], threshold)
-}
-
-// At returns the matrix element at the given row and column.
-// This is equivalent to mat[col * numRow + row] where numRow is constant
-// (E.G. for a Mat3x2 it's equal to 3)
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// At(5,0) will work just like At(1,1). Or it may panic if it's out of bounds.
-func (m1 *Mat4) At(row, col int) float32 {
-	return m1[col*4+row]
-}
-
-// Set sets the corresponding matrix element at the given row and column.
-// This has a pointer receiver because it mutates the matrix.
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// Set(5,0,val) will work just like Set(1,1,val). Or it may panic if it's out of bounds.
-func (m1 *Mat4) Set(row, col int, value float32) {
-	m1[col*4+row] = value
-}
-
-// Index returns the index of the given row and column, to be used with direct
-// access. E.G. Index(0,0) = 0.
-//
-// This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
-// (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
-// a panic if you try to access the array with it if it's truly out of bounds.
-func (Mat4) Index(row, col int) int {
-	return col*4 + row
-}
-
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecM for a MxN matrix.
@@ -1697,75 +1744,6 @@ func (m1 *Mat4) AbsSelf() {
 	m1[13] = math.Abs(m1[13])
 	m1[14] = math.Abs(m1[14])
 	m1[15] = math.Abs(m1[15])
-}
-
-// Ident sets this matrix to the identity matrix
-func (m1 *Mat4) Ident() {
-	m1[0] = 1
-	m1[1] = 0
-	m1[2] = 0
-	m1[3] = 0
-	m1[4] = 0
-	m1[5] = 1
-	m1[6] = 0
-	m1[7] = 0
-	m1[8] = 0
-	m1[9] = 0
-	m1[10] = 1
-	m1[11] = 0
-	m1[12] = 0
-	m1[13] = 0
-	m1[14] = 0
-	m1[15] = 1
-}
-
-// String pretty prints the matrix.
-func (m1 *Mat4) String() string {
-	const length = 4
-	var buf bytes.Buffer
-	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
-	for i := 0; i < length; i++ {
-		for _, col := range m1.Row(i) {
-			fmt.Fprintf(w, "%f\t", col)
-		}
-
-		fmt.Fprintln(w, "")
-	}
-	w.Flush()
-
-	return buf.String()
-}
-
-//Mat3x4 is a 3 row 4 column matrix.
-type Mat3x4 [12]float32
-
-// Ident3x4 returns the cheating matrix 3x4 with its diagonal as [1,1,1]
-func Ident3x4() Mat3x4 {
-	return Mat3x4{
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1,
-		0, 0, 0,
-	}
-}
-
-// Mat4 returns a mat4 with the last row as [0 0 0 1].
-func (m1 *Mat3x4) Mat4() Mat4 {
-	return Mat4{
-		m1[0], m1[1], m1[2], 0,
-		m1[3], m1[4], m1[5], 0,
-		m1[6], m1[7], m1[8], 0,
-		m1[9], m1[10], m1[11], 1,
-	}
-}
-
-// Mat4In is a memory friendly version of Mat4.
-func (m1 *Mat3x4) Mat4In(m2 *Mat4) {
-	m2[0], m2[4], m2[8], m2[12] = m1[0], m1[3], m1[6], m1[9]
-	m2[1], m2[5], m2[9], m2[13] = m1[1], m1[4], m1[7], m1[10]
-	m2[2], m2[6], m2[10], m2[14] = m1[2], m1[5], m1[8], m1[11]
-	m2[3], m2[7], m2[11], m2[15] = 0, 0, 0, 1
-
 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
@@ -1964,60 +1942,6 @@ func (m1 *Mat3x4) Inverse() Mat3x4 {
 	return retMat.Mul(1.0 / det)
 }
 
-// Equal performs an element-wise approximate equality test between two matrices,
-// as if FloatEqual had been used.
-func (m1 *Mat3x4) Equal(m2 *Mat3x4) bool {
-	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) && FloatEqual(m1[3], m2[3]) &&
-		FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5]) && FloatEqual(m1[6], m2[6]) && FloatEqual(m1[7], m2[7]) &&
-		FloatEqual(m1[8], m2[8]) && FloatEqual(m1[9], m2[9]) && FloatEqual(m1[10], m2[10]) && FloatEqual(m1[11], m2[11])
-}
-
-// EqualThreshold performs an element-wise approximate equality test between two matrices
-// with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat3x4) EqualThreshold(m2 *Mat3x4, threshold float32) bool {
-	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) && FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
-		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold) && FloatEqualThreshold(m1[6], m2[6], threshold) && FloatEqualThreshold(m1[7], m2[7], threshold) &&
-		FloatEqualThreshold(m1[8], m2[8], threshold) && FloatEqualThreshold(m1[9], m2[9], threshold) && FloatEqualThreshold(m1[10], m2[10], threshold) && FloatEqualThreshold(m1[11], m2[11], threshold)
-}
-
-// FuncEqual performs an element-wise approximate equality test between two matrices
-// with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
-// function may be used in practice.
-func (m1 *Mat3x4) FuncEqual(m2 *Mat3x4, eq func(float32, float32) bool) bool {
-	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3]) &&
-		eq(m1[4], m2[4]) && eq(m1[5], m2[5]) && eq(m1[6], m2[6]) && eq(m1[7], m2[7]) &&
-		eq(m1[8], m2[8]) && eq(m1[9], m2[9]) && eq(m1[10], m2[10]) && eq(m1[11], m2[11])
-}
-
-// At returns the matrix element at the given row and column.
-// This is equivalent to mat[col * numRow + row] where numRow is constant
-// (E.G. for a Mat3x2 it's equal to 3)
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// At(5,0) will work just like At(1,1). Or it may panic if it's out of bounds.
-func (m1 *Mat3x4) At(row, col int) float32 {
-	return m1[col*3+row]
-}
-
-// Set sets the corresponding matrix element at the given row and column.
-// This has a pointer receiver because it mutates the matrix.
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// Set(5,0,val) will work just like Set(1,1,val). Or it may panic if it's out of bounds.
-func (m1 *Mat3x4) Set(row, col int, value float32) {
-	m1[col*3+row] = value
-}
-
-// Index returns the index of the given row and column, to be used with direct
-// access. E.G. Index(0,0) = 0.
-//
-// This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
-// (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
-// a panic if you try to access the array with it if it's truly out of bounds.
-func (Mat3x4) Index(row, col int) int {
-	return col*3 + row
-}
-
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecM for a MxN matrix.
@@ -2138,65 +2062,6 @@ func (m1 *Mat3x4) GetAxis(i int) Vec3 {
 		m1[i*3+1],
 		m1[i*3+2],
 	}
-}
-
-// String pretty prints the matrix
-func (m1 *Mat3x4) String() string {
-	buf := new(bytes.Buffer)
-	w := tabwriter.NewWriter(buf, 4, 4, 1, ' ', tabwriter.AlignRight)
-	for i := 0; i < 3; i++ {
-		for _, col := range m1.Row(i) {
-			fmt.Fprintf(w, "%f\t", col)
-		}
-
-		fmt.Fprintln(w, "")
-	}
-	w.Flush()
-
-	return buf.String()
-}
-
-// Mat2x3 is a cheat matrix that acts like a 3x3 with the last row equal to
-// [0 0 1]. This helps with physics by saving 12 bytes and faster calculations.
-type Mat2x3 [6]float32
-
-// Ident2x3 returns the cheat 2x3 matrix with it's diagonal as [1 1].
-func Ident2x3() Mat2x3 {
-	return Mat2x3{
-		1, 0,
-		0, 1,
-		0, 0,
-	}
-}
-
-// Mat2 returns a Mat2 with the last row as [0 0 1].
-func (m1 *Mat2x3) Mat2() Mat2 {
-	return Mat2{
-		m1[0], m1[1],
-		m1[2], m1[3],
-	}
-}
-
-// Mat3 returns a Mat3 with the last row as [0 0 1].
-func (m1 *Mat2x3) Mat3() Mat3 {
-	return Mat3{
-		m1[0], m1[1], 0,
-		m1[2], m1[3], 0,
-		m1[4], m1[5], 1,
-	}
-}
-
-// Mat3In is a memory friendly version of Mat3.
-func (m1 *Mat2x3) Mat3In(m2 *Mat3) {
-	m2[0], m2[3], m2[6] = m1[0], m1[2], m1[4]
-	m2[1], m2[4], m2[7] = m1[1], m1[3], m1[5]
-	m2[2], m2[5], m2[8] = 0, 0, 1
-}
-
-// Mat2In is a memory friendly version of Mat2.
-func (m1 *Mat2x3) Mat2In(m2 *Mat2) {
-	m2[0], m2[2] = m1[0], m1[2]
-	m2[1], m2[3] = m1[1], m1[3]
 }
 
 // SetCol sets a Column within the Matrix, so it mutates the calling matrix.
@@ -2355,58 +2220,6 @@ func (m1 *Mat2x3) Inverse() Mat2x3 {
 	return retMat.Mul(1 / det)
 }
 
-// Equal performs an element-wise approximate equality test between two matrices,
-// as if FloatEqual had been used.
-func (m1 *Mat2x3) Equal(m2 *Mat2x3) bool {
-	return FloatEqual(m1[0], m2[0]) && FloatEqual(m1[1], m2[1]) && FloatEqual(m1[2], m2[2]) &&
-		FloatEqual(m1[3], m2[3]) && FloatEqual(m1[4], m2[4]) && FloatEqual(m1[5], m2[5])
-}
-
-// EqualThreshold performs an element-wise approximate equality test between two matrices
-// with a given epsilon threshold, as if FloatEqualThreshold had been used.
-func (m1 *Mat2x3) EqualThreshold(m2 *Mat2x3, threshold float32) bool {
-	return FloatEqualThreshold(m1[0], m2[0], threshold) && FloatEqualThreshold(m1[1], m2[1], threshold) &&
-		FloatEqualThreshold(m1[2], m2[2], threshold) && FloatEqualThreshold(m1[3], m2[3], threshold) &&
-		FloatEqualThreshold(m1[4], m2[4], threshold) && FloatEqualThreshold(m1[5], m2[5], threshold)
-}
-
-// FuncEqual performs an element-wise approximate equality test between two matrices
-// with a given equality functions, intended to be used with FloatEqualFunc; although and comparison
-// function may be used in practice.
-func (m1 *Mat2x3) FuncEqual(m2 *Mat2x3, eq func(float32, float32) bool) bool {
-	return eq(m1[0], m2[0]) && eq(m1[1], m2[1]) && eq(m1[2], m2[2]) && eq(m1[3], m2[3]) &&
-		eq(m1[4], m2[4]) && eq(m1[5], m2[5])
-}
-
-// At returns the matrix element at the given row and column.
-// This is equivalent to mat[col * numRow + row] where numRow is constant
-// (E.G. for a Mat3x2 it's equal to 3)
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// At(5,0) will work just like At(1,1). Or it may panic if it's out of bounds.
-func (m1 *Mat2x3) At(row, col int) float32 {
-	return m1[col*2+row]
-}
-
-// Set sets the corresponding matrix element at the given row and column.
-// This has a pointer receiver because it mutates the matrix.
-//
-// This method is garbage-in garbage-out. For instance, on a Mat4 asking for
-// Set(5,0,val) will work just like Set(1,1,val). Or it may panic if it's out of bounds.
-func (m1 *Mat2x3) Set(row, col int, value float32) {
-	m1[col*2+row] = value
-}
-
-// Index returns the index of the given row and column, to be used with direct
-// access. E.G. Index(0,0) = 0.
-//
-// This is a garbage-in garbage-out method. For instance, on a Mat4 asking for the index of
-// (5,0) will work the same as asking for (1,1). Or it may give you a value that will cause
-// a panic if you try to access the array with it if it's truly out of bounds.
-func (Mat2x3) Index(row, col int) int {
-	return col*2 + row
-}
-
 // Row returns a vector representing the corresponding row (starting at row 0).
 // This package makes no distinction between row and column vectors, so it
 // will be a normal VecM for a MxN matrix.
@@ -2436,19 +2249,4 @@ func (m1 *Mat2x3) Cols() (col0, col1, col2 Vec2) {
 // Abs returns the element-wise absolute value of this matrix
 func (m1 *Mat2x3) Abs() Mat2x3 {
 	return Mat2x3{math.Abs(m1[0]), math.Abs(m1[1]), math.Abs(m1[2]), math.Abs(m1[3]), math.Abs(m1[4]), math.Abs(m1[5])}
-}
-
-// String pretty prints the matrix
-func (m1 *Mat2x3) String() string {
-	var buf bytes.Buffer
-	w := tabwriter.NewWriter(&buf, 4, 4, 1, ' ', tabwriter.AlignRight)
-	for i := 0; i < 2; i++ {
-		for _, col := range m1.Row(i) {
-			fmt.Fprintf(w, "%f\t", col)
-		}
-		fmt.Fprintln(w, "")
-	}
-	w.Flush()
-
-	return buf.String()
 }

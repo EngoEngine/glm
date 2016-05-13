@@ -655,7 +655,7 @@ func TestSphereTriangle(s *Sphere, a, b, c *glm.Vec3) bool {
 // TestTriangleAABB returns true if [v0 v1 v2] intersects b
 func TestTriangleAABB(v0, v1, v2 *glm.Vec3, b *AABB) bool {
 	panic("implementation incomplete")
-	var p0, p2, r float32
+	/*var p0, p2, r float32
 	//var p1 float32
 	// Translate triangle as conceptually moving AABB to origin
 	u0 := v0.Sub(&b.Center)
@@ -697,7 +697,7 @@ func TestTriangleAABB(v0, v1, v2 *glm.Vec3, b *AABB) bool {
 	var p Plane
 	p.N = f0.Cross(&f1)
 	p.P = u0
-	return TestAABBPlane(b, &p)
+	return TestAABBPlane(b, &p)*/
 }
 
 // IntersectSegmentPlane returns how far in the segment, the point in world

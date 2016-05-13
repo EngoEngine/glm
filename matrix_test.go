@@ -421,7 +421,7 @@ func TestMat2FromCols(t *testing.T) {
 		3, 4,
 	}
 	if m2 != from {
-		t.Errorf("Mat2FromCols unexpected result \n%swant\n%s", from, m2)
+		t.Errorf("Mat2FromCols unexpected result \n%swant\n%s", from.String(), m2.String())
 	}
 }
 
