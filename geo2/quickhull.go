@@ -172,7 +172,7 @@ func convexHull2FromPoints(points []glm.Vec2) ConvexHull {
 	// make a backing array that holds continuously all the memory of the hull
 	backup := make([]byte, vertexArraySize+edgeArraySize+vecArraySize)
 
-	// make the slice header for the vertices, this starts at the very begining
+	// make the slice header for the vertices, this starts at the very beginning
 	// of the backing array.
 	vertexSliceHeader := reflect.SliceHeader{
 		Data: uintptr(unsafe.Pointer(&backup[0])),

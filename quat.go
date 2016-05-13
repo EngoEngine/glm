@@ -371,7 +371,7 @@ func (q1 *Quat) ApproxEqual(q2 *Quat) bool {
 }
 
 // ApproxEqualThreshold returns whether the quaternions are approximately equal
-// with a given tolerence, as if FloatEqualThreshold was called on each matching
+// with a given tolerance, as if FloatEqualThreshold was called on each matching
 // element with the given epsilon.
 func (q1 *Quat) ApproxEqualThreshold(q2 *Quat, epsilon float32) bool {
 	return FloatEqualThreshold(q1.W, q2.W, epsilon) && q1.V.ApproxEqualThreshold(&q2.V, epsilon)
@@ -395,7 +395,7 @@ func (q1 *Quat) OrientationEqual(q2 *Quat) bool {
 }
 
 // OrientationEqualThreshold returns whether the quaternions represents the same
-// orientation with a given tolerence.
+// orientation with a given tolerance.
 func (q1 *Quat) OrientationEqualThreshold(q2 *Quat, epsilon float32) bool {
 	n1 := q1.Normalized()
 	n2 := q2.Normalized()
