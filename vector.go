@@ -128,8 +128,8 @@ func (v1 *Vec2) Cross(v2 *Vec2) float32 {
 	return v1[0]*v2[1] - v1[1]*v2[0]
 }
 
-// Cross is an operation only defined on 3D vectors, commonly refered to as "the
-// cross product". It is equivalent to
+// Cross is an operation only defined on 3D vectors, commonly referred to as
+// "the cross product". It is equivalent to
 // Vec3{v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]}.
 // Another interpretation is that it's the vector whose magnitude is
 // |v1||v2|sin(theta) where theta is the angle between v1 and v2.
@@ -318,7 +318,7 @@ func (v1 *Vec2) Normalized() Vec2 {
 	return Vec2{v1[0] * l, v1[1] * l}
 }
 
-// Normalize is the same as Normalize but doesnt return a new vector.
+// Normalize is the same as Normalize but doesn't return a new vector.
 func (v1 *Vec2) Normalize() {
 	l := 1.0 / v1.Len()
 	v1[0] *= l
@@ -531,7 +531,7 @@ func (v1 *Vec3) Normalized() Vec3 {
 	return Vec3{v1[0] * l, v1[1] * l, v1[2] * l}
 }
 
-// Normalize is the same as Normalize but doesnt return a new vector.
+// Normalize is the same as Normalize but doesn't return a new vector.
 func (v1 *Vec3) Normalize() {
 	l := 1.0 / v1.Len()
 	v1[0] *= l
@@ -759,7 +759,7 @@ func (v1 *Vec4) Normalized() Vec4 {
 	return Vec4{v1[0] * l, v1[1] * l, v1[2] * l, v1[3] * l}
 }
 
-// Normalize is the same as Normalize but doesnt return a new vector.
+// Normalize is the same as Normalize but doesn't return a new vector.
 func (v1 *Vec4) Normalize() {
 	l := 1.0 / v1.Len()
 	v1[0] *= l
