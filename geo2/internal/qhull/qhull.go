@@ -15,9 +15,9 @@ const (
 // SupportDirection is the direction that we use to cache the direction for the
 // Support function.
 var SupportDirection = [3]glm.Vec2{
-	glm.Vec2{math.Cos(0 * math.Pi / 3), math.Sin(0 * math.Pi / 3)},
-	glm.Vec2{math.Cos(2 * math.Pi / 3), math.Sin(2 * math.Pi / 3)},
-	glm.Vec2{math.Cos(4 * math.Pi / 3), math.Sin(4 * math.Pi / 3)},
+	{math.Cos(0 * math.Pi / 3), math.Sin(0 * math.Pi / 3)},
+	{math.Cos(2 * math.Pi / 3), math.Sin(2 * math.Pi / 3)},
+	{math.Cos(4 * math.Pi / 3), math.Sin(4 * math.Pi / 3)},
 }
 
 // Vertex is a convex hull vertex
