@@ -1,6 +1,6 @@
 # glm ![Build Status](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/status.svg) ![Tests](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/test.svg) ![Coverage](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/cover.svg) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/luxengine/glm)
 
-VENDOR THIS IF YOU'RE USING IT. The API is not quite stable yet.
+VENDOR THIS IF YOU'RE USING IT. The API is not quite stable yet. Specialy geo*.
 
 More efficient version then go-gl math lib and better name (mgl32 is too long to type).
 
