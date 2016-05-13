@@ -538,7 +538,8 @@ func ClosestPointTetrahedronPoint(p, a, b, c, d *glm.Vec3) glm.Vec3 {
 		pq := q.Sub(p)
 		sqDist := pq.Len2()
 		if sqDist < bestSqDist {
-			bestSqDist = sqDist
+			// doesn't matter at this point
+			//bestSqDist = sqDist
 			closestPoint = q
 		}
 	}

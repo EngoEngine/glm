@@ -180,7 +180,7 @@ func BenchmarkQuatRotateConjugate(b *testing.B) {
 		m := q.Mul(&Quat{0, v})
 		c := q.Conjugated()
 
-		v = m.Mul(&c).V
+		_ = m.Mul(&c).V
 	}
 }
 

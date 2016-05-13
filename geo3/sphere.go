@@ -70,7 +70,8 @@ func EigenSphere(points []glm.Vec3) Sphere {
 	}
 	if maxf := math.Abs(m[3*2+2]); maxf > maxe {
 		maxc = 2
-		maxe = maxf
+		// not used ? but in the algorithm.
+		//maxe = maxf
 	}
 
 	var e glm.Vec3
