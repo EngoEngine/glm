@@ -87,9 +87,9 @@ func Quickhull(points []glm.Vec3) {
 		for n, edge := range horizon {
 			newfaces[n].Vertices = [3]int{faces[iface].Conflicts[iconflict].Index, edge.Tail, edge.Twin.Tail}
 			newfaces[n].Edges = [3]*qhull.Edge{
-				&qhull.Edge{Tail: newfaces[n].Vertices[1], Face: &newfaces[n]},
-				&qhull.Edge{Tail: newfaces[n].Vertices[0], Face: &newfaces[n], Twin: edge},
-				&qhull.Edge{Tail: newfaces[n].Vertices[2], Face: &newfaces[n]},
+				{Tail: newfaces[n].Vertices[1], Face: &newfaces[n]},
+				{Tail: newfaces[n].Vertices[0], Face: &newfaces[n], Twin: edge},
+				{Tail: newfaces[n].Vertices[2], Face: &newfaces[n]},
 			}
 			edge.Twin = newfaces[n].Edges[1]
 

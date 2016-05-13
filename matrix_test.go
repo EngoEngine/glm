@@ -72,10 +72,10 @@ func TestMatRowsSquare(t *testing.T) {
 
 func TestMatColsSquare(t *testing.T) {
 	t.Parallel()
-	cols := [4]Vec4{Vec4{1, 2, 3, 4},
-		Vec4{5, 6, 7, 8},
-		Vec4{9, 10, 11, 12},
-		Vec4{13, 14, 15, 16},
+	cols := [4]Vec4{{1, 2, 3, 4},
+		{5, 6, 7, 8},
+		{9, 10, 11, 12},
+		{13, 14, 15, 16},
 	}
 	m1 := Mat4FromCols(&cols[0], &cols[1], &cols[2], &cols[3])
 

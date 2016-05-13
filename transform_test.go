@@ -17,12 +17,12 @@ func TestTransform_Iden(t *testing.T) {
 func TestTransform_Translate(t *testing.T) {
 	t.Parallel()
 	tests := []Vec3{
-		Vec3{1, 2, 3},
-		Vec3{3, 2, 1},
-		Vec3{4, 6, 8},
-		Vec3{1, 5, 9},
-		Vec3{9, 8, 0},
-		Vec3{-9, 8, -0},
+		{1, 2, 3},
+		{3, 2, 1},
+		{4, 6, 8},
+		{1, 5, 9},
+		{9, 8, 0},
+		{-9, 8, -0},
 	}
 
 	for i, test := range tests {
@@ -46,12 +46,12 @@ func TestTransform_Translate(t *testing.T) {
 func TestTransform_SetTranslate(t *testing.T) {
 	t.Parallel()
 	tests := []Vec3{
-		Vec3{1, 2, 3},
-		Vec3{3, 2, 1},
-		Vec3{4, 6, 8},
-		Vec3{1, 5, 9},
-		Vec3{9, 8, 0},
-		Vec3{-9, 8, -0},
+		{1, 2, 3},
+		{3, 2, 1},
+		{4, 6, 8},
+		{1, 5, 9},
+		{9, 8, 0},
+		{-9, 8, -0},
 	}
 
 	for i, test := range tests {
