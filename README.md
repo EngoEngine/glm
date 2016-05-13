@@ -1,4 +1,4 @@
-# glm ![Build Status](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/status.svg) ![Tests](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/test.svg) ![Coverage](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/cover.svg) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/luxengine/glm)
+# glm [![Build Status](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/status.svg)](http://lionheart.hydroflame.net:8080/job/glm/) [![Tests](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/test.svg)](http://lionheart.hydroflame.net:8080/job/glm/) [![Coverage](http://lionheart.hydroflame.net:8080/job/glm/lastSuccessfulBuild/artifact/cover.svg)](http://lionheart.hydroflame.net:8080/job/glm/) [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/luxengine/glm)
 
 VENDOR THIS IF YOU'RE USING IT. The API is not quite stable yet. Specialy geo*.
 
