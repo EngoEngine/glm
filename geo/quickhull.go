@@ -3,7 +3,7 @@ package geo3
 import (
 	"fmt"
 	"github.com/luxengine/glm"
-	"github.com/luxengine/glm/geo3/internal/qhull"
+	"github.com/luxengine/glm/geo/internal/qhull"
 	"github.com/luxengine/math"
 )
 
