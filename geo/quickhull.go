@@ -1,4 +1,4 @@
-package geo3
+package geo
 
 import (
 	"fmt"
