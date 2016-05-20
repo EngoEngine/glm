@@ -226,6 +226,10 @@ func TestIsClamped(t *testing.T) {
 	if IsClamped(1.5, 0.0, 1.0) {
 		t.Errorf("Test above max threshold returns false positive")
 	}
+
+	if IsClamped(1.5, 0.0, 1.0) {
+		t.Errorf("Test above max threshold returns false positive")
+	}
 }
 
 /* These benchmarks probably aren't very interesting, there's not really many ways to optimize the functions they're benchmarking */
@@ -289,20 +293,6 @@ func TestRound(t *testing.T) {
 		if r := Round(c.Value, c.Precision); r != c.Expected {
 			t.Errorf("Round(%v, %v) != %v (got %v)", c.Value, c.Precision, c.Expected, r)
 		}
-	}
-}
-
-func TestClampFunc(t *testing.T) {
-	t.Parallel()
-	clamp := ClampFunc(0, 1)
-	if clamp(-1) != 0 {
-		t.Errorf("clamp func failed to turn -1 into a 0")
-	}
-	if clamp(2) != 1 {
-		t.Errorf("clamp func failed to turn 2 into a 1")
-	}
-	if clamp(0.5) != 0.5 {
-		t.Errorf("clamp func failed to turn 0.5 into a 0.5")
 	}
 }
 

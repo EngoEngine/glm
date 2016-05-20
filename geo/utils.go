@@ -50,16 +50,17 @@ func ExtremePointsAlongDirection(direction *glm.Vec3, points []glm.Vec3) (imin i
 
 // Variance computes the variance of a float slice.
 func Variance(s []float32) float32 {
+	ool := 1.0 / float32(len(s))
 	var u float32
 	for i := range s {
 		u += s[i]
 	}
-	u /= float32(len(s))
+	u *= ool
 	var s2 float32
 	for i := range s {
 		s2 += (s[i] - u) * (s[i] - u)
 	}
-	return s2 / float32(len(s))
+	return s2 * ool
 }
 
 // CovarianceMatrix computes the covariance matrix of the given set of points.

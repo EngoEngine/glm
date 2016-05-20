@@ -135,7 +135,7 @@ func TestVecCrossProduct(t *testing.T) {
 	expected := Vec3{-9, 18, -9}
 	result := v1.Cross(&v2)
 
-	if !expected.ApproxEqual(&result) {
+	if !expected.Equal(&result) {
 		t.Errorf("Vec3 cross product %v x %v Got: %v. Expected: %v.",
 			v1, v2, result, expected)
 	}
@@ -149,7 +149,7 @@ func TestVecCrossOfProduct(t *testing.T) {
 	var result Vec3
 	result.CrossOf(&v1, &v2)
 
-	if !expected.ApproxEqual(&result) {
+	if !expected.Equal(&result) {
 		t.Errorf("Vec3 cross product %v x %v Got: %v. Expected: %v.",
 			v1, v2, result, expected)
 	}
@@ -163,7 +163,7 @@ func TestVecCrossWithProduct(t *testing.T) {
 	result := v1
 	result.CrossWith(&v2)
 
-	if !expected.ApproxEqual(&result) {
+	if !expected.Equal(&result) {
 		t.Errorf("Vec3 cross product %v x %v Got: %v. Expected: %v.",
 			v1, v2, result, expected)
 	}
@@ -206,7 +206,7 @@ func Test2DVecNormalize(t *testing.T) {
 	v := Vec2{3, 4}
 	norm := v.Normalized()
 	expected := &Vec2{0.6, 0.8}
-	if !norm.ApproxEqual(expected) {
+	if !norm.Equal(expected) {
 		t.Errorf("%v.Normalize() failed. Got: %v. Expected: %v",
 			v, norm, expected)
 	}
@@ -254,32 +254,24 @@ func TestVecEqual(t *testing.T) {
 	v3, errV3 := Vec3{1, 2, 3}, Vec3{1, 2, 0}
 	v4, errV4 := Vec4{1, 2, 3, 4}, Vec4{1, 2, 0, 4}
 
-	assert(v2.ApproxEqual(&v2), "Vec2.ApproxEqual")
-	assert(!v2.ApproxEqual(&errV2), "Vec2.ApproxEqual")
+	assert(v2.Equal(&v2), "Vec2.Equal")
+	assert(!v2.Equal(&errV2), "Vec2.Equal")
 
-	assert(v2.ApproxEqualThreshold(&v2, 0.1), "Vec2.ApproxEqualThreshold")
-	assert(!v2.ApproxEqualThreshold(&errV2, 0.1), "Vec2.ApproxEqualThreshold")
+	assert(v2.EqualThreshold(&v2, 0.1), "Vec2.EqualThreshold")
+	assert(!v2.EqualThreshold(&errV2, 0.1), "Vec2.EqualThreshold")
 
-	assert(v2.ApproxFuncEqual(&v2, FloatEqual), "Vec2.ApproxFuncEq")
-	assert(!v2.ApproxFuncEqual(&errV2, FloatEqual), "Vec2.ApproxFuncEq")
+	assert(v3.Equal(&v3), "Vec3.Equal")
+	assert(!v3.Equal(&errV3), "Vec3.Equal")
 
-	assert(v3.ApproxEqual(&v3), "Vec3.ApproxEqual")
-	assert(!v3.ApproxEqual(&errV3), "Vec3.ApproxEqual")
+	assert(v3.EqualThreshold(&v3, 0.1), "Vec3.EqualThreshold")
+	assert(!v3.EqualThreshold(&errV3, 0.1), "Vec3.EqualThreshold")
 
-	assert(v3.ApproxEqualThreshold(&v3, 0.1), "Vec3.ApproxEqualThreshold")
-	assert(!v3.ApproxEqualThreshold(&errV3, 0.1), "Vec3.ApproxEqualThreshold")
+	assert(v4.Equal(&v4), "Vec4.Equal")
+	assert(!v4.Equal(&errV4), "Vec4.Equal")
 
-	assert(v3.ApproxFuncEqual(&v3, FloatEqual), "Vec3.ApproxFuncEq")
-	assert(!v3.ApproxFuncEqual(&errV3, FloatEqual), "Vec3.ApproxFuncEq")
+	assert(v4.EqualThreshold(&v4, 0.1), "Vec4.EqualThreshold")
+	assert(!v4.EqualThreshold(&errV4, 0.1), "Vec4.EqualThreshold")
 
-	assert(v4.ApproxEqual(&v4), "Vec4.ApproxEqual")
-	assert(!v4.ApproxEqual(&errV4), "Vec4.ApproxEqual")
-
-	assert(v4.ApproxEqualThreshold(&v4, 0.1), "Vec4.ApproxEqualThreshold")
-	assert(!v4.ApproxEqualThreshold(&errV4, 0.1), "Vec4.ApproxEqualThreshold")
-
-	assert(v4.ApproxFuncEqual(&v4, FloatEqual), "Vec4.ApproxFuncEq")
-	assert(!v4.ApproxFuncEqual(&errV4, FloatEqual), "Vec4.ApproxFuncEq")
 }
 
 func TestOuterProd2(t *testing.T) {

@@ -4,6 +4,22 @@ import (
 	"github.com/luxengine/math"
 )
 
+var (
+	// MinNormal is the smallest normal value possible.
+	MinNormal = float32(1.1754943508222875e-38) // 1 / 2**(127 - 1)
+	// MinValue is the smallest non zero value possible.
+	MinValue = float32(math.SmallestNonzeroFloat32)
+	// MaxValue is the highest value a float32 can have.
+	MaxValue = float32(math.MaxFloat32)
+
+	// InfPos is the positive infinity value.
+	InfPos = float32(math.Inf(1))
+	// InfNeg is the positive infinity value.
+	InfNeg = float32(math.Inf(-1))
+	// NaN is a shortcut for not a number
+	NaN = float32(math.NaN())
+)
+
 // Epsilon is some tiny value that determines how precisely equal we want our
 // floats to be. This is exported and left as a variable in case you want to
 // change the default threshold for the purposes of certain methods (e.g.
@@ -21,31 +37,6 @@ var Epsilon float32 = 1e-10
 func FloatEqual(a, b float32) bool {
 	return FloatEqualThreshold(a, b, Epsilon)
 }
-
-// FloatEqualFunc is a utility closure that will generate a function that
-// always approximately compares floats like FloatEqualThreshold with a different
-// threshold.
-func FloatEqualFunc(epsilon float32) func(float32, float32) bool {
-	return func(a, b float32) bool {
-		return FloatEqualThreshold(a, b, epsilon)
-	}
-}
-
-var (
-	// MinNormal is the smallest normal value possible.
-	MinNormal = float32(1.1754943508222875e-38) // 1 / 2**(127 - 1)
-	// MinValue is the smallest non zero value possible.
-	MinValue = float32(math.SmallestNonzeroFloat32)
-	// MaxValue is the highest value a float32 can have.
-	MaxValue = float32(math.MaxFloat32)
-
-	// InfPos is the positive infinity value.
-	InfPos = float32(math.Inf(1))
-	// InfNeg is the positive infinity value.
-	InfNeg = float32(math.Inf(-1))
-	// NaN is a shortcut for not a number
-	NaN = float32(math.NaN())
-)
 
 // FloatEqualThreshold is a utility function to compare floats.
 // It's Taken from http://floating-point-gui.de/errors/comparison/
@@ -78,14 +69,6 @@ func Clamp(a, low, high float32) float32 {
 	}
 
 	return a
-}
-
-// ClampFunc generates a closure that always checks if the value
-// passed in is between two constant values.
-func ClampFunc(low, high float32) func(float32) float32 {
-	return func(a float32) float32 {
-		return Clamp(a, low, high)
-	}
 }
 
 // IsClamped checks if a is clamped between low and high as if

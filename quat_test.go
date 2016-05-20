@@ -115,7 +115,7 @@ func TestAnglesToQuatZYX(t *testing.T) {
 		t.Errorf("Quaternion W incorrect. Got: %f Expected: %f", q.W, .9227)
 	}
 
-	if !q.V.ApproxEqualThreshold(&Vec3{-0.0191, 0.0462, 0.3822}, 1e-3) {
+	if !q.V.EqualThreshold(&Vec3{-0.0191, 0.0462, 0.3822}, 1e-3) {
 		t.Errorf("Quaternion V incorrect. Got: %v, Expected: %v", q.V, Vec3{-0.0191, 0.0462, 0.3822})
 	}
 }
@@ -132,7 +132,7 @@ func TestQuatMatRotateY(t *testing.T) {
 	r := Rotate3DY(math.Pi)
 	expected := r.Mul3x1(&v)
 	t.Logf("Computed from rotation matrix: %v", expected)
-	if !result.ApproxEqualThreshold(&expected, 1e-4) {
+	if !result.EqualThreshold(&expected, 1e-4) {
 		t.Errorf("Quaternion rotating vector doesn't match 3D matrix method. Got: %v, Expected: %v", result, expected)
 	}
 	m := q.Mul(&Quat{0, v})
@@ -140,12 +140,12 @@ func TestQuatMatRotateY(t *testing.T) {
 	mcv := m.Mul(&c).V
 	expected = mcv
 	t.Logf("Computed from conjugate method: %v", expected)
-	if !result.ApproxEqualThreshold(&expected, 1e-4) {
+	if !result.EqualThreshold(&expected, 1e-4) {
 		t.Errorf("Quaternion rotating vector doesn't match slower conjugate method. Got: %v, Expected: %v", result, expected)
 	}
 
 	expected = Vec3{-1, 0, 0}
-	if !result.ApproxEqualThreshold(&expected, 4e-4) { // The result we get for z is like 8e-8, but a 1e-4 threshold juuuuuust causes it to freak out when compared to 0.0
+	if !result.EqualThreshold(&expected, 4e-4) { // The result we get for z is like 8e-8, but a 1e-4 threshold juuuuuust causes it to freak out when compared to 0.0
 		t.Errorf("Quaternion rotating vector doesn't match hand-computed result. Got: %v, Expected: %v", result, expected)
 	}
 }
@@ -270,7 +270,7 @@ func TestMat4ToQuat(t *testing.T) {
 
 	threshold := math.Pow(10, -2)
 	for _, c := range tests {
-		if r := Mat4ToQuat(c.Rotation); !r.ApproxEqualThreshold(c.Expected, threshold) {
+		if r := Mat4ToQuat(c.Rotation); !r.EqualThreshold(c.Expected, threshold) {
 			t.Errorf("%v failed: Mat4ToQuat(%v) != %v (got %v)", c.Description, c.Rotation, c.Expected, r)
 		}
 	}
@@ -495,15 +495,15 @@ func TestCompareLookAt(t *testing.T) {
 			rm := mv4.Vec3()
 			rq := q.Rotate(o)
 
-			if !rq.ApproxEqualThreshold(&rm, threshold) {
+			if !rq.EqualThreshold(&rm, threshold) {
 				t.Errorf("%v failed: QuatLookAtV() != LookAtV()", c.Description)
 			}
 
-			if !e.ApproxEqualThreshold(&rm, threshold) {
+			if !e.EqualThreshold(&rm, threshold) {
 				t.Errorf("%v failed: (%v).Mul4x1(%v) != %v (got %v)", c.Description, m, o, e, rm)
 			}
 
-			if !e.ApproxEqualThreshold(&rq, threshold) {
+			if !e.EqualThreshold(&rq, threshold) {
 				t.Errorf("%v failed: (%v).Rotate(%v) != %v (got %v)", c.Description, q, o, e, rq)
 			}
 		}
@@ -578,8 +578,8 @@ func TestQuatEqual(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.A.ApproxEqualThreshold(c.B, 1e-4); r != c.Expected {
-			t.Errorf("Quat(%v).ApproxEqualThreshold(Quat(%v), 1e-4) != %v (got %v)", c.A, c.B, c.Expected, r)
+		if r := c.A.EqualThreshold(c.B, 1e-4); r != c.Expected {
+			t.Errorf("Quat(%v).EqualThreshold(Quat(%v), 1e-4) != %v (got %v)", c.A, c.B, c.Expected, r)
 		}
 	}
 }
@@ -615,7 +615,7 @@ func TestQuatAdd(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.A.Add(c.B); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := c.A.Add(c.B); !r.EqualThreshold(c.Expected, 1e-4) {
 			t.Errorf("Quat(%v).Add(Quat(%v)) != %v (got %v)", c.A, c.B, c.Expected, r)
 		}
 	}
@@ -633,7 +633,7 @@ func TestQuatSub(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.A.Sub(c.B); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := c.A.Sub(c.B); !r.EqualThreshold(c.Expected, 1e-4) {
 			t.Errorf("Quat(%v).Sub(Quat(%v)) != %v (got %v)", c.A, c.B, c.Expected, r)
 		}
 	}
@@ -652,7 +652,7 @@ func TestQuatScale(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.Rotation.Scale(c.Scalar); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := c.Rotation.Scale(c.Scalar); !r.EqualThreshold(c.Expected, 1e-4) {
 			t.Errorf("Quat(%v).Scale(%v) != %v (got %v)", c.Rotation, c.Scalar, c.Expected, r)
 		}
 	}
@@ -697,7 +697,7 @@ func TestQuatNormalize(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.Rotation.Normalized(); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := c.Rotation.Normalized(); !r.EqualThreshold(c.Expected, 1e-4) {
 			t.Errorf("Quat(%v).Normalize() != %v (got %v)", c.Rotation, c.Expected, r)
 		}
 	}
@@ -715,7 +715,7 @@ func TestQuatInverse(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := c.Rotation.Inverse(); !r.ApproxEqualThreshold(c.Expected, 1e-4) {
+		if r := c.Rotation.Inverse(); !r.EqualThreshold(c.Expected, 1e-4) {
 			t.Errorf("Quat(%v).Inverse() != %v (got %v)", c.Rotation, c.Expected, r)
 		}
 	}
@@ -739,7 +739,7 @@ func TestQuatSlerp(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := QuatSlerp(c.A, c.B, c.Scalar); !r.ApproxEqualThreshold(c.Expected, 1e-2) {
+		if r := QuatSlerp(c.A, c.B, c.Scalar); !r.EqualThreshold(c.Expected, 1e-2) {
 			t.Errorf("QuatSlerp(%v, %v, %v) != %v (got %v)", c.A, c.B, c.Scalar, c.Expected, r)
 		}
 	}
@@ -763,15 +763,15 @@ func TestQuatDot(t *testing.T) {
 	}
 }
 
-func TestApproxEqual(t *testing.T) {
+func TestQuat_Equal(t *testing.T) {
 	t.Parallel()
 	q1 := Quat{1, Vec3{2, 3, 4}}
 	q2 := Quat{1, Vec3{2, 3, 4}}
-	if !q1.ApproxEqual(&q2) {
+	if !q1.Equal(&q2) {
 		t.Errorf("quaternion should be equal %+v, %+v", q1, q2)
 	}
 	q2 = Quat{2, Vec3{6, 2, 5}}
-	if q1.ApproxEqual(&q2) {
+	if q1.Equal(&q2) {
 		t.Errorf("quaternion shouldnt be equal %+v, %+v", q1, q2)
 	}
 }
@@ -796,7 +796,7 @@ func TestQuatLerp(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := QuatLerp(&c.A, &c.B, c.Amount); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+		if r := QuatLerp(&c.A, &c.B, c.Amount); !r.EqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("QuatLerp(Quat(%v), (Quat(%v))) != %v (got %v)", c.A, c.B, c.Expected, r)
 		}
 	}
@@ -814,7 +814,7 @@ func TestQuatBetweenVectors(t *testing.T) {
 	}
 
 	for _, c := range tests {
-		if r := QuatBetweenVectors(&c.A, &c.B); !r.ApproxEqualThreshold(&c.Expected, 1e-4) {
+		if r := QuatBetweenVectors(&c.A, &c.B); !r.EqualThreshold(&c.Expected, 1e-4) {
 			t.Errorf("QuatBetweenVectors(Vec3(%v), (Vec3(%v))) != %v (got %v)", c.A, c.B, c.Expected, r)
 		}
 	}
@@ -882,7 +882,7 @@ func TestQuat_AddOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.AddOf(&test.q1, &test.q2)
-		if !q.ApproxEqualThreshold(&test.add, 1e-4) {
+		if !q.EqualThreshold(&test.add, 1e-4) {
 			t.Errorf("[%d] q1 + q2 = %v, want %v", i, q, test.add)
 		}
 	}
@@ -893,7 +893,7 @@ func TestQuat_AddWith(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.AddWith(&test.q2)
-		if !q.ApproxEqualThreshold(&test.add, 1e-4) {
+		if !q.EqualThreshold(&test.add, 1e-4) {
 			t.Errorf("[%d] q1 + q2 = %v, want %v", i, q, test.add)
 		}
 	}
@@ -904,7 +904,7 @@ func TestQuat_SubOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.SubOf(&test.q1, &test.q2)
-		if !q.ApproxEqualThreshold(&test.sub, 1e-4) {
+		if !q.EqualThreshold(&test.sub, 1e-4) {
 			t.Errorf("[%d] q1 - q2 = %v, want %v", i, q, test.sub)
 		}
 	}
@@ -915,7 +915,7 @@ func TestQuat_SubWith(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.SubWith(&test.q2)
-		if !q.ApproxEqualThreshold(&test.sub, 1e-4) {
+		if !q.EqualThreshold(&test.sub, 1e-4) {
 			t.Errorf("[%d] q1 - q2 = %v, want %v", i, q, test.sub)
 		}
 	}
@@ -925,7 +925,7 @@ func TestQuat_Mul(t *testing.T) {
 	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Mul(&test.q2)
-		if !q.ApproxEqualThreshold(&test.mul, 1e-4) {
+		if !q.EqualThreshold(&test.mul, 1e-4) {
 			t.Errorf("[%d] q1 * q2 = %v, want %v", i, q, test.mul)
 		}
 	}
@@ -936,7 +936,7 @@ func TestQuat_MulOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.MulOf(&test.q1, &test.q2)
-		if !q.ApproxEqualThreshold(&test.mul, 1e-4) {
+		if !q.EqualThreshold(&test.mul, 1e-4) {
 			t.Errorf("[%d] q1 * q2 = %v, want %v", i, q, test.mul)
 		}
 	}
@@ -947,7 +947,7 @@ func TestQuat_MulWith(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.MulWith(&test.q2)
-		if !q.ApproxEqualThreshold(&test.mul, 1e-4) {
+		if !q.EqualThreshold(&test.mul, 1e-4) {
 			t.Errorf("[%d] q1 * q2 = %v, want %v", i, q, test.mul)
 		}
 	}
@@ -957,7 +957,7 @@ func TestQuat_Scale(t *testing.T) {
 	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Scale(test.f)
-		if !q.ApproxEqualThreshold(&test.scale, 1e-4) {
+		if !q.EqualThreshold(&test.scale, 1e-4) {
 			t.Errorf("[%d] q1 * f = %v, want %v", i, q, test.scale)
 		}
 	}
@@ -968,7 +968,7 @@ func TestQuat_ScaleOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.ScaleOf(test.f, &test.q1)
-		if !q.ApproxEqualThreshold(&test.scale, 1e-4) {
+		if !q.EqualThreshold(&test.scale, 1e-4) {
 			t.Errorf("[%d] q1 * f = %v, want %v", i, q, test.scale)
 		}
 	}
@@ -979,7 +979,7 @@ func TestQuat_ScaleWith(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.ScaleWith(test.f)
-		if !q.ApproxEqualThreshold(&test.scale, 1e-4) {
+		if !q.EqualThreshold(&test.scale, 1e-4) {
 			t.Errorf("[%d] q1 * f = %v, want %v", i, q, test.scale)
 		}
 	}
@@ -989,7 +989,7 @@ func TestQuat_Conjugated(t *testing.T) {
 	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Conjugated()
-		if !q.ApproxEqualThreshold(&test.conj, 1e-4) {
+		if !q.EqualThreshold(&test.conj, 1e-4) {
 			t.Errorf("[%d] conj(q1) = %v, want %v", i, q, test.conj)
 		}
 	}
@@ -1000,7 +1000,7 @@ func TestQuat_Conjugate(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.Conjugate()
-		if !q.ApproxEqualThreshold(&test.conj, 1e-4) {
+		if !q.EqualThreshold(&test.conj, 1e-4) {
 			t.Errorf("[%d] conj(q1) = %v, want %v", i, q, test.conj)
 		}
 	}
@@ -1011,7 +1011,7 @@ func TestQuat_ConjugateOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.ConjugateOf(&test.q1)
-		if !q.ApproxEqualThreshold(&test.conj, 1e-4) {
+		if !q.EqualThreshold(&test.conj, 1e-4) {
 			t.Errorf("[%d] conj(q1) = %v, want %v", i, q, test.conj)
 		}
 	}
@@ -1021,7 +1021,7 @@ func TestQuat_Normalized(t *testing.T) {
 	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Normalized()
-		if !q.ApproxEqualThreshold(&test.normal, 1e-4) {
+		if !q.EqualThreshold(&test.normal, 1e-4) {
 			t.Errorf("[%d] unit(q1) = %v, want %v", i, q, test.normal)
 		}
 	}
@@ -1032,7 +1032,7 @@ func TestQuat_Normalize(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.Normalize()
-		if !q.ApproxEqualThreshold(&test.normal, 1e-4) {
+		if !q.EqualThreshold(&test.normal, 1e-4) {
 			t.Errorf("[%d] unit(q1) = %v, want %v", i, q, test.normal)
 		}
 	}
@@ -1043,7 +1043,7 @@ func TestQuat_SetNormalizeOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.SetNormalizedOf(&test.q1)
-		if !q.ApproxEqualThreshold(&test.normal, 1e-4) {
+		if !q.EqualThreshold(&test.normal, 1e-4) {
 			t.Errorf("[%d] unit(q1) = %v, want %v", i, q, test.normal)
 		}
 	}
@@ -1053,7 +1053,7 @@ func TestQuat_Inverse(t *testing.T) {
 	t.Parallel()
 	for i, test := range quatTests {
 		q := test.q1.Inverse()
-		if !q.ApproxEqualThreshold(&test.inv, 1e-4) {
+		if !q.EqualThreshold(&test.inv, 1e-4) {
 			t.Errorf("[%d] inv(q1) = %v, want %v", i, q, test.inv)
 		}
 	}
@@ -1064,7 +1064,7 @@ func TestQuat_Invert(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.Invert()
-		if !q.ApproxEqualThreshold(&test.inv, 1e-4) {
+		if !q.EqualThreshold(&test.inv, 1e-4) {
 			t.Errorf("[%d] inv(q1) = %v, want %v", i, q, test.inv)
 		}
 	}
@@ -1075,7 +1075,7 @@ func TestQuat_InverseOf(t *testing.T) {
 	for i, test := range quatTests {
 		var q Quat
 		q.InverseOf(&test.q1)
-		if !q.ApproxEqualThreshold(&test.inv, 1e-4) {
+		if !q.EqualThreshold(&test.inv, 1e-4) {
 			t.Errorf("[%d] inv(q1) = %v, want %v", i, q, test.inv)
 		}
 	}
@@ -1086,7 +1086,7 @@ func TestQuat_AddScaledVec(t *testing.T) {
 	for i, test := range quatTests {
 		q := test.q1
 		q.AddScaledVec(test.f, &test.v1)
-		if !q.ApproxEqualThreshold(&test.svec, 1e-4) {
+		if !q.EqualThreshold(&test.svec, 1e-4) {
 			t.Errorf("[%d] addscaledvec(q1) = %v, want %v", i, q, test.svec)
 		}
 	}

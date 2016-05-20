@@ -95,9 +95,8 @@ func TestExtract3DScale(t *testing.T) {
 		},
 	}
 
-	eq := FloatEqualFunc(1e-6)
 	for _, c := range tests {
-		if x, y, z := Extract3DScale(&c.M); !eq(x, c.X) || !eq(y, c.Y) || !eq(z, c.Z) {
+		if x, y, z := Extract3DScale(&c.M); !FloatEqualThreshold(x, c.X, 1e-6) || !FloatEqualThreshold(y, c.Y, 1e-6) || !FloatEqualThreshold(z, c.Z, 1e-6) {
 			t.Errorf("ExtractScale(%v) != %v, %v, %v (got %v, %v, %v)", c.M, c.X, c.Y, c.Z, x, y, z)
 		}
 	}
@@ -128,9 +127,8 @@ func TestExtractMaxScale(t *testing.T) {
 		},
 	}
 
-	eq := FloatEqualFunc(1e-6)
 	for _, c := range tests {
-		if r := ExtractMaxScale(&c.M); !eq(r, c.V) {
+		if r := ExtractMaxScale(&c.M); !FloatEqualThreshold(r, c.V, 1e-6) {
 			t.Errorf("ExtractMaxScale(%v) != %v (got %v)", c.M, c.V, r)
 		}
 	}
@@ -155,7 +153,7 @@ func TestTransformCoordinate(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if v := TransformCoordinate(test.v, test.m); !test.out.ApproxEqualThreshold(&v, 1e-4) {
+		if v := TransformCoordinate(test.v, test.m); !test.out.EqualThreshold(&v, 1e-4) {
 			t.Errorf("TransformCoordinate on vector %v and matrix %v fails to give result %v (got %v)", test.v, test.m, test.out, v)
 		}
 	}
@@ -179,7 +177,7 @@ func TestTransformNormal(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if v := TransformNormal(test.v, test.m); !test.out.ApproxEqualThreshold(&v, 1e-4) {
+		if v := TransformNormal(test.v, test.m); !test.out.EqualThreshold(&v, 1e-4) {
 			t.Errorf("TransformNormal on vector %v and matrix %v fails to give result %v (got %v)", test.v, test.m, test.out, v)
 		}
 	}
@@ -210,7 +208,7 @@ func TestRotate2D(t *testing.T) {
 
 	for i, test := range tests {
 		m := Rotate2D(test.angle)
-		if end := m.Mul2x1(&test.start); !end.ApproxEqualThreshold(&test.end, 1e-2) {
+		if end := m.Mul2x1(&test.start); !end.EqualThreshold(&test.end, 1e-2) {
 			t.Errorf("[%d] m * v = %v, want %v", i, end, test.end)
 		}
 	}
@@ -235,15 +233,15 @@ func TestRotate3D(t *testing.T) {
 		x := Rotate3DX(test.angle)
 		y := Rotate3DY(test.angle)
 		z := Rotate3DZ(test.angle)
-		if end := x.Mul3x1(&test.start); !end.ApproxEqualThreshold(&test.endRX, 1e-2) {
+		if end := x.Mul3x1(&test.start); !end.EqualThreshold(&test.endRX, 1e-2) {
 			t.Errorf("[%d] Rotate3DX m * v = %v, want %v", i, end, test.endRX)
 		}
 
-		if end := y.Mul3x1(&test.start); !end.ApproxEqualThreshold(&test.endRY, 1e-2) {
+		if end := y.Mul3x1(&test.start); !end.EqualThreshold(&test.endRY, 1e-2) {
 			t.Errorf("[%d] Rotate3DY m * v = %v, want %v", i, end, test.endRY)
 		}
 
-		if end := z.Mul3x1(&test.start); !end.ApproxEqualThreshold(&test.endRZ, 1e-2) {
+		if end := z.Mul3x1(&test.start); !end.EqualThreshold(&test.endRZ, 1e-2) {
 			t.Errorf("[%d] Rotate3DZ m * v = %v, want %v", i, end, test.endRZ)
 		}
 	}

@@ -14,14 +14,14 @@ func TestProject(t *testing.T) {
 	win := Project(obj, modelview, projection, initialX, initialY, width, height)
 	answer := &Vec3{1205.0000359117985, -1.0000501200556755, 0.5} // From glu.Project()
 
-	if !win.ApproxEqualThreshold(answer, 1e-4) {
+	if !win.EqualThreshold(answer, 1e-4) {
 		var diff Vec3
 		diff.SubOf(&win, answer)
 		t.Errorf("Project does something weird, differs from expected by of %v", diff.Len())
 	}
 
 	objr := UnProject(&win, modelview, projection, initialX, initialY, width, height)
-	if !objr.ApproxEqualThreshold(obj, 1e-4) {
+	if !objr.EqualThreshold(obj, 1e-4) {
 		t.Errorf("UnProject(%v) != %v (got %v)", win, obj, objr)
 	}
 }

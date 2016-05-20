@@ -334,23 +334,16 @@ func NormalizeVec2(v Vec2) Vec2 {
 	return v
 }
 
-// ApproxEqual takes in a vector and does an element-wise
+// Equal takes in a vector and does an element-wise
 // approximate float comparison as if FloatEqual had been used
-func (v1 *Vec2) ApproxEqual(v2 *Vec2) bool {
+func (v1 *Vec2) Equal(v2 *Vec2) bool {
 	return FloatEqual(v1[0], v2[0]) && FloatEqual(v1[1], v2[1])
 }
 
-// ApproxEqualThreshold takes in a threshold for comparing two floats, and uses
+// EqualThreshold takes in a threshold for comparing two floats, and uses
 // it to do an element-wise comparison of the vector to another.
-func (v1 *Vec2) ApproxEqualThreshold(v2 *Vec2, threshold float32) bool {
+func (v1 *Vec2) EqualThreshold(v2 *Vec2, threshold float32) bool {
 	return FloatEqualThreshold(v1[0], v2[0], threshold) && FloatEqualThreshold(v1[1], v2[1], threshold)
-}
-
-// ApproxFuncEqual takes in a func that compares two floats, and uses it to do
-// an element-wise comparison of the vector to another. This is intended to be
-// used with FloatEqualFunc
-func (v1 *Vec2) ApproxFuncEqual(v2 *Vec2, eq func(float32, float32) bool) bool {
-	return eq(v1[0], v2[0]) && eq(v1[1], v2[1])
 }
 
 // X is an element access func, it is equivalent to v[n] where
@@ -549,23 +542,16 @@ func NormalizeVec3(v Vec3) Vec3 {
 	return v
 }
 
-// ApproxEqual takes in a vector and does an element-wise
+// Equal takes in a vector and does an element-wise
 // approximate float comparison as if FloatEqual had been used
-func (v1 *Vec3) ApproxEqual(v2 *Vec3) bool {
+func (v1 *Vec3) Equal(v2 *Vec3) bool {
 	return FloatEqual(v1[0], v2[0]) && FloatEqual(v1[1], v2[1]) && FloatEqual(v1[2], v2[2])
 }
 
-// ApproxEqualThreshold takes in a threshold for comparing two floats, and uses
+// EqualThreshold takes in a threshold for comparing two floats, and uses
 // it to do an element-wise comparison of the vector to another.
-func (v1 *Vec3) ApproxEqualThreshold(v2 *Vec3, threshold float32) bool {
+func (v1 *Vec3) EqualThreshold(v2 *Vec3, threshold float32) bool {
 	return FloatEqualThreshold(v1[0], v2[0], threshold) && FloatEqualThreshold(v1[1], v2[1], threshold) && FloatEqualThreshold(v1[2], v2[2], threshold)
-}
-
-// ApproxFuncEqual takes in a func that compares two floats, and uses it to do
-// an element-wise comparison of the vector to another. This is intended to be
-// used with FloatEqualFunc
-func (v1 *Vec3) ApproxFuncEqual(v2 *Vec3, eq func(float32, float32) bool) bool {
-	return eq(v1[0], v2[0]) && eq(v1[1], v2[1]) && eq(v1[2], v2[2])
 }
 
 // X is an element access func, it is equivalent to v[n] where
@@ -779,23 +765,16 @@ func NormalizeVec4(v Vec4) Vec4 {
 	return v
 }
 
-// ApproxEqual takes in a vector and does an element-wise
+// Equal takes in a vector and does an element-wise
 // approximate float comparison as if FloatEqual had been used
-func (v1 *Vec4) ApproxEqual(v2 *Vec4) bool {
+func (v1 *Vec4) Equal(v2 *Vec4) bool {
 	return FloatEqual(v1[0], v2[0]) && FloatEqual(v1[1], v2[1]) && FloatEqual(v1[2], v2[2]) && FloatEqual(v1[3], v2[3])
 }
 
-// ApproxEqualThreshold takes in a threshold for comparing two floats, and uses
+// EqualThreshold takes in a threshold for comparing two floats, and uses
 // it to do an element-wise comparison of the vector to another.
-func (v1 *Vec4) ApproxEqualThreshold(v2 *Vec4, threshold float32) bool {
+func (v1 *Vec4) EqualThreshold(v2 *Vec4, threshold float32) bool {
 	return FloatEqualThreshold(v1[0], v2[0], threshold) && FloatEqualThreshold(v1[1], v2[1], threshold) && FloatEqualThreshold(v1[2], v2[2], threshold) && FloatEqualThreshold(v1[3], v2[3], threshold)
-}
-
-// ApproxFuncEqual takes in a func that compares two floats, and uses it to do
-// an element-wise comparison of the vector to another. This is intended to be
-// used with FloatEqualFunc
-func (v1 *Vec4) ApproxFuncEqual(v2 *Vec4, eq func(float32, float32) bool) bool {
-	return eq(v1[0], v2[0]) && eq(v1[1], v2[1]) && eq(v1[2], v2[2]) && eq(v1[3], v2[3])
 }
 
 // X is an element access func, it is equivalent to v[n] where
