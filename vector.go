@@ -2,6 +2,7 @@ package glm
 
 import (
 	"fmt"
+
 	"github.com/luxengine/math"
 )
 

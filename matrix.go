@@ -3,8 +3,9 @@ package glm
 import (
 	"bytes"
 	"fmt"
-	"github.com/luxengine/math"
 	"text/tabwriter"
+
+	"github.com/luxengine/math"
 )
 
 // Mat2 represents a column major 2x2 matrix.
