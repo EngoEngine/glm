@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"github.com/luxengine/glm"
+	"github.com/engoengine/glm"
 )
 
 // Rect is a rectangle in 3D space, they are a simpler version of OBBs.

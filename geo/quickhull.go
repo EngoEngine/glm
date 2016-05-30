@@ -2,9 +2,9 @@ package geo
 
 import (
 	"fmt"
-	"github.com/luxengine/glm"
-	"github.com/luxengine/glm/geo/internal/qhull"
-	"github.com/luxengine/math"
+	"github.com/engoengine/glm"
+	"github.com/engoengine/glm/geo/internal/qhull"
+	"github.com/engoengine/math"
 )
 
 // Quickhull returns the convex hull of the given points.

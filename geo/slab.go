@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"github.com/luxengine/glm"
+	"github.com/engoengine/glm"
 )
 
 // Slab represent a region R = (x, y, z) | Near <= a*x + b*y + c*z <= Far

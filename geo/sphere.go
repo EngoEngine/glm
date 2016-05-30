@@ -1,8 +1,8 @@
 package geo
 
 import (
-	"github.com/luxengine/glm"
-	"github.com/luxengine/math"
+	"github.com/engoengine/glm"
+	"github.com/engoengine/math"
 )
 
 // Sphere is a bounding volume for spheres.

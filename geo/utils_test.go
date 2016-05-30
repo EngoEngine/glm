@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"github.com/luxengine/glm"
+	"github.com/engoengine/glm"
 	"math/rand"
 	"testing"
 )

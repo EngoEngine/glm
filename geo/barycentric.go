@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"github.com/luxengine/glm"
+	"github.com/engoengine/glm"
 )
 
 // Barycentric returns the barycentric coordinates for a point in a triangle.

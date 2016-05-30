@@ -1,7 +1,7 @@
 package geo
 
 import (
-	"github.com/luxengine/glm"
+	"github.com/engoengine/glm"
 )
 
 // candidate for optimized barycentric. Actually fails so far. But weird

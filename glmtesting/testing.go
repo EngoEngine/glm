@@ -1,9 +1,9 @@
 package glmtesting
 
 import (
-	"github.com/luxengine/glm"
-	"github.com/luxengine/glm/flops/32/flops"
-	"github.com/luxengine/math"
+	"github.com/engoengine/glm"
+	"github.com/engoengine/glm/flops/32/flops"
+	"github.com/engoengine/math"
 )
 
 // FloatEqual returns true if v0 == v1 for every component. Will also return true

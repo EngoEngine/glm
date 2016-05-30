@@ -1,7 +1,7 @@
 package tensors
 
 import (
-	"github.com/luxengine/glm"
+	"github.com/engoengine/glm"
 )
 
 // Continuous returns a continuous inertia tensor from the given coefficients.
