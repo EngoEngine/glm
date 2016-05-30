@@ -2,7 +2,7 @@ package geo
 
 import (
 	"github.com/engoengine/glm"
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 // AABB is an axis-aligned bounding box

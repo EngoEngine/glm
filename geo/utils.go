@@ -3,7 +3,7 @@ package geo
 import (
 	"github.com/engoengine/glm"
 	"github.com/engoengine/glm/flops/32/flops"
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 // IsConvexQuad returns true if the qualidrateral is convex.

@@ -1,7 +1,7 @@
 package glm
 
 import (
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 	"math/rand"
 	"testing"
 	"time"

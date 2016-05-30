@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"text/tabwriter"
 
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 // Mat2 represents a column major 2x2 matrix.

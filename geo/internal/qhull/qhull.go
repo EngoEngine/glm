@@ -3,7 +3,7 @@ package qhull
 import (
 	"fmt"
 	"github.com/engoengine/glm"
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 const (

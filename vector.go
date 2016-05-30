@@ -3,7 +3,7 @@ package glm
 import (
 	"fmt"
 
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 // Vec2 is the representation of a vector with 2 components.

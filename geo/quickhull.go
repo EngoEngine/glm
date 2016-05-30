@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/engoengine/glm"
 	"github.com/engoengine/glm/geo/internal/qhull"
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 // Quickhull returns the convex hull of the given points.

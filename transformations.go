@@ -1,7 +1,7 @@
 package glm
 
 import (
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 // Rotate2D returns a rotation Matrix about a angle in 2-D space. Specifically

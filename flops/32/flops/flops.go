@@ -1,7 +1,7 @@
 package flops
 
 import (
-	"github.com/engoengine/math"
+	"github.com/luxengine/math"
 )
 
 const (
