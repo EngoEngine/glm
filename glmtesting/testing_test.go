@@ -2,7 +2,7 @@ package glmtesting
 
 import (
 	"github.com/engoengine/glm"
-	"github.com/luxengine/math"
+	"github.com/EngoEngine/math"
 	"testing"
 )
 

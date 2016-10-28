@@ -1,7 +1,7 @@
 package glm
 
 import (
-	"github.com/luxengine/math"
+	"github.com/EngoEngine/math"
 )
 
 // RotationOrder is the order in which

@@ -2,7 +2,7 @@ package geo
 
 import (
 	"github.com/engoengine/glm"
-	"github.com/luxengine/math"
+	"github.com/EngoEngine/math"
 )
 
 // OBB is a Oriented Bounding Box.

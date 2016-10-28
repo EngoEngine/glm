@@ -1,7 +1,7 @@
 package glm
 
 import (
-	"github.com/luxengine/math"
+	"github.com/EngoEngine/math"
 )
 
 // CartesianToSpherical converts 3-dimensional cartesian coordinates (x,y,z) to
