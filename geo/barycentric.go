@@ -9,7 +9,7 @@ import (
 // point p (such as normals, texture coordinates, colors, etc)
 func Barycentric(a, b, c, p *glm.Vec3) (u, v, w float32) {
 	v0, v1, v2 := b.Sub(a), c.Sub(a), p.Sub(a)
-	d00 := v1.Dot(&v1)
+	d00 := v0.Dot(&v0)
 	d01 := v0.Dot(&v1)
 	d11 := v1.Dot(&v1)
 	d20 := v2.Dot(&v0)
