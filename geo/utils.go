@@ -1,9 +1,9 @@
 package geo
 
 import (
+	"github.com/EngoEngine/math"
 	"github.com/engoengine/glm"
 	"github.com/engoengine/glm/flops/32/flops"
-	"github.com/EngoEngine/math"
 )
 
 // IsConvexQuad returns true if the qualidrateral is convex.

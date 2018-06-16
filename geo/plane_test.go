@@ -10,13 +10,13 @@ func TestPlane_PlaneFromPoints(t *testing.T) {
 		points [3]glm.Vec3
 		plane  Plane
 	}{
-	/*{ // 0. up, above 0,0,0
-		points: [3]glm.Vec3{glm.Vec3{0, 1, 0}, glm.Vec3{0, 1, 1}, glm.Vec3{1, 1, 0}},
-		plane: Plane{
-			N: glm.Vec3{0, 1, 0},
-			D: 1,
-		},
-	},*/
+		/*{ // 0. up, above 0,0,0
+			points: [3]glm.Vec3{glm.Vec3{0, 1, 0}, glm.Vec3{0, 1, 1}, glm.Vec3{1, 1, 0}},
+			plane: Plane{
+				N: glm.Vec3{0, 1, 0},
+				D: 1,
+			},
+		},*/
 	}
 
 	for i, test := range tests {
