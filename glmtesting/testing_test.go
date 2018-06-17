@@ -1,8 +1,8 @@
 package glmtesting
 
 import (
-	"github.com/engoengine/glm"
 	"github.com/EngoEngine/math"
+	"github.com/engoengine/glm"
 	"testing"
 )
 
