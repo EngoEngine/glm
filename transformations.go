@@ -181,6 +181,7 @@ func Scale2D(scaleX, scaleY float32) Mat3 {
 //    [[ xz(1-c)-ys, yz(1-c)+xs, z^2(1-c)+c, 0 ]]
 //    [[ 0         , 0         , 0         , 1 ]]
 func HomogRotate3D(angle float32, axis *Vec3) Mat4 {
+	axis.Normalize()
 	x, y, z := axis[0], axis[1], axis[2]
 	s, c := math.Sincos(angle)
 	k := 1 - c
